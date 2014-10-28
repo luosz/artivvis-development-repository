@@ -1,0 +1,132 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform sampler3D temperature;
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+uniform float gradientStepSize;
+
+
+
+void main()
+{
+
+	vec4 finalColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	vec3 position = facePos;
+	vec3 texCoord;
+	vec4 color;
+	vec3 normal;
+	float extinction = 0.005f;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+
+	vec3 lightPosition = vec3(2.0f, -2.0f, 2.0f);
+
+	float absorption = 0.0f;
+
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{
+		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		texCoord = (position + 1.0f) / 2.0f; 
+
+		float index = texture(volume, texCoord).x;
+
+		 
+
+		if (index > 0.4f)
+		{
+			vec3 newDir = normalize(lightPosition - position);
+			float Tray = 1.0f;
+			vec3 newPos = lightPosition;
+			bool newEntered = false;
+			vec3 newTexCoord;
+			float Lvox, Tvox;
+
+			newPos = newPos + (newDir * rayStepSize);
+
+			for(int i=0; i<maxRaySteps; i++)
+			{
+				if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+					continue;
+
+				newTexCoord = (newPos + 1.0f) / 2.0f;
+
+				float newIndex = texture(volume, texCoord).x;
+
+				Tvox = exp(-(extinction/newIndex));
+				
+				if (newIndex == index)
+				{
+					Lvox = (1 - Tvox) * Tray;
+					break;
+				}
+				
+				Tray = Tray * Tvox;
+				newPos = newPos + (newDir * rayStepSize);
+			}
+
+			absorption += 0.01f;
+			finalColor += Lvox * vec4(0.4f, 0.0f, 0.0f, 1.0f);
+			 
+
+		}
+
+		
+		else if (index > 0.03f)
+		{
+			vec3 newDir = normalize(lightPosition - position);
+			float Tray = 1.0f;
+			vec3 newPos = lightPosition;
+			bool newEntered = false;
+			vec3 newTexCoord;
+			float Lvox, Tvox;
+
+			newPos = newPos + (newDir * rayStepSize);
+
+			for(int i=0; i<maxRaySteps; i++)
+			{
+				if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+					continue;
+
+				newTexCoord = (newPos + 1.0f) / 2.0f;
+
+				float newIndex = texture(volume, texCoord).x;
+
+				Tvox = exp(-(extinction/newIndex));
+				
+				if (newIndex == index)
+				{
+					Lvox = (1 - Tvox) * Tray;
+					break;
+				}
+				
+				Tray = Tray * Tvox;
+				newPos = newPos + (newDir * rayStepSize);
+			}
+
+			absorption += 0.05f;
+			finalColor += Lvox * vec4(0.1f, 0.1f, 0.1f, 1.0f);
+		}			
+		
+		
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f)
+			break;
+	}
+	
+	FragColor = finalColor;
+}
+
+
+
+

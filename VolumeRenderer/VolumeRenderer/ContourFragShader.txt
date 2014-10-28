@@ -1,0 +1,60 @@
+#version 330
+
+in vec2 texCoords;
+
+uniform bool showDiffuse;
+uniform int numPixelsLower;
+uniform float suggestiveContourThreshold;
+uniform int kernelRadius;
+
+uniform sampler2D diffuseImage;
+uniform sampler2D opacityImage;
+
+out vec4 FragColor;
+
+void main()
+{
+	float sample;
+	float maxSample;
+	float deltaPix = 1.0f / 800.0f; 
+	bool isValley = false;
+	int numPixels = ((kernelRadius*2) + 1) * ((kernelRadius*2) + 1);
+	int numLower = 0;
+
+	float centreSample = texture(diffuseImage, texCoords).x;
+
+	if (centreSample == 0.0f)
+	{
+		FragColor = vec4(texture2D(opacityImage, texCoords));
+		return;
+	}
+
+	for (int i=-kernelRadius; i<=kernelRadius; i++)
+	{
+		for (int j=-kernelRadius; j<=kernelRadius; j++)
+		{
+			if (i == 0 && j == 0)
+				continue;
+
+			sample = texture(diffuseImage, vec2((texCoords.x + (i*deltaPix)), (texCoords.y + (j*deltaPix)))).x;
+
+			if (sample < centreSample)
+				numLower++;
+
+			maxSample = max(sample, maxSample);
+		}
+	}
+	
+	if (numLower < numPixelsLower && ((maxSample-centreSample) >= suggestiveContourThreshold))
+		isValley = true;
+	
+	if (!showDiffuse)
+	{
+		if (isValley)
+			FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		else
+			FragColor = texture(opacityImage, texCoords);
+	}
+	else
+		FragColor = texture(diffuseImage, texCoords);
+}

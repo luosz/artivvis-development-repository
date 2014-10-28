@@ -1,0 +1,47 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 eyeSpacePos;
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+
+uniform vec2 division2;
+
+
+
+void main()
+{
+	vec3 position = facePos;
+	vec3 texCoord;
+	float depth = 0.0f;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{
+		texCoord = (position + 1.0f) / 2.0f; 
+
+		float index = texture(volume, texCoord).x;
+		
+		if (index > division2.x && index < division2.y)
+		{	
+			depth = distance(camPos, position) / 4.0f;
+			break;
+		}
+
+
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+			break;
+	}
+
+	FragColor = vec4(depth, depth, depth, 1.0f);
+}

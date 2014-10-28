@@ -1,0 +1,174 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 eyeSpacePos;
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+uniform float gradientStepSize;
+
+uniform vec2 division1;
+uniform vec2 division2;
+uniform vec2 division3;
+
+uniform float opacity1;
+uniform float opacity2;
+uniform float opacity3;
+
+uniform float contourThreshold;
+
+uniform vec3 lightPosition;
+
+vec3 CalculateNormal(vec3 texCoord)
+{
+	vec3 sample1, sample2;
+
+	sample1.x = texture(volume, texCoord - vec3(gradientStepSize, 0.0f, 0.0f)).x;
+	sample2.x = texture(volume, texCoord + vec3(gradientStepSize, 0.0f, 0.0f)).x;
+	sample1.y = texture(volume, texCoord - vec3(0.0f, gradientStepSize, 0.0f)).x;
+	sample2.y = texture(volume, texCoord + vec3(0.0f, gradientStepSize, 0.0f)).x;
+	sample1.z = texture(volume, texCoord - vec3(0.0f, 0.0f, gradientStepSize)).x;
+	sample2.z = texture(volume, texCoord + vec3(0.0f, 0.0f, gradientStepSize)).x;
+
+	return normalize(sample2 - sample1);
+}
+
+
+vec4 CalculateLighting(vec4 color, vec3 N)
+{
+	vec3 lightDirection = normalize(facePos - lightPosition);
+	vec4 diffuseLight = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	vec4 specularLight = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	vec3 L, H;
+
+	L = normalize(lightDirection);
+	H = normalize(L + normalize(-facePos));
+	
+	float diff = clamp(dot(N,L), 0.0f, 1.0f);
+	float amb = 0.3f;
+	vec4 spec = specularLight * pow (max(0.0f, dot(H, N)), 50.0f); 
+
+	return ((color * diff) + spec + (color * amb));
+}
+
+
+void main()
+{
+	vec4 finalColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	vec3 position = facePos;
+	vec3 texCoord;
+	vec4 color;
+	vec3 normal;
+
+	bool hitDiv1 = false;
+	bool hitDiv2 = false;
+	bool hitDiv3 = false;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+
+	float absorption = 0.0f;
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{
+		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		texCoord = (position + 1.0f) / 2.0f; 
+
+		float index = texture(volume, texCoord).x;
+
+		if (index > division1.x && index < division1.y && !hitDiv1)
+		{
+		
+			color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+			normal = CalculateNormal(texCoord);
+			color = CalculateLighting(color, normal);
+
+			if ((absorption + opacity1) > 1.0f)
+				color = (1.0f - absorption) * color;
+			else
+				color = opacity1 * color;
+
+			finalColor += color;
+			absorption += opacity1;
+
+//			if (abs(dot(normal, direction)) < contourThreshold)
+//			{
+//				finalColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+//				break;
+//			}
+
+			hitDiv1 = true;			
+		}		
+		else if (index > division2.x && index < division2.y && !hitDiv2)
+		{	
+		
+			color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+			normal = CalculateNormal(texCoord);
+			color = CalculateLighting(color, normal);
+
+			if ((absorption + opacity2) > 1.0f)
+				color = (1.0f - absorption) * color;
+			else
+				color = opacity2 * color;
+
+			finalColor += color;
+			absorption += opacity2;
+
+			if (abs(dot(normal, direction)) < contourThreshold)
+			{
+				finalColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				break;
+			}
+
+			hitDiv2 = true;
+		}
+		else if (index > division3.x && index < division3.y && !hitDiv3)
+		{	
+			color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+			normal = CalculateNormal(texCoord);
+			color = CalculateLighting(color, normal);
+
+			if ((absorption + opacity3) > 1.0f)
+				color = (1.0f - absorption) * color;
+			else
+				color = opacity3 * color;
+
+			finalColor += color;
+			absorption += opacity3;
+
+			hitDiv3 = true;
+		}
+
+
+//		if (index > division1.x && index < division1.y)
+//		{
+//			if (abs(dot(normal, direction)) < contourThreshold)
+//			{
+//				finalColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+//				break;
+//			}		
+//		}	
+		if (index > division2.x && index < division2.y)
+		{	
+			if (abs(dot(normal, direction)) < contourThreshold)
+			{
+				finalColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+				break;
+			}
+		}
+
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f)
+			break;
+	}
+
+	FragColor = finalColor;
+}

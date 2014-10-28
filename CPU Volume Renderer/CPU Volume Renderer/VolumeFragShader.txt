@@ -1,0 +1,48 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 eyeSpacePos;
+in vec3 facePos;
+
+uniform sampler3D texColor;
+uniform vec3 camPos;
+uniform float minRange;
+uniform float cutOff;
+uniform float maxRange;
+
+void main()
+{
+	float stepsize = 0.005f;
+	vec4 src;
+	vec4 dst = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	vec3 position = facePos;
+	vec3 tex;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+	
+	for(int i=0; i<1000; i++)
+	{
+		tex = (position + 1.0f) / 2.0f; 
+		float index = texture(texColor, tex).x;
+
+		if (index > minRange && index < maxRange)
+			dst += vec4(index, 0.0f, 0.0f, 1.0f);
+//		else
+//			dst += vec4(index * 20.0f);
+
+		position = position + (direction * stepsize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+		{
+			dst /= (i/2);
+			break;
+		}
+	}
+
+	
+
+
+	FragColor = dst;
+}

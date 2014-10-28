@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Renderer" Collapsed="true">
+    <Position X="5.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAgAAAAAAAAAAAAAAAAAAAQACAAAAAAA=</HashCode>
+      <FileName>Renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenGLRenderer" Collapsed="true">
+    <Position X="1.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>OpenGLRenderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GPURaycaster" Collapsed="true">
+    <Position X="0.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAEAAAAAAAAAAAAAAAAAAAAAIAAAKQgAAAAA=</HashCode>
+      <FileName>GPURaycaster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GPUContours" Collapsed="true">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAIAAAAAAAAAAEBAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>GPUContours.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPURenderer" Collapsed="true">
+    <Position X="5.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>CPURenderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPURaycaster" Collapsed="true">
+    <Position X="5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAEAAAIAAAAAAAAAAAAAAAgAAAAACQgAIAAA=</HashCode>
+      <FileName>CPURaycaster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BurnsContours" Collapsed="true">
+    <Position X="6.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wAAAAIAAAAAAARAAEAAAAwgAAAAQAACgAAACAAAAIgA=</HashCode>
+      <FileName>BurnsContours.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MarchingCubesRenderer" Collapsed="true">
+    <Position X="9.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gEAAAAAAAAAAAxAAAAAAAAAAAAAQAQEAAAgCAAAAoAE=</HashCode>
+      <FileName>MarchingCubesRenderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

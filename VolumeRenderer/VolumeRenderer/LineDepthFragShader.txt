@@ -1,0 +1,15 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 color;
+in vec3 linePos;
+
+uniform vec3 camPos;
+
+void main()
+{
+	float depth = distance(camPos, linePos) / 4.0f;
+
+	FragColor = vec4(color, depth);
+}

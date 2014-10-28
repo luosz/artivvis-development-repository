@@ -1,0 +1,31 @@
+#version 330
+
+out vec4 FragColor;
+in vec3 normal;
+in vec3 position;
+
+vec4 CalculateLighting(vec4 color, vec3 N)
+{
+	vec3 lightDirection = vec3(1.0f, 1.0f, 1.0f);
+	vec4 diffuseLight = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	vec4 specularLight = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	vec3 L, H;
+
+	L = normalize(lightDirection);
+	H = normalize(L + normalize(-position));
+	
+	float diff = clamp(dot(N,L), 0.0f, 1.0f);
+	vec4 spec = specularLight * pow (max(0.0f, dot(H, N)), 50.0f); 
+
+	return ((color * diff) + spec);
+}
+
+void main()
+{
+	vec4 finalColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	finalColor = CalculateLighting(finalColor, normal);
+
+
+	FragColor = vec4(finalColor);
+}

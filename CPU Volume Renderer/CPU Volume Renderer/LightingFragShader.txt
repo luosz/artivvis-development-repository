@@ -1,0 +1,68 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 facePos;
+in vec3 eyeSpacePos;
+
+uniform sampler3D texColor;
+uniform vec3 camPos;
+uniform float minRange;
+uniform float cutOff;
+uniform float maxRange;
+
+void main()
+{
+	float stepsize = 0.005f;
+	vec4 color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	vec3 position = facePos;
+	vec3 tex;
+	float delta = 0.005f;
+	vec3 lightPosition = vec3(1.0f, 1.0f, 1.0f);
+	vec4 diffuseLight = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	vec3 N, L;
+
+	
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+	
+	for(int i=0; i<1000; i++)
+	{
+		tex = (position + 1.0f) / 2.0f;
+		float index = texture(texColor, tex).x;
+
+		if (index > cutOff && index < maxRange)
+		{
+			vec3 sample1, sample2;
+
+			sample1.x = texture(texColor, tex - vec3(delta, 0.0f, 0.0f)).x;
+			sample2.x = texture(texColor, tex + vec3(delta, 0.0f, 0.0f)).x;
+			sample1.y = texture(texColor, tex - vec3(0.0f, delta, 0.0f)).x;
+			sample2.y = texture(texColor, tex + vec3(0.0f, delta, 0.0f)).x;
+			sample1.z = texture(texColor, tex - vec3(0.0f, 0.0f, delta)).x;
+			sample2.z = texture(texColor, tex + vec3(0.0f, 0.0f, delta)).x;
+
+			N = normalize(sample2 - sample1);
+			L = normalize(lightPosition - eyeSpacePos);
+
+			float diff = clamp(dot(N,L), 0.0f, 1.0f);
+			
+			color = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+
+			color = diffuseLight * diff;
+
+			break;
+		}
+		else
+		{
+			position = position + (direction * stepsize);
+		
+			if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+				break;
+		}
+	}
+
+	
+
+	FragColor = color;
+}

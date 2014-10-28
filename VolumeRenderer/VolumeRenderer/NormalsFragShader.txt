@@ -1,0 +1,62 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 eyeSpacePos;
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+uniform float gradientStepSize;
+
+uniform vec2 division2;
+
+vec3 CalculateNormal(vec3 texCoord)
+{
+	vec3 sample1, sample2;
+
+	sample1.x = texture(volume, texCoord - vec3(gradientStepSize, 0.0f, 0.0f)).x;
+	sample2.x = texture(volume, texCoord + vec3(gradientStepSize, 0.0f, 0.0f)).x;
+	sample1.y = texture(volume, texCoord - vec3(0.0f, gradientStepSize, 0.0f)).x;
+	sample2.y = texture(volume, texCoord + vec3(0.0f, gradientStepSize, 0.0f)).x;
+	sample1.z = texture(volume, texCoord - vec3(0.0f, 0.0f, gradientStepSize)).x;
+	sample2.z = texture(volume, texCoord + vec3(0.0f, 0.0f, gradientStepSize)).x;
+
+	return normalize(sample2 - sample1);
+}
+
+
+
+void main()
+{
+	vec3 position = facePos;
+	vec3 texCoord;
+	vec3 normal = vec3(0.0f, 0.0f, 0.0f);
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{		
+		texCoord = (position + 1.0f) / 2.0f; 
+
+		float index = texture(volume, texCoord).x;
+	
+		if (index > division2.x && index < division2.y)
+		{	
+			normal = CalculateNormal(texCoord);
+			break;
+		}
+
+
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+			break;
+	}
+
+	FragColor = vec4(normal, 1.0f);
+}

@@ -1,0 +1,21 @@
+#version 330
+
+in vec2 texCoords;
+uniform sampler2D texColor;
+
+out vec4 FragColor;
+
+void main()
+{
+	FragColor = vec4(texture2D(texColor, texCoords));
+
+
+//	if (texture2D(texColor, texCoords).x > 0.0f)
+//		FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+//	else
+//		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+//	FragColor = vec4(texture(texColor, texCoords).x, 0.0f, 0.0f, 1.0f);
+
+
+}

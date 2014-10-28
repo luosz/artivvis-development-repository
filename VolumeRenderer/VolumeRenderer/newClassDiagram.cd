@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="VolumeRenderer">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQIAAAAAgAAAAAAAAAEAAAAAAAAAAAAAAACAAACgAA=</HashCode>
+      <FileName>VolumeRenderer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="camera" />
+      <Field Name="renderer" />
+      <Field Name="shaderManager" />
+      <Field Name="volume" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Camera">
+    <Position X="13.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQgAAAgAAAAAAAEEAAAIMAAMAAAAAAAAAAGAAAgAAA=</HashCode>
+      <FileName>Camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Renderer">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAgAAAAAAAAAAAAAAAAAAAQACAAAAAAA=</HashCode>
+      <FileName>Renderer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="raycaster" />
+      <Field Name="contourDrawer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Raycaster">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAIAjAACAAAQAAAAAAAABAkAAAAAAAAAACAgAAAAA=</HashCode>
+      <FileName>Raycaster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShaderManager">
+    <Position X="11.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAABAAAAAAAAAAAAAAAgAAAAAAACAACIAAAAAA=</HashCode>
+      <FileName>ShaderManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ContourDrawer">
+    <Position X="3.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAIAAAIAAAAAAAAAAAAAAAAAAAAAAAAACAADAAAA=</HashCode>
+      <FileName>ContourDrawer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VolumeDataset">
+    <Position X="6.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAABAAABYAAABAEAAAgAAAAAAAAAAAQgACAAgAAUg=</HashCode>
+      <FileName>VolumeDataset.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VoxelReader">
+    <Position X="6.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAACAAAAAAEA=</HashCode>
+      <FileName>VoxelReader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

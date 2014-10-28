@@ -1,0 +1,23 @@
+#version 330
+
+in vec2 texCoords;
+
+uniform sampler2D depthImage;
+uniform sampler2D contoursImage;
+
+out vec4 FragColor;
+
+void main()
+{
+	if (texture(depthImage, texCoords).x == 1.0f)
+		discard;
+
+	if ((texture(depthImage, texCoords).x - texture(contoursImage, texCoords).w) >= -0.01f)
+		FragColor = vec4(texture(contoursImage, texCoords).x, texture(contoursImage, texCoords).y, texture(contoursImage, texCoords).z, 1.0f);
+
+	else
+//		FragColor = texture(depthImage, texCoords);
+
+		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	
+}

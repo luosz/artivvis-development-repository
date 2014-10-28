@@ -1,0 +1,18 @@
+#version 330
+
+in vec3 vPosition;
+layout (location = 2) in vec3 vNormal;
+layout (location = 3) in vec3 vColor;
+
+out vec3 normal;
+out vec3 position;
+
+uniform mat4 proj, view, model;
+
+void main()
+{
+	normal = vNormal;
+	position = mat3(view * model) * vPosition;
+
+	gl_Position = proj * view * model * vec4(vPosition.x,vPosition.y,vPosition.z,1.0);	
+}
