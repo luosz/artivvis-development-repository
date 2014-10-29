@@ -6,118 +6,183 @@ QtWidget::QtWidget(QWidget *parent)		:	  QMainWindow(parent)
 }
 
 QtWidget::~QtWidget()
-{
-}
+{ }
 
 void QtWidget::Init(VolumeRenderer &volumeRenderer)
 {
 	volume = &volumeRenderer.volume;
 	shaderManager = &volumeRenderer.shaderManager;
 	raycaster = volumeRenderer.renderer->raycaster;
-	contourDrawer = volumeRenderer.renderer->contourDrawer;
+	transferFunction = &volumeRenderer.renderer->transferFunction;
+	contourDrawer = new GPUContours();									// Careful of this
 
-	// Tab 1
-	oldCutOffSliderPos = raycaster->cutOff * 100;
-	ui.cutOffSlider->setValue(oldCutOffSliderPos);
-	ui.cutOffLabel->setText(QString::number(raycaster->cutOff, 'f', 2));
-
-	oldMinSliderPos = raycaster->minRange * 100;
-	ui.minSlider->setValue(oldMinSliderPos);
-	ui.minLabel->setText(QString::number(raycaster->minRange, 'f', 2));
-
-	oldMaxSliderPos = raycaster->maxRange * 100;
-	ui.maxSlider->setValue(oldMaxSliderPos);
-	ui.maxLabel->setText(QString::number(raycaster->maxRange, 'f', 2));
-
-	// Tab 2
-	ui.maxRayStepsBox->setText(QString::number(raycaster->maxRaySteps, 'f', 0));
-	ui.rayStepSizeBox->setText(QString::number(raycaster->rayStepSize, 'f', 3));
-	ui.gradientStepSizeBox->setText(QString::number(raycaster->gradientStepSize, 'f', 3));
-	
-
-	// Tab 4
-	oldTimingSliderPos = volume->timePerFrame * 100;
-	ui.timingSlider->setValue(oldTimingSliderPos);
-	ui.timingLabel->setText(QString::number(volume->timePerFrame, 'f', 2));	
-
-	// Tab 5
-	oldOpacityDiv1SliderPos = raycaster->opacities[0] * 100;
-	ui.opacityDiv1Slider->setValue(oldOpacityDiv1SliderPos);
-	ui.opacityDiv1Label->setText(QString::number(raycaster->opacities[0], 'f', 2));
-
-	oldOpacityDiv2SliderPos = raycaster->opacities[1] * 100;
-	ui.opacityDiv2Slider->setValue(oldOpacityDiv2SliderPos);
-	ui.opacityDiv2Label->setText(QString::number(raycaster->opacities[1], 'f', 2));
-
-	oldOpacityDiv3SliderPos = raycaster->opacities[2] * 100;
-	ui.opacityDiv3Slider->setValue(oldOpacityDiv3SliderPos);
-	ui.opacityDiv3Label->setText(QString::number(raycaster->opacities[2], 'f', 2));
-
-	oldOpacityDiv4SliderPos = raycaster->opacities[3] * 100;
-	ui.opacityDiv4Slider->setValue(oldOpacityDiv4SliderPos);
-	ui.opacityDiv4Label->setText(QString::number(raycaster->opacities[3], 'f', 2));
-
-
-	// Contour Tab
-	ui.suggestiveThresholdSlider->setValue(contourDrawer->suggestiveContourThreshold * 200);
-	ui.suggestiveThresholdLabel->setText(QString::number(contourDrawer->suggestiveContourThreshold, 'f', 2));
-
-	ui.numPixelsLowerSlider->setValue(contourDrawer->numPixelsLower);
-	ui.numPixelsLowerLabel->setText(QString::number(contourDrawer->numPixelsLower, 10));
-
-	ui.kernelRadiusSlider->setValue(contourDrawer->kernelRadius);
-	ui.kernelRadiusLabel->setText(QString::number(contourDrawer->kernelRadius, 10));
+	InitTransferFuncTab();
+	InitRegionsTab();
+	InitShadersTab();
+	InitContoursTab();
+	InitOpacityTab();
+	InitRaycastTab();
+	InitTimingTab();
 }
-
 
 void QtWidget::CloseProgram()
 {
 	exit(0);
 }
 
+#pragma region TransferFuncTab
+
+void QtWidget::InitTransferFuncTab()
+{
+	tfIntensitySliders.push_back(ui.tfIntensity1);
+	tfIntensitySliders.push_back(ui.tfIntensity2);
+	tfIntensitySliders.push_back(ui.tfIntensity3);
+	tfIntensitySliders.push_back(ui.tfIntensity4);
+	tfIntensitySliders.push_back(ui.tfIntensity5);
+	tfIntensitySliders.push_back(ui.tfIntensity6);
+	tfIntensitySliders.push_back(ui.tfIntensity7);
+	tfIntensitySliders.push_back(ui.tfIntensity8);
+	tfIntensitySliders.push_back(ui.tfIntensity9);
+	tfIntensitySliders.push_back(ui.tfIntensity10);
+	tfIntensitySliders.push_back(ui.tfIntensity11);
+	tfIntensitySliders.push_back(ui.tfIntensity12);
+	tfIntensitySliders.push_back(ui.tfIntensity13);
+	tfIntensitySliders.push_back(ui.tfIntensity14);
+	tfIntensitySliders.push_back(ui.tfIntensity15);
+
+	tfIntensityLabels.push_back(ui.tfIntLabel1);
+	tfIntensityLabels.push_back(ui.tfIntLabel2);
+	tfIntensityLabels.push_back(ui.tfIntLabel3);
+	tfIntensityLabels.push_back(ui.tfIntLabel4);
+	tfIntensityLabels.push_back(ui.tfIntLabel5);
+	tfIntensityLabels.push_back(ui.tfIntLabel6);
+	tfIntensityLabels.push_back(ui.tfIntLabel7);
+	tfIntensityLabels.push_back(ui.tfIntLabel8);
+	tfIntensityLabels.push_back(ui.tfIntLabel9);
+	tfIntensityLabels.push_back(ui.tfIntLabel10);
+	tfIntensityLabels.push_back(ui.tfIntLabel11);
+	tfIntensityLabels.push_back(ui.tfIntLabel12);
+	tfIntensityLabels.push_back(ui.tfIntLabel13);
+	tfIntensityLabels.push_back(ui.tfIntLabel14);
+	tfIntensityLabels.push_back(ui.tfIntLabel15);
+
+	for (int i=0; i<tfIntensitySliders.size(); i++)
+	{
+		if (i<transferFunction->numIntensities)
+		{
+			tfIntensitySliders[i]->setValue(transferFunction->intensities[i] * 100);
+			tfIntensityLabels[i]->setText(QString::number(transferFunction->intensities[i], 'f', 3));
+		}
+		else
+			tfIntensityLabels[i]->setText("Null");
+	}
+}
+
+void QtWidget::ClampTFSliders(int x, int currentSlider, int direction)
+{
+	if (currentSlider < 0 || currentSlider >= tfIntensitySliders.size() || currentSlider >= transferFunction->numIntensities)
+		return;
+
+	if (x < tfIntensitySliders[currentSlider]->value() && direction == -1)
+	{
+		transferFunction->intensities[currentSlider] = x / 100.0f;
+		tfIntensityLabels[currentSlider]->setText(QString::number(transferFunction->intensities[currentSlider], 'f', 3));
+		tfIntensitySliders[currentSlider]->setValue(x);
+		ClampTFSliders(x, currentSlider-1, -1);
+	}
+	else if (x > tfIntensitySliders[currentSlider]->value() && direction == 1)
+	{
+		transferFunction->intensities[currentSlider] = x / 100.0f;
+		tfIntensityLabels[currentSlider]->setText(QString::number(transferFunction->intensities[currentSlider], 'f', 3));
+		tfIntensitySliders[currentSlider]->setValue(x);
+		ClampTFSliders(x, currentSlider+1, 1);
+	}
+}
+
+void QtWidget::AdjustTFIntensity(int x)
+{
+	QObject *q = sender();
+
+	for (int i=0; i<transferFunction->numIntensities && i<tfIntensitySliders.size(); i++)
+	{
+		if (q == tfIntensitySliders[i])
+		{
+			transferFunction->intensities[i] = x / 100.0f;
+			tfIntensityLabels[i]->setText(QString::number(transferFunction->intensities[i], 'f', 3));
+
+			ClampTFSliders(x, i-1, -1);
+			ClampTFSliders(x, i+1, 1);
+			break;
+		}
+	}
+	transferFunction->LoadLookup();
+}
+
+#pragma endregion TransferFuncTab
+
+
+#pragma region RegionsTab
+
+void QtWidget::InitRegionsTab()
+{
+	ui.cutOffSlider->setValue(raycaster->cutOff * 100);
+	ui.cutOffLabel->setText(QString::number(raycaster->cutOff, 'f', 2));
+
+	ui.minSlider->setValue(raycaster->minRange * 100);
+	ui.minLabel->setText(QString::number(raycaster->minRange, 'f', 2));
+
+	ui.maxSlider->setValue(raycaster->maxRange * 100);
+	ui.maxLabel->setText(QString::number(raycaster->maxRange, 'f', 2));
+}
+
 void QtWidget::AdjustCutOff(int x)
 {
-	raycaster->cutOff += (x - oldCutOffSliderPos) / 100.0f;
-	oldCutOffSliderPos = x;
+	raycaster->cutOff = x / 100.0f;
 	ui.cutOffLabel->setText(QString::number(raycaster->cutOff, 'f', 2));
 	ui.cutOffSlider->setValue(x);
 
-	if (oldMaxSliderPos < oldCutOffSliderPos)
+	if (raycaster->maxRange < raycaster->cutOff)
 		AdjustMaximum(x);
 
-	if (oldMinSliderPos > oldCutOffSliderPos)
+	if (raycaster->minRange > raycaster->cutOff)
 		AdjustMinimum(x);
 
 }
 
 void QtWidget::AdjustMinimum(int x)
 {
-	raycaster->minRange += (x - oldMinSliderPos) / 100.0f;
-	oldMinSliderPos = x;
+	raycaster->minRange = x / 100.0f;
 	ui.minLabel->setText(QString::number(raycaster->minRange, 'f', 2));
 	ui.minSlider->setValue(x);
 
-	if (oldMaxSliderPos < oldMinSliderPos)
+	if (raycaster->maxRange < raycaster->minRange)
 		AdjustMaximum(x);
 
-	if (oldCutOffSliderPos < oldMinSliderPos)
+	if (raycaster->cutOff < raycaster->minRange)
 		AdjustCutOff(x);
 }
 
 void QtWidget::AdjustMaximum(int x)
 {
-	raycaster->maxRange += (x - oldMaxSliderPos) / 100.0f;
-	oldMaxSliderPos = x;
+	raycaster->maxRange = x / 100.0f;
 	ui.maxLabel->setText(QString::number(raycaster->maxRange, 'f', 2));
 	ui.maxSlider->setValue(x);
 
-	if (oldCutOffSliderPos > oldMaxSliderPos)
+	if (raycaster->cutOff > raycaster->maxRange)
 		AdjustCutOff(x);
 
-	if (oldMinSliderPos > oldMaxSliderPos)
+	if (raycaster->minRange > raycaster->maxRange)
 		AdjustMinimum(x);
 }
 
+#pragma endregion RegionsTab
+
+
+#pragma region ShadersTab
+
+void QtWidget::InitShadersTab()
+{
+}
 
 void QtWidget::ChangeShader(QString qStr)
 {
@@ -135,37 +200,75 @@ void QtWidget::ChangeShader(QString qStr)
 		shaderManager->currentShader = XToonShader;
 	else if (qStr == "Shadow Shader")
 		shaderManager->currentShader = ShadowShader;
+	else if (qStr == "Smoke Shader")
+		shaderManager->currentShader = SmokeShader;
+	else if (qStr == "Transfer Func Shader")
+		shaderManager->currentShader = TFShader;
 }
 
+#pragma endregion ShadersTab
+
+
+#pragma region TimingTab
+
+void QtWidget::InitTimingTab()
+{
+	ui.timingSlider->setValue(volume->timePerFrame * 100);
+	ui.timingLabel->setText(QString::number(volume->timePerFrame, 'f', 2));	
+}
 
 void QtWidget::AdjustTiming(int x)
 {
-	volume->timePerFrame += (x - oldTimingSliderPos) / 100.0f;
-	oldTimingSliderPos = x;
+	volume->timePerFrame = x / 100.0f;
 	ui.timingLabel->setText(QString::number(volume->timePerFrame, 'f', 2));
+}
+
+#pragma endregion TimingTab
+
+
+#pragma region RaycastTab
+
+void QtWidget::InitRaycastTab()
+{
+	ui.maxRayStepsBox->setText(QString::number(raycaster->maxRaySteps, 'f', 0));
+	ui.rayStepSizeBox->setText(QString::number(raycaster->rayStepSize, 'f', 3));
+	ui.gradientStepSizeBox->setText(QString::number(raycaster->gradientStepSize, 'f', 3));
 }
 
 void QtWidget::ChangeMaxRaySteps(QString qStr)
 {
 	raycaster->maxRaySteps = qStr.toInt();
-
 }
 
 void QtWidget::ChangeRayStepSize(QString qStr)
 {
 	raycaster->rayStepSize = qStr.toFloat();
-
 }
 
 void QtWidget::ChangeGradientStepSize(QString qStr)
 {
 	raycaster->gradientStepSize = qStr.toFloat();
-
 }
 
+#pragma endregion RaycastTab
 
 
+#pragma region OpacityTab
 
+void QtWidget::InitOpacityTab()
+{
+	ui.opacityDiv1Slider->setValue(raycaster->opacities[0] * 100);
+	ui.opacityDiv1Label->setText(QString::number(raycaster->opacities[0], 'f', 2));
+
+	ui.opacityDiv2Slider->setValue(raycaster->opacities[1] * 100);
+	ui.opacityDiv2Label->setText(QString::number(raycaster->opacities[1], 'f', 2));
+
+	ui.opacityDiv3Slider->setValue(raycaster->opacities[2] * 100);
+	ui.opacityDiv3Label->setText(QString::number(raycaster->opacities[2], 'f', 2));
+
+	ui.opacityDiv4Slider->setValue(raycaster->opacities[3] * 100);
+	ui.opacityDiv4Label->setText(QString::number(raycaster->opacities[3], 'f', 2));
+}
 
 void QtWidget::ChangeOpacityDiv1Min(QString qStr)
 {
@@ -232,7 +335,22 @@ void QtWidget::AdjustOpacityDiv4(int x)
 	ui.opacityDiv4Label->setText(QString::number(raycaster->opacities[3], 'f', 4));
 }
 
+#pragma endregion OpacityTab
 
+
+#pragma region ContoursTab
+
+void QtWidget::InitContoursTab()
+{
+	ui.suggestiveThresholdSlider->setValue(contourDrawer->suggestiveContourThreshold * 200);
+	ui.suggestiveThresholdLabel->setText(QString::number(contourDrawer->suggestiveContourThreshold, 'f', 2));
+
+	ui.numPixelsLowerSlider->setValue(contourDrawer->numPixelsLower);
+	ui.numPixelsLowerLabel->setText(QString::number(contourDrawer->numPixelsLower, 10));
+
+	ui.kernelRadiusSlider->setValue(contourDrawer->kernelRadius);
+	ui.kernelRadiusLabel->setText(QString::number(contourDrawer->kernelRadius, 10));
+}
 
 void QtWidget::AdjustContourThreshold(int x)
 {
@@ -262,3 +380,7 @@ void QtWidget::ToggleShowDiffuse(bool x)
 {
 
 }
+
+#pragma endregion ContoursTab
+
+

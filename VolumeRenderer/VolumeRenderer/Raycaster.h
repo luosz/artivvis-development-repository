@@ -4,6 +4,7 @@
 #include "ShaderManager.h"
 #include "Camera.h"
 #include "VolumeDataset.h"
+#include "TransferFunction.h"
 
 class Raycaster
 {
@@ -23,7 +24,7 @@ public:
 	int numYPixels;
 
 	virtual void Init(int screenWidth, int screenHeight, VolumeDataset &volume) = 0;
-	virtual void Raycast(VolumeDataset &volume, GLuint shaderProgramID, Camera &camera) = 0;
+	virtual void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera) = 0;
 };
 
 #endif

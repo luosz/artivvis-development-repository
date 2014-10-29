@@ -5,6 +5,7 @@
 #include "ui_volumerenderer.h"
 #include <math.h>
 #include "VolumeRenderer.h"
+#include "TransferFunction.h"
 
 
 class QtWidget : public QMainWindow
@@ -19,19 +20,38 @@ public:
 
 	void Init(VolumeRenderer &VolumeRenderer);
 
+	void InitOpacityTab();
+	void InitRegionsTab();
+	void InitRaycastTab();
+	void InitShadersTab();
+	void InitTimingTab();
+	void InitContoursTab();
+	void InitTransferFuncTab();
+
 public slots:
 	void CloseProgram();
+
+#pragma region RegionsTab
 	void AdjustCutOff(int x);
 	void AdjustMinimum(int x);
 	void AdjustMaximum(int x);
-	void AdjustTiming(int x);
+#pragma endregion RegionsTab
 
+#pragma region TimingTab
+	void AdjustTiming(int x);
+#pragma endregion TimingTab
+
+#pragma region ShadersTab
 	void ChangeShader(QString qStr);
+#pragma endregion ShadersTab
 	
+#pragma region RaycastTab
 	void ChangeMaxRaySteps(QString qStr);
 	void ChangeRayStepSize(QString qStr);
 	void ChangeGradientStepSize(QString qStr);
+#pragma endregion RaycastTab
 
+#pragma region OpacityTab
 	void ChangeOpacityDiv1Min(QString qStr);
 	void ChangeOpacityDiv1Max(QString qStr);
 	void ChangeOpacityDiv2Min(QString qStr);
@@ -45,28 +65,30 @@ public slots:
 	void AdjustOpacityDiv2(int x);
 	void AdjustOpacityDiv3(int x);
 	void AdjustOpacityDiv4(int x);
+#pragma endregion OpacityTab
 
+#pragma region ContoursTab
 	void AdjustContourThreshold(int x);
 	void AdjustSuggestiveThreshold(int x);
 	void AdjustNumPixelsLower(int x);
 	void AdjustKernelRadius(int x);
 	void ToggleShowDiffuse(bool x);
+#pragma endregion ContoursTab
+
+#pragma region TransferFuncTab
+	void AdjustTFIntensity(int x);
+	void ClampTFSliders(int x, int currentSlider, int direction);
+#pragma endregion TransferFuncTab
 
 private:
 	VolumeDataset *volume;
 	ShaderManager *shaderManager;
 	Raycaster *raycaster;
 	ContourDrawer *contourDrawer;
+	TransferFunction *transferFunction;
 
-	int oldCutOffSliderPos;
-	int oldMinSliderPos;
-	int oldMaxSliderPos;
-	int oldTimingSliderPos;
-
-	int oldOpacityDiv1SliderPos;
-	int oldOpacityDiv2SliderPos;
-	int oldOpacityDiv3SliderPos;
-	int oldOpacityDiv4SliderPos;
+	std::vector<QSlider*> tfIntensitySliders;
+	std::vector<QLabel*> tfIntensityLabels;
 
 	Ui::VolumeRendererClass ui;
 };

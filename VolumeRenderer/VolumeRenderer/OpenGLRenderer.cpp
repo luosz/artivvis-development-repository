@@ -3,22 +3,15 @@
 void OpenGLRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
 	raycaster = new GPURaycaster();
-	contourDrawer = new GPUContours();
-
 	raycaster->Init(screenWidth, screenHeight, volume);
-	contourDrawer->Init(screenWidth, screenHeight, volume);
 
-	transferFunction.LoadXML(" ");
+	transferFunction.Init(" ");
 }
 
 
 void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
 {
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);
-	shaderProgramID = shaderManager.UseShader(SmokeShader);
-	raycaster->Raycast(volume, shaderProgramID, camera);
-
-//	contourDrawer->DrawContours(volume, camera, shaderManager, *raycaster);
-
+	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
 	
 }

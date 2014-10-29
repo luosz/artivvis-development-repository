@@ -1,5 +1,12 @@
 #include "TransferFunction.h"
 
+void TransferFunction::Init(const char *filename)
+{
+	colorTable.resize(256);
+	LoadXML(filename);
+	LoadLookup();
+}
+
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
@@ -22,8 +29,7 @@ void TransferFunction::LoadXML(const char *filename)
 		int b = atoi(key->FirstChildElement("colorL")->Attribute("b"));
 		int a = atoi(key->FirstChildElement("colorL")->Attribute("a"));
 
-		colours.push_back(glm::vec3(r / 255.0f, g / 255.0f, b / 255.0f));
-		opacities.push_back(a / 255.0f);
+		colors.push_back(glm::vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f));
 
 		std::cout << "intensity=" << intensity;
 		std::cout << "\tcolorL r=" << r << " g=" << g << " b=" << b << " a=" << a;
@@ -31,4 +37,44 @@ void TransferFunction::LoadXML(const char *filename)
 
 		key = key->NextSiblingElement();
 	}
+
+	numIntensities = intensities.size();
+}
+
+void TransferFunction::LoadLookup()
+{
+	glm::vec4 previousColor(0.0f);
+	float previousIntensity = 0.0f;
+	int next = 0;
+
+	for (int i=0; i<256; i++)
+	{
+		float currentIntensity = (float)i / (float)256;
+
+		while (next < numIntensities && currentIntensity > intensities[next])
+		{
+			previousIntensity = intensities[next];
+			previousColor = colors[next];
+			next++;
+		}
+
+		if (next < numIntensities)
+			colorTable[i] = LERPColor(previousColor, colors[next], previousIntensity, intensities[next], currentIntensity);
+		else
+			colorTable[i] = LERPColor(previousColor, glm::vec4(0.0f), previousIntensity, 1.0f, currentIntensity);
+	}
+
+	glGenTextures(1, &tfTexture);
+    glBindTexture(GL_TEXTURE_1D, tfTexture);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 256, 0, GL_RGBA, GL_FLOAT, &colorTable[0]); 
+	glBindTexture(GL_TEXTURE_1D, 0);
+}
+
+glm::vec4 TransferFunction::LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity)
+{
+	float fraction = (currentIntensity - firstIntensity) / (secondIntensity - firstIntensity);
+
+	return firstColor + ((secondColor - firstColor) * fraction);
 }

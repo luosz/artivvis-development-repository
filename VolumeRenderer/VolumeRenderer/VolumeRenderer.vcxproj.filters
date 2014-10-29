@@ -269,6 +269,12 @@
     <Text Include="SmokeVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
+    <Text Include="TransFuncFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="TransFuncVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

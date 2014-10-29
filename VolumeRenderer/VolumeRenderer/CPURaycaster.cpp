@@ -41,7 +41,7 @@ void CPURaycaster::GenerateTexture(int screenWidth, int screenHeight)
 
 
 
-void CPURaycaster::Raycast(VolumeDataset &volume, GLuint shaderProgramID, Camera &camera)
+void CPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
 {
 	float xMin, yMin, zMin, xMax, yMax, zMax;
 	xMin = yMin = zMin = -1.0f;

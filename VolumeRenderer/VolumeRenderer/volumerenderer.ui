@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>514</width>
+    <width>520</width>
     <height>341</height>
    </rect>
   </property>
@@ -35,12 +35,12 @@
      <rect>
       <x>30</x>
       <y>20</y>
-      <width>451</width>
+      <width>461</width>
       <height>231</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -521,11 +521,21 @@
        <bool>false</bool>
       </property>
       <property name="currentText">
-       <string>X-Toon Shader</string>
+       <string>Transfer Func Shader</string>
       </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <item>
+       <property name="text">
+        <string>Transfer Func Shader</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Smoke Shader</string>
+       </property>
+      </item>
       <item>
        <property name="text">
         <string>X-Toon Shader</string>
@@ -807,94 +817,71 @@
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
-      <string>Blank</string>
+      <string>TransferFunc</string>
      </attribute>
-     <widget class="QLineEdit" name="div3MinBox">
+     <widget class="QSlider" name="tfIntensity1">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>130</y>
-        <width>41</width>
-        <height>20</height>
+        <x>10</x>
+        <y>10</y>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
+      </property>
      </widget>
-     <widget class="QLineEdit" name="div1MaxBox">
+     <widget class="QSlider" name="tfIntensity2">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>10</x>
         <y>50</y>
-        <width>41</width>
-        <height>20</height>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QLineEdit" name="div1MinBox">
-      <property name="geometry">
-       <rect>
-        <x>210</x>
-        <y>50</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLineEdit" name="div4MinBox">
+     <widget class="QSlider" name="tfIntensity3">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>170</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="div4MaxBox">
-      <property name="geometry">
-       <rect>
-        <x>400</x>
-        <y>170</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="div2MinBox">
-      <property name="geometry">
-       <rect>
-        <x>210</x>
+        <x>10</x>
         <y>90</y>
-        <width>41</width>
-        <height>20</height>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QLineEdit" name="div2MaxBox">
-      <property name="geometry">
-       <rect>
-        <x>400</x>
-        <y>90</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLineEdit" name="div3MaxBox">
+     <widget class="QSlider" name="tfIntensity4">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>10</x>
         <y>130</y>
-        <width>41</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QSlider" name="div1MinSlider">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>50</y>
-        <width>121</width>
+        <width>91</width>
         <height>19</height>
        </rect>
       </property>
@@ -908,12 +895,12 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="div2MinSlider">
+     <widget class="QSlider" name="tfIntensity6">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>90</y>
-        <width>121</width>
+        <x>150</x>
+        <y>10</y>
+        <width>91</width>
         <height>19</height>
        </rect>
       </property>
@@ -927,12 +914,12 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="div3MinSlider">
+     <widget class="QSlider" name="tfIntensity9">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>150</x>
         <y>130</y>
-        <width>121</width>
+        <width>91</width>
         <height>19</height>
        </rect>
       </property>
@@ -946,31 +933,12 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="div4MinSlider">
+     <widget class="QSlider" name="tfIntensity7">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>170</y>
-        <width>121</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksAbove</enum>
-      </property>
-     </widget>
-     <widget class="QSlider" name="div1MaxSlider">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
+        <x>150</x>
         <y>50</y>
-        <width>121</width>
+        <width>91</width>
         <height>19</height>
        </rect>
       </property>
@@ -984,31 +952,12 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="div4MaxSlider">
+     <widget class="QSlider" name="tfIntensity8">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>170</y>
-        <width>121</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksAbove</enum>
-      </property>
-     </widget>
-     <widget class="QSlider" name="div2MaxSlider">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
+        <x>150</x>
         <y>90</y>
-        <width>121</width>
+        <width>91</width>
         <height>19</height>
        </rect>
       </property>
@@ -1022,12 +971,12 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="div3MaxSlider">
+     <widget class="QSlider" name="tfIntensity5">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>130</y>
-        <width>121</width>
+        <x>10</x>
+        <y>170</y>
+        <width>91</width>
         <height>19</height>
        </rect>
       </property>
@@ -1041,95 +990,298 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="Line" name="line">
+     <widget class="QSlider" name="tfIntensity10">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>170</y>
+        <width>91</width>
+        <height>19</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel1">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>10</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel2">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>50</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel3">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>90</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel4">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>130</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel5">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>170</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel8">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>90</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel6">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>10</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel7">
       <property name="geometry">
        <rect>
         <x>250</x>
         <y>50</y>
-        <width>16</width>
-        <height>141</height>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel9">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>130</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel10">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>170</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="tfIntensity11">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>10</y>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_10">
+     <widget class="QSlider" name="tfIntensity12">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>290</x>
         <y>50</y>
-        <width>46</width>
-        <height>13</height>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Division 1</string>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_11">
+     <widget class="QSlider" name="tfIntensity13">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>290</x>
         <y>90</y>
-        <width>46</width>
-        <height>13</height>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Division 2</string>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_12">
+     <widget class="QSlider" name="tfIntensity14">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>290</x>
         <y>130</y>
-        <width>46</width>
-        <height>13</height>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Division 3</string>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_13">
+     <widget class="QSlider" name="tfIntensity15">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>290</x>
         <y>170</y>
-        <width>46</width>
-        <height>13</height>
+        <width>91</width>
+        <height>19</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Division 4</string>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_14">
+     <widget class="QLabel" name="tfIntLabel12">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>20</y>
-        <width>46</width>
-        <height>13</height>
+        <x>390</x>
+        <y>50</y>
+        <width>31</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Minimum</string>
+       <string>TextLabel</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_15">
+     <widget class="QLabel" name="tfIntLabel14">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>20</y>
-        <width>46</width>
-        <height>13</height>
+        <x>390</x>
+        <y>130</y>
+        <width>31</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Maximum</string>
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel15">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>170</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel13">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>90</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="tfIntLabel11">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>10</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
       </property>
      </widget>
     </widget>
@@ -1142,7 +1294,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>514</width>
+     <width>520</width>
      <height>21</height>
     </rect>
    </property>
@@ -1499,134 +1651,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>div1MinBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv1Min(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>259</x>
-     <y>133</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>19</x>
-     <y>76</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div1MaxBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv1Max(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>451</x>
-     <y>125</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>495</x>
-     <y>122</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div2MinBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv2Min(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>274</x>
-     <y>178</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>22</x>
-     <y>157</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div2MaxBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv2Max(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>465</x>
-     <y>178</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>499</x>
-     <y>168</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div3MinBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv3Min(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>247</x>
-     <y>216</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>27</x>
-     <y>206</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div3MaxBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv3Max(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>465</x>
-     <y>212</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>496</x>
-     <y>233</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div4MinBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv4Min(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>254</x>
-     <y>258</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>126</x>
-     <y>295</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>div4MaxBox</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>ChangeOpacityDiv4Max(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>456</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>494</x>
-     <y>288</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>contourThresholdSlider</sender>
    <signal>valueChanged(int)</signal>
    <receiver>VolumeRendererClass</receiver>
@@ -1706,6 +1730,246 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tfIntensity1</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>98</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>13</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity2</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>122</x>
+     <y>141</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>23</x>
+     <y>158</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity3</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>177</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>27</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity4</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>218</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>22</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity5</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>249</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>27</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity6</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>249</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>496</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity7</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>138</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>505</x>
+     <y>174</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity8</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>226</x>
+     <y>177</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>502</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity9</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>209</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>499</x>
+     <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity10</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>243</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>488</x>
+     <y>301</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity11</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>355</x>
+     <y>95</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity12</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>386</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>496</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity13</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>371</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>192</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity14</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>368</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>490</x>
+     <y>260</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tfIntensity15</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>AdjustTFIntensity(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>258</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>474</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>CloseProgram()</slot>
@@ -1734,5 +1998,6 @@
   <slot>AdjustNumPixelsLower(int)</slot>
   <slot>AdjustKernelRadius(int)</slot>
   <slot>ToggleShowDiffuse(bool)</slot>
+  <slot>AdjustTFIntensity(int)</slot>
  </slots>
 </ui>

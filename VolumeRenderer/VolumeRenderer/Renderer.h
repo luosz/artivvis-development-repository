@@ -12,7 +12,6 @@ class Renderer
 {
 public:
 	Raycaster *raycaster;
-	ContourDrawer *contourDrawer;
 	TransferFunction transferFunction;
 
 	virtual void Init(int screenWidth, int screenHeight, VolumeDataset &volume) = 0;

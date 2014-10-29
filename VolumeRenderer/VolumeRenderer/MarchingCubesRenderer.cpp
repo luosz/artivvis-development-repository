@@ -4,10 +4,7 @@
 void MarchingCubesRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
 	raycaster = new GPURaycaster();
-	contourDrawer = new BurnsContours();
-
 	raycaster->Init(screenWidth, screenHeight, volume);
-	contourDrawer->Init(screenWidth, screenHeight, volume);
 
 	CalculateNormals(volume);
 	CalculateSurface(volume);

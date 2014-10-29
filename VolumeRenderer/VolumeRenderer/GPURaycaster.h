@@ -23,7 +23,7 @@ public:
 
 	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void GenerateTextures(VolumeDataset &volume);
-	void Raycast(VolumeDataset &volume, GLuint shaderProgramID, Camera &camera);
+	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 };
 
 #endif

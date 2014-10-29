@@ -28,7 +28,7 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 	switch(key)
 	{
 		case 'w':
-			volumeRenderer.renderer->contourDrawer->compute = true;
+			volumeRenderer.renderer->transferFunction.LoadLookup();
 			break;
 	}
 }

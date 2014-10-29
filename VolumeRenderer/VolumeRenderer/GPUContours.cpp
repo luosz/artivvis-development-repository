@@ -42,72 +42,72 @@ void GPUContours::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
 
 void GPUContours::DrawContours(VolumeDataset &volume, Camera &camera, ShaderManager &shaderManager, Raycaster &raycaster)
 {
-	int uniformLocation;
-	GLuint shaderProgramID = shaderManager.UseShader(DiffuseShader);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuseTexture, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	
-	raycaster.Raycast(volume, shaderProgramID, camera);
-
-	
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTexture, 0);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	
-	
-	shaderProgramID = shaderManager.UseShader(OpacityShader);
-	raycaster.Raycast(volume, shaderProgramID, camera);
-	
-
-	
-	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	
-
-	shaderProgramID = shaderManager.UseShader(ContourShader);
-
-	glActiveTexture (GL_TEXTURE0);
-	uniformLocation = glGetUniformLocation(shaderProgramID,"diffuseImage");
-	glUniform1i(uniformLocation, 0);
-	glBindTexture (GL_TEXTURE_2D, diffuseTexture);
-
-	
-	glActiveTexture (GL_TEXTURE1);
-	uniformLocation = glGetUniformLocation(shaderProgramID,"opacityImage");
-	glUniform1i(uniformLocation, 1);
-	glBindTexture (GL_TEXTURE_2D, opacityTexture);
-	
-
-	uniformLocation = glGetUniformLocation(shaderProgramID, "numPixelsLower");
-	glUniform1i(uniformLocation, numPixelsLower);
-
-	uniformLocation = glGetUniformLocation(shaderProgramID, "suggestiveContourThreshold");
-	glUniform1f(uniformLocation, suggestiveContourThreshold);
-
-	uniformLocation = glGetUniformLocation(shaderProgramID, "kernelRadius");
-	glUniform1i(uniformLocation, kernelRadius);
-
-	int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
-	glBegin(GL_QUADS);
-	glVertexAttrib2f(texcoords_location, 0.0f, 0.0f);
-	glVertex2f(-1.0f, -1.0f);
-
-	glVertexAttrib2f(texcoords_location, 1.0f, 0.0f);
-	glVertex2f(1.0f, -1.0f);
-
-	glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
-	glVertex2f(1.0f, 1.0f);
-
-	glVertexAttrib2f(texcoords_location, 0.0f, 1.0f);
-	glVertex2f(-1.0f, 1.0f);
-	glEnd();
+//	int uniformLocation;
+//	GLuint shaderProgramID = shaderManager.UseShader(DiffuseShader);
+//
+//	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuseTexture, 0);
+//	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+//	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	
+//	
+//	raycaster.Raycast(volume, shaderProgramID, camera);
+//
+//	
+//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTexture, 0);
+//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+//	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	
+//	
+//	
+//	shaderProgramID = shaderManager.UseShader(OpacityShader);
+//	raycaster.Raycast(volume, shaderProgramID, camera);
+//	
+//
+//	
+//	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+//	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	
+//	
+//
+//	shaderProgramID = shaderManager.UseShader(ContourShader);
+//
+//	glActiveTexture (GL_TEXTURE0);
+//	uniformLocation = glGetUniformLocation(shaderProgramID,"diffuseImage");
+//	glUniform1i(uniformLocation, 0);
+//	glBindTexture (GL_TEXTURE_2D, diffuseTexture);
+//
+//	
+//	glActiveTexture (GL_TEXTURE1);
+//	uniformLocation = glGetUniformLocation(shaderProgramID,"opacityImage");
+//	glUniform1i(uniformLocation, 1);
+//	glBindTexture (GL_TEXTURE_2D, opacityTexture);
+//	
+//
+//	uniformLocation = glGetUniformLocation(shaderProgramID, "numPixelsLower");
+//	glUniform1i(uniformLocation, numPixelsLower);
+//
+//	uniformLocation = glGetUniformLocation(shaderProgramID, "suggestiveContourThreshold");
+//	glUniform1f(uniformLocation, suggestiveContourThreshold);
+//
+//	uniformLocation = glGetUniformLocation(shaderProgramID, "kernelRadius");
+//	glUniform1i(uniformLocation, kernelRadius);
+//
+//	int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
+//	glBegin(GL_QUADS);
+//	glVertexAttrib2f(texcoords_location, 0.0f, 0.0f);
+//	glVertex2f(-1.0f, -1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 1.0f, 0.0f);
+//	glVertex2f(1.0f, -1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
+//	glVertex2f(1.0f, 1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 0.0f, 1.0f);
+//	glVertex2f(-1.0f, 1.0f);
+//	glEnd();
 }
 
 

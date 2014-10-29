@@ -6,7 +6,7 @@ void GPURaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume
 	rayStepSize = 0.005f;
 	gradientStepSize = 0.005f;
 	contourThreshold = 0.0f;
-	lightPosition = glm::vec3(0.0f, -5.0f, -5.0f);
+	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
 
 	minRange = 0.0f;
 	cutOff = 0.5f;
@@ -74,7 +74,7 @@ void GPURaycaster::GenerateTextures(VolumeDataset &volume)
 
 
 // Messy but just inputs all data to shader
-void GPURaycaster::Raycast(VolumeDataset &volume, GLuint shaderProgramID, Camera &camera)
+void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
 {
 	int uniformLoc;
 
@@ -132,6 +132,11 @@ void GPURaycaster::Raycast(VolumeDataset &volume, GLuint shaderProgramID, Camera
 
 	uniformLoc = glGetUniformLocation(shaderProgramID,"lightPosition");
 	glUniform3f(uniformLoc, lightPosition.x, lightPosition.y, lightPosition.z);
+
+	glActiveTexture (GL_TEXTURE2);
+	uniformLoc = glGetUniformLocation(shaderProgramID,"transferFunc");
+	glUniform1i(uniformLoc,2);
+	glBindTexture (GL_TEXTURE_1D, transferFunction.tfTexture);
 
 
 	for (int i=0; i<opacityDivisions.size(); i++)

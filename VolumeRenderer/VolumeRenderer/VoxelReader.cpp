@@ -6,8 +6,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/TVvort/";
 //	headerFile = folderPath + "TVvort.mhd";
 
-//	folderPath = "../../Samples/Nucleon/";
-//	headerFile = folderPath + "nucleon.mhd";
+	folderPath = "../../Samples/Nucleon/";
+	headerFile = folderPath + "nucleon.mhd";
 
 //	folderPath = "../../Samples/CThead/";
 //	headerFile = folderPath + "CThead.mhd";
@@ -36,8 +36,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/Bonsai/";
 //	headerFile = folderPath + "bonsai.mhd";
 
-	folderPath = "../../Samples/SmokeSim/";
-	headerFile = folderPath + "SmokeSim.mhd";
+//	folderPath = "../../Samples/SmokeSim/";
+//	headerFile = folderPath + "SmokeSim.mhd";
 
 	ReadMHD(folderPath, headerFile, properties);
 	ReadRaw(properties);
@@ -189,5 +189,6 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 VolumeProperties::VolumeProperties()
 {
 	timesteps = 1;
-	timePerFrame = 0.2f;
+	timePerFrame = 0.1f;
 }
+

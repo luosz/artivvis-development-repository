@@ -281,85 +281,85 @@ void BurnsContours::CalculateContours(VolumeDataset &volume, Camera &camera, Ray
 
 void BurnsContours::Display(VolumeDataset &volume, Camera &camera, Raycaster &raycaster, ShaderManager &shaderManager)
 {
-	GLuint shaderProgramID = shaderManager.UseShader(DepthShader);
-	
-
-	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depthTexture, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	raycaster.Raycast(volume, shaderProgramID, camera);
-
-
-
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, contoursTexture, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	
-	shaderProgramID = shaderManager.UseShader(LineDepthShader);
-	
-
-	int uniformLoc;
-	glm::mat4 model_mat = glm::mat4(1.0f);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
-	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
-
-
-	glBegin(GL_LINES);
-
-	for (int i=0; i<vertices.size(); i++)
-	{
-		glColor3f(colors[i].x, colors[i].y, colors[i].z);
-		glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
-	}
-
-	glEnd();
-
-	
-	shaderProgramID = shaderManager.UseShader(ComparisonShader);
-	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-
-	
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-	glActiveTexture (GL_TEXTURE0);
-	 int uniformLocation = glGetUniformLocation(shaderProgramID,"depthImage");
-	glUniform1i(uniformLocation, 0);
-	glBindTexture (GL_TEXTURE_2D, depthTexture);
-
-	glActiveTexture (GL_TEXTURE1);
-	uniformLocation = glGetUniformLocation(shaderProgramID,"contoursImage");
-	glUniform1i(uniformLocation, 1);
-	glBindTexture (GL_TEXTURE_2D, contoursTexture);
-
-
-
-	int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
-	glBegin(GL_QUADS);
-	glVertexAttrib2f(texcoords_location, 0.0f, 0.0f);
-	glVertex2f(-1.0f, -1.0f);
-
-	glVertexAttrib2f(texcoords_location, 1.0f, 0.0f);
-	glVertex2f(1.0f, -1.0f);
-
-	glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
-	glVertex2f(1.0f, 1.0f);
-
-	glVertexAttrib2f(texcoords_location, 0.0f, 1.0f);
-	glVertex2f(-1.0f, 1.0f);
-	glEnd();
+//	GLuint shaderProgramID = shaderManager.UseShader(DepthShader);
+//	
+//
+//	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depthTexture, 0);
+//	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+//	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	
+//	raycaster.Raycast(volume, NULL, shaderProgramID, camera);
+//
+//
+//
+//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, contoursTexture, 0);
+//	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+//	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//	
+//	shaderProgramID = shaderManager.UseShader(LineDepthShader);
+//	
+//
+//	int uniformLoc;
+//	glm::mat4 model_mat = glm::mat4(1.0f);
+//
+//	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
+//	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
+//
+//	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
+//	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
+//
+//	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
+//	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
+//
+//	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
+//	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
+//
+//
+//	glBegin(GL_LINES);
+//
+//	for (int i=0; i<vertices.size(); i++)
+//	{
+//		glColor3f(colors[i].x, colors[i].y, colors[i].z);
+//		glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
+//	}
+//
+//	glEnd();
+//
+//	
+//	shaderProgramID = shaderManager.UseShader(ComparisonShader);
+//	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+//
+//	
+//	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+//
+//	glActiveTexture (GL_TEXTURE0);
+//	 int uniformLocation = glGetUniformLocation(shaderProgramID,"depthImage");
+//	glUniform1i(uniformLocation, 0);
+//	glBindTexture (GL_TEXTURE_2D, depthTexture);
+//
+//	glActiveTexture (GL_TEXTURE1);
+//	uniformLocation = glGetUniformLocation(shaderProgramID,"contoursImage");
+//	glUniform1i(uniformLocation, 1);
+//	glBindTexture (GL_TEXTURE_2D, contoursTexture);
+//
+//
+//
+//	int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
+//	glBegin(GL_QUADS);
+//	glVertexAttrib2f(texcoords_location, 0.0f, 0.0f);
+//	glVertex2f(-1.0f, -1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 1.0f, 0.0f);
+//	glVertex2f(1.0f, -1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
+//	glVertex2f(1.0f, 1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 0.0f, 1.0f);
+//	glVertex2f(-1.0f, 1.0f);
+//	glEnd();
 }
 
 

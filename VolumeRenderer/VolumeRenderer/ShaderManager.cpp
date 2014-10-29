@@ -5,7 +5,7 @@ void ShaderManager::Init()
 {
 	LoadShaders();
 	CompileShaders();
-	currentShader = XToonShader;
+	currentShader = TFShader;
 }
 
 
@@ -60,6 +60,9 @@ void ShaderManager::LoadShaders()
 	shaders.push_back(shader);
 
 	shader.Load("SmokeVertShader.txt", "SmokeFragShader.txt");
+	shaders.push_back(shader);
+
+	shader.Load("TransFuncVertShader.txt", "TransFuncFragShader.txt");
 	shaders.push_back(shader);
 
 	CompileShaders();
