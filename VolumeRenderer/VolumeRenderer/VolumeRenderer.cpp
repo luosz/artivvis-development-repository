@@ -11,7 +11,6 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	renderer = new OpenGLRenderer();
 
 	renderer->Init(screenWidth, screenHeight, volume);
-
 }
 
 

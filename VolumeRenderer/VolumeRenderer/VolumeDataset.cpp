@@ -4,8 +4,7 @@
 void VolumeDataset::Init()
 {
 	VolumeProperties properties;
-	VoxelReader reader;
-	reader.LoadVolume(std::string(), std::string(), properties);
+	voxelReader.LoadVolume(std::string(), std::string(), properties);
 
 	memblock3D = properties.bufferAddress;
 	timesteps = properties.timesteps;
@@ -20,26 +19,31 @@ void VolumeDataset::Init()
 
 	currentTimestep = 0;
 	oldTime = clock();
+
 }
 
 
 // Update for volume, at the moment used just for advancing timestep but could be for simulation or streaming etc.
 void VolumeDataset::Update()
 {
-	clock_t currentTime = clock();
-	float time = (currentTime - oldTime) / (float) CLOCKS_PER_SEC;
-
-	if (time > timePerFrame)
+	if (timesteps > 1)
 	{
-		if (currentTimestep < timesteps - 1)
-			currentTimestep++;
-		else
-			currentTimestep = 0;
+		clock_t currentTime = clock();
+		float time = (currentTime - oldTime) / (float) CLOCKS_PER_SEC;
 
-		oldTime = currentTime;
+		if (time > timePerFrame)
+		{
+			if (currentTimestep < timesteps - 1)
+				currentTimestep++;
+			else
+				currentTimestep = 0;
+
+			oldTime = currentTime;
+
+			UpdateTexture();
+		}
 	}
 }
-
 
 void VolumeDataset::ReverseEndianness()
 {
@@ -55,4 +59,55 @@ void VolumeDataset::ReverseEndianness()
 	}
 
 	memcpy(memblock3D, &bytes[0], xRes * yRes * zRes * bytesPerElement);
+}
+
+GLuint VolumeDataset::GenerateTexture()
+{
+	GLuint tex;
+	int textureSize = xRes * yRes * zRes * bytesPerElement;
+
+	glEnable(GL_TEXTURE_3D);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_3D, tex);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+
+	// Reverses endianness in copy
+	if (!littleEndian)
+		glPixelStoref(GL_UNPACK_SWAP_BYTES, true);
+
+	if (elementType == "MET_UCHAR")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8,xRes, yRes, zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, memblock3D);
+
+	else if (elementType == "SHORT")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_UNSIGNED_SHORT, memblock3D);
+
+	else if (elementType == "FLOAT")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_FLOAT, memblock3D);
+
+	glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
+	
+	glBindTexture(GL_TEXTURE_3D, 0);
+
+	return tex;
+}
+
+
+void VolumeDataset::UpdateTexture()
+{
+	glDeleteTextures(1, &currTexture3D);
+	currTexture3D = nextTexture3D;
+
+	if (currentTimestep < timesteps-1)
+		voxelReader.CopyFileToBuffer(memblock3D, currentTimestep+1);
+	else
+		voxelReader.CopyFileToBuffer(memblock3D, 0);
+
+	nextTexture3D = GenerateTexture();
 }

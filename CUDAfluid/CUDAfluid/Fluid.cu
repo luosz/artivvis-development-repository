@@ -112,7 +112,7 @@ __device__ glm::vec3 GetCentre(int i, int j, int k, float dx)
 
 __global__ void CudaAddArtificialForces(SimData data)
 {
-	int span = 7;
+	int span = 15;
 	int middleX = data.gridRes[0] / 2;
 	int middleY = data.gridRes[1] / 2;
 	int middleZ = data.gridRes[2] / 2;

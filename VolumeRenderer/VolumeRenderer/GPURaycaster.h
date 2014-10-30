@@ -14,7 +14,7 @@
 class GPURaycaster		:		public Raycaster
 {
 public:
-	std::vector<GLuint> textures;
+//	std::vector<GLuint> textures;
 	XToon xToon;
 
 	float contourThreshold;
@@ -22,7 +22,7 @@ public:
 
 
 	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);
-	void GenerateTextures(VolumeDataset &volume);
+//	void GenerateTextures(VolumeDataset &volume);
 	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 };
 

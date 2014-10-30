@@ -6,8 +6,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/TVvort/";
 //	headerFile = folderPath + "TVvort.mhd";
 
-	folderPath = "../../Samples/Nucleon/";
-	headerFile = folderPath + "nucleon.mhd";
+//	folderPath = "../../Samples/Nucleon/";
+//	headerFile = folderPath + "nucleon.mhd";
 
 //	folderPath = "../../Samples/CThead/";
 //	headerFile = folderPath + "CThead.mhd";
@@ -36,8 +36,14 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/Bonsai/";
 //	headerFile = folderPath + "bonsai.mhd";
 
-//	folderPath = "../../Samples/SmokeSim/";
-//	headerFile = folderPath + "SmokeSim.mhd";
+	folderPath = "../../Samples/SmokeSim/";
+	headerFile = folderPath + "SmokeSim.mhd";
+
+//	folderPath = "../../Samples/CTknee/";
+//	headerFile = folderPath + "CTknee.mhd";
+
+//	folderPath = "../../Samples/downsampled vortex/";
+//	headerFile = folderPath + "dsVort.mhd";
 
 	ReadMHD(folderPath, headerFile, properties);
 	ReadRaw(properties);
@@ -126,7 +132,8 @@ struct MyFileSort : public std::binary_function<std::string, std::string, bool>
 // Reads in the raw binary data using properties copied in from header
 void VoxelReader::ReadRaw(VolumeProperties &properties)
 {
-	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
+//	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
+	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement;
 	properties.bufferAddress = new GLubyte [bufferSize];
 	int numBytesInBufferFilled = 0;
 	
@@ -135,7 +142,6 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 
 	WIN32_FIND_DATAA findFileData;
 	HANDLE hFind;
-	std::vector<std::string> files;
 
 	hFind = FindFirstFileA(directory.c_str(), &findFileData);
 
@@ -148,11 +154,17 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 		
 		sort(files.begin(), files.end(), MyFileSort());
 
+//		for (int i=0; i<files.size(); i++)
+//		{
+//			std::string currentFile(properties.rawFilePath + "/" + files[i]); 
+//			CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
+//		}
+
 		for (int i=0; i<files.size(); i++)
-		{
-			std::string currentFile(properties.rawFilePath + "/" + files[i]); 
-			CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
-		}
+			files[i] = std::string(properties.rawFilePath + "/" + files[i]);
+
+		std::string currentFile(properties.rawFilePath + "/" + files[0]); 
+		CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
 	}
 	else
 	{
@@ -177,6 +189,29 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 		myFile.close();
 
 		numBytesInBufferFilled += size;
+	}
+	else 
+		std::cout << "Unable to open file";
+
+	
+}
+
+
+void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
+{
+	std::string fileName = files[fileIndex];
+
+	std::streampos size;
+
+	std::ifstream myFile (fileName, std::ios::in|std::ios::binary|std::ios::ate);
+
+	if (myFile.is_open())
+	{
+		size = myFile.tellg();
+		
+		myFile.seekg (0, std::ios::beg);
+		myFile.read ((char*)bufferAddress, size);
+		myFile.close();
 	}
 	else 
 		std::cout << "Unable to open file";

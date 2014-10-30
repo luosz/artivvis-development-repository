@@ -51,7 +51,7 @@ void CopyToFile()
 		outStream.close();
 	}
 
-	if (numFiles == 100)
+	if (numFiles == 200)
 	{
 		cudaDeviceReset();
 		exit(0);

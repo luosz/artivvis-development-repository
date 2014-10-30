@@ -28,12 +28,16 @@ struct VolumeProperties
 class VoxelReader
 {
 public:
+	std::vector<std::string> files;
+
 	void LoadVolume(std::string folderPath, std::string headerFile, VolumeProperties &properties);
+	void CopyFileToBuffer(std::string fileName, int &numBytesInBufferFilled, VolumeProperties &properties);
+	void CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex);
 
 private:
 	void ReadMHD(std::string folderPath, std::string headerFile, VolumeProperties &properties);
 	void ReadRaw(VolumeProperties &properties);
-	void CopyFileToBuffer(std::string fileName, int &numBytesInBufferFilled, VolumeProperties &properties);
+	
 };
 
 

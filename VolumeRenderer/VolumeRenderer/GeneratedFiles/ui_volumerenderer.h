@@ -536,7 +536,7 @@ public:
         QObject::connect(tfIntensity14, SIGNAL(sliderMoved(int)), VolumeRendererClass, SLOT(AdjustTFIntensity(int)));
         QObject::connect(tfIntensity15, SIGNAL(sliderMoved(int)), VolumeRendererClass, SLOT(AdjustTFIntensity(int)));
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(6);
         shaderComboBox->setCurrentIndex(0);
 
 

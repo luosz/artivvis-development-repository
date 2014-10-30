@@ -26,48 +26,48 @@ void GPURaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume
 	opacities[1] = 0.6f;
 
 	xToon.ReadTexture();
-	GenerateTextures(volume);
+//	GenerateTextures(volume);
 }
 
-void GPURaycaster::GenerateTextures(VolumeDataset &volume)
-{
-	textures.resize(volume.timesteps);
-
-	int textureSize = volume.xRes * volume.yRes * volume.zRes * volume.bytesPerElement;
-
-	for (int i=0; i<volume.timesteps; i++)
-	{
-		glEnable(GL_TEXTURE_3D);
-		glGenTextures(1, &textures[i]);
-		glBindTexture(GL_TEXTURE_3D, textures[i]);
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-
-		// Reverses endianness in copy
-		if (!volume.littleEndian)
-			glPixelStoref(GL_UNPACK_SWAP_BYTES, true);
-
-		if (volume.elementType == "MET_UCHAR")
-			glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, volume.memblock3D + (i * textureSize));
-
-		else if (volume.elementType == "SHORT")
-			glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_UNSIGNED_SHORT, volume.memblock3D + (i * textureSize));
-
-		else if (volume.elementType == "FLOAT")
-			glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_FLOAT, volume.memblock3D + (i * textureSize));
-
-		glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
-		
-
-		glBindTexture(GL_TEXTURE_3D, 0);
-	}
-}
+//void GPURaycaster::GenerateTextures(VolumeDataset &volume)
+//{
+//	textures.resize(volume.timesteps);
+//
+//	int textureSize = volume.xRes * volume.yRes * volume.zRes * volume.bytesPerElement;
+//
+//	for (int i=0; i<volume.timesteps; i++)
+//	{
+//		glEnable(GL_TEXTURE_3D);
+//		glGenTextures(1, &textures[i]);
+//		glBindTexture(GL_TEXTURE_3D, textures[i]);
+//		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//
+//		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//
+//
+//		// Reverses endianness in copy
+//		if (!volume.littleEndian)
+//			glPixelStoref(GL_UNPACK_SWAP_BYTES, true);
+//
+//		if (volume.elementType == "MET_UCHAR")
+//			glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, volume.memblock3D + (i * textureSize));
+//
+//		else if (volume.elementType == "SHORT")
+//			glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_UNSIGNED_SHORT, volume.memblock3D + (i * textureSize));
+//
+//		else if (volume.elementType == "FLOAT")
+//			glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_FLOAT, volume.memblock3D + (i * textureSize));
+//
+//		glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
+//		
+//
+//		glBindTexture(GL_TEXTURE_3D, 0);
+//	}
+//}
 
 
 
@@ -92,7 +92,7 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 	glActiveTexture (GL_TEXTURE0);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"3dVolume");
 	glUniform1i(uniformLoc,0);
-	glBindTexture (GL_TEXTURE_3D, textures[volume.currentTimestep]);
+	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
 
 	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
 	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
