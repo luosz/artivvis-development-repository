@@ -1,0 +1,102 @@
+#include "VisibilityRaycaster.h"
+
+void VisibilityRaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
+{
+	maxRaySteps = 1000;
+	rayStepSize = 0.005f;
+	gradientStepSize = 0.005f;
+	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
+
+	glGenTextures(1, &histTexture);
+    glBindTexture(GL_TEXTURE_2D, histTexture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+// Messy but just inputs all data to shader
+void VisibilityRaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
+{
+	int uniformLoc;
+
+	glm::mat4 model_mat = glm::mat4(1.0f);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
+
+	glActiveTexture (GL_TEXTURE0);
+	uniformLoc = glGetUniformLocation(shaderProgramID,"3dVolume");
+	glUniform1i(uniformLoc,0);
+	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
+	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID,"maxRaySteps");
+	glUniform1i(uniformLoc, maxRaySteps);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID,"rayStepSize");
+	glUniform1f(uniformLoc, rayStepSize);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID,"gradientStepSize");
+	glUniform1f(uniformLoc, gradientStepSize);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID,"lightPosition");
+	glUniform3f(uniformLoc, lightPosition.x, lightPosition.y, lightPosition.z);
+
+	glActiveTexture (GL_TEXTURE2);
+	uniformLoc = glGetUniformLocation(shaderProgramID,"histTexture");
+	glUniform1i(uniformLoc,2);
+	glBindTexture (GL_TEXTURE_2D, histTexture);
+
+	// Final render is the front faces of a cube rendered
+	glBegin(GL_QUADS);
+
+	// Front Face
+	glVertex3f(-1.0f, -1.0f,  1.0f);
+	glVertex3f( 1.0f, -1.0f,  1.0f);
+	glVertex3f( 1.0f,  1.0f,  1.0f);
+	glVertex3f(-1.0f,  1.0f,  1.0f);
+ 
+	// Back Face
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f,  1.0f, -1.0f);
+	glVertex3f( 1.0f,  1.0f, -1.0f);
+	glVertex3f( 1.0f, -1.0f, -1.0f);
+ 
+	// Top Face
+	glVertex3f(-1.0f,  1.0f, -1.0f);
+	glVertex3f(-1.0f,  1.0f,  1.0f);
+	glVertex3f( 1.0f,  1.0f,  1.0f);
+	glVertex3f( 1.0f,  1.0f, -1.0f);
+	
+	// Bottom Face
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f( 1.0f, -1.0f, -1.0f);
+	glVertex3f( 1.0f, -1.0f,  1.0f);
+	glVertex3f(-1.0f, -1.0f,  1.0f);
+ 
+	// Right face
+	glVertex3f( 1.0f, -1.0f, -1.0f);
+	glVertex3f( 1.0f,  1.0f, -1.0f);
+	glVertex3f( 1.0f,  1.0f,  1.0f);
+	glVertex3f( 1.0f, -1.0f,  1.0f);
+ 
+	// Left Face
+	glVertex3f(-1.0f, -1.0f, -1.0f);
+	glVertex3f(-1.0f, -1.0f,  1.0f);
+	glVertex3f(-1.0f,  1.0f,  1.0f);
+	glVertex3f(-1.0f,  1.0f, -1.0f);
+
+	glEnd();
+
+	glBindTexture(GL_TEXTURE_3D, 0);
+}

@@ -101,6 +101,12 @@
     <ClCompile Include="TransferFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VisibilityRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VisibilityRaycaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="volumerenderer.ui">
@@ -175,6 +181,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TransferFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisibilityRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisibilityRaycaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -273,6 +285,12 @@
       <Filter>Shaders</Filter>
     </Text>
     <Text Include="TransFuncVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="VisibilityHistFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="VisibilityHistVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>

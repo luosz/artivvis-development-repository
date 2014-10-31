@@ -1,0 +1,62 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform sampler1D transferFunc;
+uniform sampler2D histTexture;
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+uniform float gradientStepSize;
+
+uniform vec3 lightPosition;
+
+
+void main()
+{
+	vec3 position = facePos;
+	vec3 texCoord;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+
+	int histID;
+	vec2 histCoord;
+
+	float absorption = 0.0f;
+	float opacity;
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{
+		texCoord = (position + 1.0f) / 2.0f; 
+		float index = texture(volume, texCoord).x;
+
+		histID = int(index / (1.0f / 256.0f));
+
+		histCoord.x = histID % 8;
+		histCoord.y = int(histID / 8);
+//
+//		if (histID % 4 == 0)
+//			texture(histTexture, histCoord).x = (1.0f / 256.0f);
+//		if (histID % 4 == 1)
+//			texture(histTexture, histCoord).y = (1.0f / 256.0f);
+//		if (histID % 4 == 2)
+//			texture(histTexture, histCoord).z = (1.0f / 256.0f);
+//		if (histID % 4 == 3)
+//			texture(histTexture, histCoord).w = (1.0f / 256.0f);
+		
+		opacity = texture(transferFunc, index).w;
+		absorption += opacity;
+
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f)
+			break;
+	}
+
+	return;
+}

@@ -5,6 +5,7 @@
 #include "GPUContours.h"
 #include "GPURaycaster.h"
 #include "CPURaycaster.h"
+#include "VisibilityRaycaster.h"
 #include "BurnsContours.h"
 #include "TransferFunction.h"
 

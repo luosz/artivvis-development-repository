@@ -102,6 +102,8 @@
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
+    <ClCompile Include="VisibilityRaycaster.cpp" />
+    <ClCompile Include="VisibilityRenderer.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
     <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="VoxelReader.cpp" />
@@ -149,6 +151,8 @@
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransferFunction.h" />
+    <ClInclude Include="VisibilityRaycaster.h" />
+    <ClInclude Include="VisibilityRenderer.h" />
     <ClInclude Include="VolumeDataset.h" />
     <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="VoxelReader.h" />
@@ -197,6 +201,8 @@
     <Text Include="TextureVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />
     <Text Include="TransFuncVertShader.txt" />
+    <Text Include="VisibilityHistFragShader.txt" />
+    <Text Include="VisibilityHistVertShader.txt" />
     <Text Include="XToonFragShader.txt" />
     <Text Include="XToonVertShader.txt" />
   </ItemGroup>
