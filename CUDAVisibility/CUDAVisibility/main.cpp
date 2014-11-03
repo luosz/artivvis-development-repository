@@ -11,12 +11,18 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 
+#define WIDGET_WIDTH 300
+#define WIDGET_HEIGHT 200
+
 Camera camera;
 ShaderManager shaderManager;
 GPURaycaster raycaster;
 TransferFunction transferFunction;
 VolumeDataset volume;
-VisibilityHistogram visibilityHist;
+VisibilityHistogram visibilityHistogram;
+
+GLuint mainWindow;
+GLuint widgetWindow;
 
 // For mouse control
 int xclickedAt = -1;
@@ -31,9 +37,11 @@ void Init()
 
 	camera.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 	shaderManager.Init();
-	visibilityHist.Init(SCREEN_WIDTH, SCREEN_HEIGHT, volume);
 
 	transferFunction.Init(" ");
+
+	visibilityHistogram.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
+	raycaster.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 
@@ -43,6 +51,8 @@ void Init()
 // Update renderer and check for Qt events
 void Update()
 {
+	glutSetWindow(mainWindow);
+
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -50,10 +60,19 @@ void Update()
 
 
 	glEnable(GL_DEPTH_TEST);
-	visibilityHist.CalculateHistogram(volume, transferFunction, camera, shaderManager);
-
+//	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
 
 	glutSwapBuffers();
+
+	glutSetWindow(widgetWindow);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	visibilityHistogram.DrawHistogram(shaderManager, camera);
+	glutSwapBuffers();
+
+	glutSetWindow(mainWindow);
+
+//	GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
+//	raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
 
 }
 
@@ -65,6 +84,12 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 {
 	switch(key)
 	{
+		case 'm':
+			visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
+			break;
+		case 'n':
+			visibilityHistogram.currentSlice--;
+			break;
 		case 27:
 			exit(0);
 			break;
@@ -153,8 +178,10 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    glutCreateWindow("Fluid Simulation");
+    glutCreateWindow("Visibility Histogram");
 
+	mainWindow = glutGetWindow();
+		
 	// Tell glut where the display function is
 	glutDisplayFunc(Update);
 	glutIdleFunc(Update);
@@ -180,6 +207,9 @@ int main(int argc, char *argv[])
 	glutMouseFunc(MouseButton);
 	glutMotionFunc(MouseMove);
 	glutMouseWheelFunc(MouseWheel);
+
+	glutCreateSubWindow(mainWindow, 0, SCREEN_HEIGHT - WIDGET_HEIGHT, WIDGET_WIDTH, WIDGET_HEIGHT);
+	widgetWindow = glutGetWindow();
 
 	// Begin infinite event loop
 	glutMainLoop();

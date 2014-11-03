@@ -7,8 +7,8 @@ void GPURaycaster::Init(int screenWidth, int screenHeight)
 	gradientStepSize = 0.005f;
 	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
 
+	
 }
-
 
 
 // Messy but just inputs all data to shader

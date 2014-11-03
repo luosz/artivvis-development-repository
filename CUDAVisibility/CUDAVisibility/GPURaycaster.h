@@ -8,6 +8,7 @@
 #include <vector>
 #include "VolumeDataset.h"
 #include "TransferFunction.h"
+#include "ShaderManager.h"
 
 
 class GPURaycaster
@@ -20,7 +21,6 @@ public:
 	float gradientStepSize;
 
 	glm::vec3 lightPosition;
-
 	void Init(int screenWidth, int screenHeight);
 	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 };

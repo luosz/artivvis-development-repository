@@ -1,0 +1,32 @@
+#version 330
+
+in vec2 imageCoords;
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform sampler1D transferFunc;
+uniform sampler2D opacityTex;
+
+out vec4 FragColor;
+
+void main()
+{
+//	FragColor = vec4(1.0, 1.0f, 1.0f, 1.0f);
+
+	if (abs(facePos.x) > 1.0f || abs(facePos.y) > 1.0f || abs(facePos.z) > 1.0f)
+		return;
+
+	float prevOpacity = texture(opacityTex, imageCoords).y;
+
+	vec3 texCoord = (facePos + 1.0f) / 2.0f; 
+	float scalar = texture(volume, texCoord).x;
+
+	float alpha = texture(transferFunc, scalar).w;
+
+	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
+	float visibility = (1.0f - prevOpacity) * alpha;
+
+	vec4 final = vec4(visibility, opacity, scalar, 1.0f);
+
+	FragColor = final;
+}

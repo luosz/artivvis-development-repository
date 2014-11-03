@@ -22,6 +22,9 @@ void ShaderManager::LoadShaders()
 	shader.Load("TransFuncVertShader.txt", "TransFuncFragShader.txt");
 	shaders.push_back(shader);
 
+	shader.Load("VisibilityVertShader.txt", "VisibilityFragShader.txt");
+	shaders.push_back(shader);
+
 	CompileShaders();
 }
 

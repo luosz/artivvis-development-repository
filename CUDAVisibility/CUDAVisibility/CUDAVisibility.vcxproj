@@ -48,6 +48,8 @@
     <Text Include="TextureVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />
     <Text Include="TransFuncVertShader.txt" />
+    <Text Include="VisibilityFragShader.txt" />
+    <Text Include="VisibilityVertShader.txt" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="VisibilityHist.cu" />
