@@ -21,14 +21,11 @@ TransferFunction transferFunction;
 VolumeDataset volume;
 VisibilityHistogram visibilityHistogram;
 
-GLuint mainWindow;
-GLuint widgetWindow;
-
 // For mouse control
 int xclickedAt = -1;
 int yclickedAt = -1;
 
-
+bool showGraph;
 
 void Init()
 {
@@ -42,6 +39,8 @@ void Init()
 
 	visibilityHistogram.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 	raycaster.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	showGraph = false;
 }
 
 
@@ -51,8 +50,6 @@ void Init()
 // Update renderer and check for Qt events
 void Update()
 {
-	glutSetWindow(mainWindow);
-
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -60,20 +57,16 @@ void Update()
 
 
 	glEnable(GL_DEPTH_TEST);
-//	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
+
+	if (showGraph)
+		visibilityHistogram.DrawHistogram(shaderManager, camera);
+	else
+	{
+		GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
+		raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
+	}
 
 	glutSwapBuffers();
-
-	glutSetWindow(widgetWindow);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	visibilityHistogram.DrawHistogram(shaderManager, camera);
-	glutSwapBuffers();
-
-	glutSetWindow(mainWindow);
-
-//	GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
-//	raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
-
 }
 
 
@@ -88,7 +81,10 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 			visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
 			break;
 		case 'n':
-			visibilityHistogram.currentSlice--;
+			if (showGraph)
+				showGraph = false;
+			else
+				showGraph = true;
 			break;
 		case 27:
 			exit(0);
@@ -179,8 +175,6 @@ int main(int argc, char *argv[])
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     glutCreateWindow("Visibility Histogram");
-
-	mainWindow = glutGetWindow();
 		
 	// Tell glut where the display function is
 	glutDisplayFunc(Update);
@@ -194,12 +188,9 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
 		return 1;
     }
-
-
-		
+	
 	// Initialize Renderer and Qt
 	Init();
-
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);
@@ -207,9 +198,6 @@ int main(int argc, char *argv[])
 	glutMouseFunc(MouseButton);
 	glutMotionFunc(MouseMove);
 	glutMouseWheelFunc(MouseWheel);
-
-	glutCreateSubWindow(mainWindow, 0, SCREEN_HEIGHT - WIDGET_HEIGHT, WIDGET_WIDTH, WIDGET_HEIGHT);
-	widgetWindow = glutGetWindow();
 
 	// Begin infinite event loop
 	glutMainLoop();

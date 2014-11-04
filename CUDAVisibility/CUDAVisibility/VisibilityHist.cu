@@ -212,9 +212,16 @@ void VisibilityHistogram::DrawHistogram(ShaderManager shaderManager, Camera &cam
 
 	glBegin(GL_LINES);
 
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+
+	glColor3f(1.0f, 0.0f, 0.0f);
 	for (int i=0; i<256; i++)
 	{
-		glColor3f(1.0f, 0.0f, 0.0f);
 		glVertex3f(i / 255.0f, 0.0f, 0.0f);
 		glVertex3f(i / 255.0f, visibilities[i], 0.0f);
 	}
