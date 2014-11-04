@@ -1,5 +1,7 @@
 #include "VisibilityHist.h"
 
+texture <float4, cudaTextureType2D, cudaReadModeElementType> texRef;
+
 void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 {
 	xPixels = screenWidth;
@@ -37,6 +39,17 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	numVis.resize(256);
 	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
 	std::fill(numVis.begin(), numVis.end(), 0);
+
+	//glGenBuffers(1, &PBO);
+	//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
+	//glBufferData(GL_PIXEL_UNPACK_BUFFER, screenWidth * screenHeight * 4, NULL, GL_DYNAMIC_COPY);
+
+	//cudaGLRegisterBufferObject(PBO);
+
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, opacityTex, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
+
+//	HANDLE_ERROR( cudaMalloc((void**)&cudaBuffer, xPixels*yPixels*4*sizeof(float)) );
+
 }
 
 GLuint VisibilityHistogram::GenerateSliceTexture()
@@ -44,8 +57,8 @@ GLuint VisibilityHistogram::GenerateSliceTexture()
 	GLuint tex;
 	glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, xPixels, yPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
@@ -85,6 +98,40 @@ glm::vec3 VisibilityHistogram::FindClosestCorner(Camera &camera)
 	return boxCorners[minPoint];
 }
 
+__global__ void CudaEvaluate(int xPixels, int yPixels)
+{
+	unsigned int tx = threadIdx.x;
+//    unsigned int ty = threadIdx.y;
+//    unsigned int bw = blockDim.x;
+//    unsigned int bh = blockDim.y;
+// 
+//    // Non-normalized U, V coordinates of input texture for current thread.
+//    unsigned int u = ( bw * blockIdx.x ) + tx;
+//    unsigned int v = ( bh * blockIdx.y ) + ty;
+// 
+//    // Early-out if we are beyond the texture coordinates for our texture.
+//    if ( u > xPixels || v > yPixels ) return;
+// 
+//    // The 1D index in the destination buffer.
+//    unsigned int index = ( v * xPixels ) + u;
+
+	// look up cuda filter mode
+	int4 blah;
+	blah.w = 0;
+	blah.x =0;
+	blah.y=0;
+	blah.z=0;
+     
+    float4 color = tex2D(texRef, 400, 400);
+ 
+    printf("%f, %f, %f, %f\n", color.x, color.y, color.z, color.w);
+
+ 
+
+}
+
+
+
 void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
 {
 	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
@@ -123,7 +170,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	glActiveTexture (GL_TEXTURE2);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"opacityTex");
 	glUniform1i(uniformLoc,2);
-	glBindTexture (GL_TEXTURE_1D, opacityTex);
+	glBindTexture (GL_TEXTURE_2D, opacityTex);
 
 
 	glm::vec3 closestCorner = FindClosestCorner(camera);
@@ -137,7 +184,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	{
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//		dist += currentSlice * 0.005f;
+		dist += currentSlice * 0.005f;
 		dist += 0.005f;
 
 		float extent = dist * glm::tan((camera.FoV / 2.0f) * (glm::pi<float>()/180.0f));
@@ -166,15 +213,51 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 
 		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_FLOAT, pixelBuffer);
 
+//		cudaGLMapBufferObject((void**)&cudaBuffer, PBO);
+//		CudaEvaluate<<<1, 1>>>(xPixels*yPixels, 4, cudaBuffer);
+//		cudaDeviceSynchronize();
+//		cudaGLUnmapBufferObject(PBO);
 
-		for (int i=0; i<xPixels*yPixels; i++)
+//		HANDLE_ERROR( cudaGraphicsMapResources(1, &resource, NULL) );
+//		HANDLE_ERROR( cudaGraphicsResourceGetMappedPointer((void**)cudaBuffer, xPixels*yPixels*4*sizeof(float), resource) );
+		cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 32, 32, 32,
+                                             cudaChannelFormatKindFloat );
+
+		cudaGraphicsResource_t resources[1] = {resource};
+
+		HANDLE_ERROR( cudaGraphicsMapResources(1, resources) );
+		cudaArray *arry;
+
+		 cudaMallocArray(&arry, &channelDesc, 800, 800);
+		HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&arry, resource, 0, 0) ); 
+
+		 
+
+//		const cudaChannelFormatDesc desc = cudaCreateChannelDesc( 32, 32, 32, 32, cudaChannelFormatKindFloat );
+
+		HANDLE_ERROR( cudaBindTextureToArray(texRef, arry) );
+
+		CudaEvaluate<<<1, 1>>>(xPixels, yPixels);
+		cudaDeviceSynchronize();
+
+		HANDLE_ERROR( cudaUnbindTexture(texRef) );
+		HANDLE_ERROR( cudaGraphicsUnmapResources(1, resources) );
+
+//		HANDLE_ERROR( cudaBindTextureToArray(tex, arry) );
+		
+//		HANDLE_ERROR( cudaUnbindTexture(tex) );
+
+		
+
+
+		for (int j=0; j<xPixels*yPixels; j++)
 		{
-			float scalar = pixelBuffer[i*4 + 2];
+			float scalar = pixelBuffer[j*4 + 2];
 
 			if (scalar > 0.0f)
 			{
 				int bin = scalar * 255.0f;
-				visibilities[bin] += pixelBuffer[i*4 + 0];
+				visibilities[bin] += pixelBuffer[j*4 + 0];
 				numVis[bin]++;
 			}
 		}

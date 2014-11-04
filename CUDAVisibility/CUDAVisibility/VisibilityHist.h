@@ -1,10 +1,10 @@
 #ifndef VISIBILITY_HIST_H
 #define VISIBILITY_HIST_H
 
-#include "CudaHeaders.h"
 #include "VolumeDataset.h"
 #include "TransferFunction.h"
 #include "ShaderManager.h"
+#include "CudaHeaders.h"
 
 class VisibilityHistogram
 {
@@ -21,6 +21,10 @@ public:
 
 	std::vector<float> visibilities;
 	std::vector<int> numVis;
+
+	GLuint PBO;
+	float *cudaBuffer;
+	cudaGraphicsResource_t resource;
 
 
 	void Init(int screenWidth, int screenHeight);

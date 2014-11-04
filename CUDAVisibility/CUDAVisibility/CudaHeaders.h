@@ -5,6 +5,8 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "cudaGL.h"
+#include "cuda_gl_interop.h"
 #include <iostream>
 #include "GLM.h"
 

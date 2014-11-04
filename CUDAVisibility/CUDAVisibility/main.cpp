@@ -11,8 +11,6 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 
-#define WIDGET_WIDTH 300
-#define WIDGET_HEIGHT 200
 
 Camera camera;
 ShaderManager shaderManager;
@@ -29,6 +27,8 @@ bool showGraph;
 
 void Init()
 {
+	cudaGLSetGLDevice(0);
+
 	volume.Init();
 	volume.currTexture3D = volume.GenerateTexture();
 
@@ -55,6 +55,7 @@ void Update()
 
 	camera.Update();
 
+	
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -65,6 +66,7 @@ void Update()
 		GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
 		raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
 	}
+
 
 	glutSwapBuffers();
 }
