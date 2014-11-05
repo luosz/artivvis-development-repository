@@ -5,10 +5,13 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+
 #include "cudaGL.h"
 #include "cuda_gl_interop.h"
+
 #include <iostream>
 #include "GLM.h"
+
 
 static void HandleError(cudaError_t err, const char *file, int line ) 
 {

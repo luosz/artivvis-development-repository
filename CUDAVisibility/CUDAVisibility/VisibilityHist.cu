@@ -30,25 +30,25 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
 
 	currentSlice = 0;
-	numSlices = 256;
+	numSlices = 512;
+	numBins = 256;
 	opacityTex = GenerateSliceTexture();
 
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
 
-	visibilities.resize(256);
-	numVis.resize(256);
+	visibilities.resize(numBins);
+	numVis.resize(numBins);
 	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
 	std::fill(numVis.begin(), numVis.end(), 0);
 
-	//glGenBuffers(1, &PBO);
-	//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
-	//glBufferData(GL_PIXEL_UNPACK_BUFFER, screenWidth * screenHeight * 4, NULL, GL_DYNAMIC_COPY);
+	HANDLE_ERROR( cudaMalloc((void**)&cudaHistBins, 256 * sizeof(float)) );
+	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin, 256 * sizeof(int)) );
 
-	//cudaGLRegisterBufferObject(PBO);
+//	thrust::device_vector<float> blah(100);
+//	cudaHistBins.resize(256);
+//	cudaNumInBin.resize(256);
 
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, opacityTex, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
-
-//	HANDLE_ERROR( cudaMalloc((void**)&cudaBuffer, xPixels*yPixels*4*sizeof(float)) );
 
 }
 
@@ -61,20 +61,11 @@ GLuint VisibilityHistogram::GenerateSliceTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, xPixels, yPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, xPixels, yPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return tex;
-}
-
-void VisibilityHistogram::InitSlices()
-{
-	
-//	slices.resize(numSlices);
-
-//	for (int i=0; i<numSlices; i++)
-//		slices[i] = GenerateSliceTexture();
 }
 
 
@@ -98,44 +89,54 @@ glm::vec3 VisibilityHistogram::FindClosestCorner(Camera &camera)
 	return boxCorners[minPoint];
 }
 
-__global__ void CudaEvaluate(int xPixels, int yPixels)
+__global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *numInBin)
 {
-	unsigned int tx = threadIdx.x;
-//    unsigned int ty = threadIdx.y;
-//    unsigned int bw = blockDim.x;
-//    unsigned int bh = blockDim.y;
-// 
-//    // Non-normalized U, V coordinates of input texture for current thread.
-//    unsigned int u = ( bw * blockIdx.x ) + tx;
-//    unsigned int v = ( bh * blockIdx.y ) + ty;
-// 
-//    // Early-out if we are beyond the texture coordinates for our texture.
-//    if ( u > xPixels || v > yPixels ) return;
-// 
-//    // The 1D index in the destination buffer.
-//    unsigned int index = ( v * xPixels ) + u;
+	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
 
-	// look up cuda filter mode
-	int4 blah;
-	blah.w = 0;
-	blah.x =0;
-	blah.y=0;
-	blah.z=0;
-     
-    float4 color = tex2D(texRef, 400, 400);
- 
-    printf("%f, %f, %f, %f\n", color.x, color.y, color.z, color.w);
+	if (tid < xPixels * yPixels)
+	{
+		int v = (int) tid / yPixels;
+		int u = tid % yPixels;
 
- 
+		float4 color = tex2D(texRef, u, v);
+		float scalar = color.z;
 
+		if (scalar > 0.0f)
+		{
+//			printf("%d, %d, %d\n", tid, u, v);
+			int bin = scalar * 255.0f;
+//			printf("%f, %f, %f %f\n", color.x, color.y, color.z, color.w);
+			atomicAdd(&(histBins[bin]), (float)color.x);
+			atomicAdd(&(numInBin[bin]), (int)1);
+		}
+	}
 }
 
+__global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
+{
+	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if (tid < numBins)
+	{
+		if (numInBin[tid] > 0)
+		{
+//			printf("%d, %f, %d\n", tid, histBins[tid], numInBin[tid]);
+			histBins[tid] = histBins[tid] / numInBin[tid];
+		}
+	}
+}
 
 
 void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
 {
-	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
-	std::fill(numVis.begin(), numVis.end(), 0);
+//	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
+//	std::fill(numVis.begin(), numVis.end(), 0);
+
+	HANDLE_ERROR( cudaMemset(cudaHistBins, 0, 256 * sizeof(float)) );
+	HANDLE_ERROR( cudaMemset(cudaNumInBin, 0, 256 * sizeof(int)) );
+
+//	thrust::fill(cudaHistBins.begin(), cudaHistBins.end(), 0.0f);
+//	thrust::fill(cudaNumInBin.begin(), cudaNumInBin.end(), 0);
 
 	GLuint shaderProgramID = shaderManager.UseShader(VisibilityShader);
 
@@ -182,9 +183,10 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 
 	for (int i=0; i<numSlices; i++)
 	{
+		
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		dist += currentSlice * 0.005f;
+//		dist += currentSlice * 0.005f;
 		dist += 0.005f;
 
 		float extent = dist * glm::tan((camera.FoV / 2.0f) * (glm::pi<float>()/180.0f));
@@ -211,66 +213,52 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 		glVertex3f(bottomRight.x, bottomRight.y, bottomRight.z);
 		glEnd();
 
-		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_FLOAT, pixelBuffer);
+//		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_FLOAT, pixelBuffer);
 
-//		cudaGLMapBufferObject((void**)&cudaBuffer, PBO);
-//		CudaEvaluate<<<1, 1>>>(xPixels*yPixels, 4, cudaBuffer);
-//		cudaDeviceSynchronize();
-//		cudaGLUnmapBufferObject(PBO);
+//		glBindTexture(GL_TEXTURE_2D, 0);
 
-//		HANDLE_ERROR( cudaGraphicsMapResources(1, &resource, NULL) );
-//		HANDLE_ERROR( cudaGraphicsResourceGetMappedPointer((void**)cudaBuffer, xPixels*yPixels*4*sizeof(float), resource) );
-		cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc(32, 32, 32, 32,
-                                             cudaChannelFormatKindFloat );
 
-		cudaGraphicsResource_t resources[1] = {resource};
-
-		HANDLE_ERROR( cudaGraphicsMapResources(1, resources) );
-		cudaArray *arry;
-
-		 cudaMallocArray(&arry, &channelDesc, 800, 800);
+		HANDLE_ERROR( cudaGraphicsMapResources(1, &resource) );
+		cudaArray *arry = 0;
+		
 		HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&arry, resource, 0, 0) ); 
 
-		 
-
-//		const cudaChannelFormatDesc desc = cudaCreateChannelDesc( 32, 32, 32, 32, cudaChannelFormatKindFloat );
 
 		HANDLE_ERROR( cudaBindTextureToArray(texRef, arry) );
 
-		CudaEvaluate<<<1, 1>>>(xPixels, yPixels);
-		cudaDeviceSynchronize();
+		int numPixels = xPixels * yPixels;
+		CudaEvaluate<<<(numPixels + 255) / 256, 256>>>(xPixels, yPixels, cudaHistBins, cudaNumInBin);
 
 		HANDLE_ERROR( cudaUnbindTexture(texRef) );
-		HANDLE_ERROR( cudaGraphicsUnmapResources(1, resources) );
-
-//		HANDLE_ERROR( cudaBindTextureToArray(tex, arry) );
-		
-//		HANDLE_ERROR( cudaUnbindTexture(tex) );
-
+		HANDLE_ERROR( cudaGraphicsUnmapResources(1, &resource) );
 		
 
 
-		for (int j=0; j<xPixels*yPixels; j++)
-		{
-			float scalar = pixelBuffer[j*4 + 2];
-
-			if (scalar > 0.0f)
-			{
-				int bin = scalar * 255.0f;
-				visibilities[bin] += pixelBuffer[j*4 + 0];
-				numVis[bin]++;
-			}
-		}
+//		for (int j=0; j<xPixels*yPixels; j++)
+//		{
+//			float scalar = pixelBuffer[j*4 + 2];
+//
+//			if (scalar > 0.0f)
+//			{
+//				int bin = scalar * 255.0f;
+//				visibilities[bin] += pixelBuffer[j*4 + 0];
+//				numVis[bin]++;
+//			}
+//		}
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-	for (int i=0; i<256; i++)
-	{
-		if (numVis[i] > 0.0f)
-			visibilities[i] /= numVis[i];
-	}
+	CudaNormalize<<< (numBins + 255) / 256, 256>>>(256, cudaHistBins, cudaNumInBin);
+
+	HANDLE_ERROR( cudaMemcpy(&visibilities[0], cudaHistBins, 256 * sizeof(float), cudaMemcpyDeviceToHost) );
+
+//	for (int i=0; i<256; i++)
+//	{
+//		if (numVis[i] > 0.0f)
+//			visibilities[i] /= numVis[i];
+//	}
 }
 
 

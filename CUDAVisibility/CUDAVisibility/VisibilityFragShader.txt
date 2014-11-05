@@ -12,11 +12,11 @@ out vec4 FragColor;
 void main()
 {
 
-//	if (abs(facePos.x) > 1.0f || abs(facePos.y) > 1.0f || abs(facePos.z) > 1.0f)
-//	{	
-//		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-//		return;
-//	}
+	if (abs(facePos.x) > 1.0f || abs(facePos.y) > 1.0f || abs(facePos.z) > 1.0f)
+	{	
+		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		return;
+	}
 
 	float prevOpacity = texture(opacityTex, imageCoords).y;
 
@@ -29,6 +29,7 @@ void main()
 	float visibility = (1.0f - prevOpacity) * alpha;
 
 	vec4 final = vec4(visibility, opacity, scalar, 1.0f);
+//	vec4 final = vec4(1.0f, 2.0f, 3.0f, 4.0f);
 
 	FragColor = final;
 }

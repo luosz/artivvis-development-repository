@@ -55,7 +55,7 @@ void Update()
 
 	camera.Update();
 
-	
+	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -89,6 +89,7 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 				showGraph = true;
 			break;
 		case 27:
+			cudaDeviceReset();
 			exit(0);
 			break;
 	}
