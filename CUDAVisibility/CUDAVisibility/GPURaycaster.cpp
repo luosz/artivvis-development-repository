@@ -3,7 +3,7 @@
 void GPURaycaster::Init(int screenWidth, int screenHeight)
 {
 	maxRaySteps = 1000;
-	rayStepSize = 0.005f;
+	rayStepSize = 0.01f;
 	gradientStepSize = 0.005f;
 	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
 

@@ -47,8 +47,8 @@ void QtWidget::InitTransferFuncTab()
 	tfIntensitySliders.push_back(ui.tfIntensity11);
 	tfIntensitySliders.push_back(ui.tfIntensity12);
 	tfIntensitySliders.push_back(ui.tfIntensity13);
-	tfIntensitySliders.push_back(ui.tfIntensity14);
-	tfIntensitySliders.push_back(ui.tfIntensity15);
+//	tfIntensitySliders.push_back(ui.tfIntensity14);
+//	tfIntensitySliders.push_back(ui.tfIntensity15);
 
 	tfIntensityLabels.push_back(ui.tfIntLabel1);
 	tfIntensityLabels.push_back(ui.tfIntLabel2);
@@ -63,8 +63,8 @@ void QtWidget::InitTransferFuncTab()
 	tfIntensityLabels.push_back(ui.tfIntLabel11);
 	tfIntensityLabels.push_back(ui.tfIntLabel12);
 	tfIntensityLabels.push_back(ui.tfIntLabel13);
-	tfIntensityLabels.push_back(ui.tfIntLabel14);
-	tfIntensityLabels.push_back(ui.tfIntLabel15);
+//	tfIntensityLabels.push_back(ui.tfIntLabel14);
+//	tfIntensityLabels.push_back(ui.tfIntLabel15);
 
 	for (int i=0; i<tfIntensitySliders.size(); i++)
 	{
@@ -76,6 +76,9 @@ void QtWidget::InitTransferFuncTab()
 		else
 			tfIntensityLabels[i]->setText("Null");
 	}
+
+	ui.tfIntensity15->setValue(transferFunction->targetIntensity * 100);
+	ui.tfIntLabel15->setText(QString::number(transferFunction->targetIntensity, 'f', 3));
 }
 
 void QtWidget::ClampTFSliders(int x, int currentSlider, int direction)
@@ -116,6 +119,19 @@ void QtWidget::AdjustTFIntensity(int x)
 		}
 	}
 	transferFunction->LoadLookup();
+}
+
+void QtWidget::AdjustIntensityFocus(int x)
+{
+	transferFunction->targetIntensity = x / 100.0f;
+	ui.tfIntLabel15->setText(QString::number(transferFunction->targetIntensity, 'f', 3));
+
+//	transferFunction->IntensityOptimize();
+}
+
+void QtWidget::ToggleIntensityOptimize(bool x)
+{
+	transferFunction->optimizeIntensity = x;
 }
 
 #pragma endregion TransferFuncTab

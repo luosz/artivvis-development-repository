@@ -14,7 +14,7 @@ void main()
 
 	if (abs(facePos.x) > 1.0f || abs(facePos.y) > 1.0f || abs(facePos.z) > 1.0f)
 	{	
-		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+//		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 		return;
 	}
 
@@ -25,11 +25,22 @@ void main()
 
 	float alpha = texture(transferFunc, scalar).w;
 
-	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
-	float visibility = (1.0f - prevOpacity) * alpha;
+//	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
+//	float visibility = (1.0f - prevOpacity) * alpha;
+
+	float opacity = prevOpacity + alpha;
+
+	float visibility; 
+	
+	if (opacity > 1.0f)
+	{
+		opacity = 1.0f;
+		visibility = (1.0f - prevOpacity);
+	}
+	else
+		visibility = alpha;
 
 	vec4 final = vec4(visibility, opacity, scalar, 1.0f);
-//	vec4 final = vec4(1.0f, 2.0f, 3.0f, 4.0f);
 
 	FragColor = final;
 }

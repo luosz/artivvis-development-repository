@@ -1148,6 +1148,9 @@
         <height>19</height>
        </rect>
       </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -1163,6 +1166,9 @@
         <width>91</width>
         <height>19</height>
        </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -1187,30 +1193,17 @@
        <enum>QSlider::TicksAbove</enum>
       </property>
      </widget>
-     <widget class="QSlider" name="tfIntensity14">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>130</y>
-        <width>91</width>
-        <height>19</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksAbove</enum>
-      </property>
-     </widget>
      <widget class="QSlider" name="tfIntensity15">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>310</x>
         <y>170</y>
-        <width>91</width>
-        <height>19</height>
+        <width>101</width>
+        <height>20</height>
        </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -1232,23 +1225,10 @@
        <string>TextLabel</string>
       </property>
      </widget>
-     <widget class="QLabel" name="tfIntLabel14">
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>130</y>
-        <width>31</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="tfIntLabel15">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>420</x>
         <y>170</y>
         <width>31</width>
         <height>16</height>
@@ -1282,6 +1262,32 @@
       </property>
       <property name="text">
        <string>TextLabel</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>150</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Intensity Focus</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>130</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Optimize Intensity</string>
       </property>
      </widget>
     </widget>
@@ -1939,26 +1945,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>tfIntensity14</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>VolumeRendererClass</receiver>
-   <slot>AdjustTFIntensity(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>368</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>490</x>
-     <y>260</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>tfIntensity15</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>VolumeRendererClass</receiver>
-   <slot>AdjustTFIntensity(int)</slot>
+   <slot>AdjustIntensityFocus(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>358</x>
@@ -1967,6 +1957,22 @@
     <hint type="destinationlabel">
      <x>474</x>
      <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>ToggleIntensityOptimize(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>347</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>303</y>
     </hint>
    </hints>
   </connection>
@@ -1999,5 +2005,7 @@
   <slot>AdjustKernelRadius(int)</slot>
   <slot>ToggleShowDiffuse(bool)</slot>
   <slot>AdjustTFIntensity(int)</slot>
+  <slot>AdjustIntensityFocus(int)</slot>
+  <slot>ToggleIntensityOptimize(bool)</slot>
  </slots>
 </ui>

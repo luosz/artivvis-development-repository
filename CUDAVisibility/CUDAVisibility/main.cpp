@@ -40,7 +40,7 @@ void Init()
 	visibilityHistogram.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 	raycaster.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	showGraph = false;
+	showGraph = true;
 }
 
 

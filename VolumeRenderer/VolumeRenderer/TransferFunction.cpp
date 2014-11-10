@@ -7,21 +7,31 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	LoadLookup();
 
 	volume = &volume_;
+	frequencies.resize(256);
 	CalculateFrequencies();
 	weights.resize(numIntensities);
+	numIterations = 100;
+
+	targetIntensity = 0.4f;
+
+	optimizeIntensity = false;
+}
+
+void TransferFunction::Update()
+{
+	if (optimizeIntensity)
+		IntensityOptimize();
 }
 
 void TransferFunction::CalculateFrequencies()
 {
-	frequencies.resize(256);
 	std::fill(frequencies.begin(), frequencies.end(), 0);
 
 	numVoxels = volume->xRes * volume->yRes * volume->zRes;
 
-	for (int i=0; i<numVoxels; i++)
+	for (int i=0; i<numVoxels; i++)			//	only suitable for byte size datasets
 	{
-		float scalar = (float)volume->memblock3D[i];
-		int bin = (int)(scalar * 256.0f);
+		int bin = (int)volume->memblock3D[i];
 		frequencies[bin]++;
 	}
 }
@@ -30,9 +40,9 @@ void TransferFunction::CalculateFrequencies()
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
-	auto r = doc.LoadFile("nucleon.tfi");
+//	auto r = doc.LoadFile("nucleon.tfi");
 //	auto r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
-//	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
+	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;
@@ -71,7 +81,7 @@ void TransferFunction::LoadLookup()
 
 	for (int i=0; i<256; i++)
 	{
-		float currentIntensity = (float)i / (float)256;
+		float currentIntensity = (float)i / (float)255;
 
 		while (next < numIntensities && currentIntensity > intensities[next])
 		{
@@ -103,15 +113,17 @@ glm::vec4 TransferFunction::LERPColor(glm::vec4 firstColor, glm::vec4 secondColo
 
 
 
-float TransferFunction::GetEntropyByID(float intensity, int index)
+
+
+float TransferFunction::GetWeightedEntropyOpacityByID(float intensity, int index)
 {
-	float frequency = frequencies[(int)(intensity * 256)];
-		//const double epsilon = 1e-6;
+	float frequency = frequencies[intensity];
+	//const double epsilon = 1e-6;
 	float probability = frequency / numVoxels;
 
 	if (probability > glm::epsilon<float>())
 	{
-		float normalised = intensity / 256.0f;
+		float normalised = intensity / 255.0f;
 
 		return GetWeightByInterp(normalised, index) * GetOpacityByInterp(normalised, index) * probability * (-log(probability));
 	}
@@ -121,7 +133,7 @@ float TransferFunction::GetEntropyByID(float intensity, int index)
 	}
 }
 
-float TransferFunction::GetEntropy(int index)
+float TransferFunction::GetWeightedAreaEntropy(int index)
 {
 	float a, b;
 
@@ -146,14 +158,14 @@ float TransferFunction::GetEntropy(int index)
 			}
 			else
 			{
-				std::cout << "index out of range in get_area_integral()" << std::endl;
+				std::cout << "index out of range in get_area_entropy()" << std::endl;
 			}
 		}
 	}
 
 	//std::cout<<"intensity "<<a<<" "<<b;
-	a = a * 256.0f;
-	b = b * 256.0f;
+	a = a * 255.0f;
+	b = b * 255.0f;
 	//std::cout<<" map to [0, 255] "<<a<<" "<<b<<std::endl;
 
 	float sum = 0;
@@ -163,7 +175,7 @@ float TransferFunction::GetEntropy(int index)
 		if (intensity >= a)
 		{
 			//std::cout<<intensity<<" ";
-			sum += GetEntropyByID(intensity, index);
+			sum += GetWeightedEntropyOpacityByID(intensity, index);
 		}
 	}
 	//std::cout<<std::endl;
@@ -188,56 +200,111 @@ void TransferFunction::IntensityOptimize()
 			weights[i] /= sum;
 	}
 	
-
-	int max_index = -1;
-	int min_index = -1;
-	float max_area = std::numeric_limits<float>::min();
-	float min_area = std::numeric_limits<float>::max();
-
-
-	for (int i = 0; i<numIntensities - 1; i++)
+	for (int i=0; i<numIterations; i++)
 	{
-		if (colors[i].a > glm::epsilon<float>())
+		int max_index = -1;
+		int min_index = -1;
+		float max_area = std::numeric_limits<float>::min();
+		float min_area = std::numeric_limits<float>::max();
+
+		for (int j=0; j<numIntensities - 1; j++)
 		{
-			float area = GetEntropy(i);
-			if (area > max_area)
+			if (colors[j].a > glm::epsilon<float>())
 			{
-				max_index = i;
-				max_area = area;
-			}
-			if (area < min_area && colors[i].a < 1.0f)
-			{
-				min_index = i;
-				min_area = area;
+				float area = GetWeightedAreaEntropy(j);
+				if (area > max_area)
+				{
+					max_index = j;
+					max_area = area;
+				}
+				if (area < min_area && colors[j].a < 1.0f)
+				{
+					min_index = j;
+					min_area = area;
+				}
 			}
 		}
+
+
+		if (min_index != max_index && max_index > -1 && min_index > -1)
+		{
+			// get the upper vertex of an edge
+			int max_index_next = max_index + 1;
+
+			float weight_max_1 = GetWeightedEntropyOpacityByID(intensities[max_index] * 255.0f, max_index);
+			float weight_max_2 = GetWeightedEntropyOpacityByID(intensities[max_index_next] * 255.0f, max_index_next);
+
+			if (colors[max_index_next].a > glm::epsilon<float>() && colors[max_index_next].a < 1 && weight_max_2 > weight_max_1)
+			{
+				max_index++;
+			}
+
+			// get the lower vertex of an edge
+			int min_index_next = min_index + 1;
+
+			float weight_min_1 = GetWeightedEntropyOpacityByID(intensities[min_index] * 255.0f, min_index);
+			float weight_min_2 = GetWeightedEntropyOpacityByID(intensities[min_index_next] * 255.0f, min_index_next);
+
+			if (colors[min_index_next].a > glm::epsilon<float>() && colors[min_index_next].a < 1 && weight_min_2 < weight_min_1)
+			{
+				min_index++;
+			}
+
+			float step_size = 1.0f / 255.0f;
+
+			float height_max = colors[max_index].a;
+			float height_max_new = height_max - step_size;
+			height_max_new = height_max_new < glm::epsilon<float>() ? glm::epsilon<float>() : height_max_new;
+
+			float area = GetWeightedNeighbourArea(max_index);
+			colors[max_index].a = height_max_new; // update opacity
+			float new_area = GetWeightedNeighbourArea(max_index); // calculate new area using new opacity
+			float area_decreased = area - new_area;
+
+			//double height_increased = get_height_given_area_increment(min_index, area_decreased);
+			float height_min = colors[min_index].a;
+			float height_min_new = height_min + step_size;
+			height_min_new = height_min_new > 1 ? 1 : height_min_new;
+			colors[min_index].a = height_min_new; // update opacity
+			//std::cout<<"balance TF entropy max index="<<max_index<<" min index="<<min_index<<" opacity="<<height_max<<" new opacity="<<height_max_new<<" area="<<area<<" new area="<<new_area<<" height="<<height_min<<" new height="<<height_min_new<<endl;
+		}
 	}
+
+	LoadLookup();
+}
+
+float TransferFunction::GetWeightedNeighbourArea(int index)
+{
+	return GetWeightedAreaEntropy(index) + GetWeightedAreaEntropy(index - 1);
 }
 
 
 float TransferFunction::GetOpacityByInterp(float intensity, int index)
 {
-	int i1 = index, i2 = index + 1;
+	int i1 = index;
+	int i2 = index + 1;
+
 	if (i1 >= 0 && i2 < numIntensities)
 	{
 		// linear interpolation
-		double t = (intensity - intensities[i1]) / (intensities[i2] - intensities[i1]);
+		float t = (intensity - intensities[i1]) / (intensities[i2] - intensities[i1]);
 
-		double a = intensities[i1];
-		double b = intensities[i2];
+		float a = colors[i1].a;
+		float b = colors[i2].a;
+
 		return (a + (b - a) * t);
 	}
 	else
 	{
 		if (i1 == -1)
 		{
-			return intensities[i2];
+			return colors[i2].a;
 		}
 		else
 		{
 			if (i1 == numIntensities - 1)
 			{
-				return intensities[i1];
+				return colors[i1].a;
 			}
 			else
 			{
@@ -251,16 +318,17 @@ float TransferFunction::GetOpacityByInterp(float intensity, int index)
 
 float TransferFunction::GetWeightByInterp(float intensity, int index)
 {
-	int i1 = index, i2 = index + 1;
+	int i1 = index;
+	int i2 = index + 1;
 
 	if (i1 >= 0 && i2 < numIntensities)
 	{
 		// linear interpolation
-		double t = (intensity - intensities[i1]) / (intensities[i2] - intensities[i1]);
+		float t = (intensity - intensities[i1]) / (intensities[i2] - intensities[i1]);
 
 		// get control point weights
-		double a = GetWeight(i1);
-		double b = GetWeight(i2);
+		float a = GetWeight(i1);
+		float b = GetWeight(i2);
 
 		return (a + (b - a) * t);
 	}

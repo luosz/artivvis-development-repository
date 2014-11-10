@@ -78,6 +78,8 @@ public slots:
 #pragma region TransferFuncTab
 	void AdjustTFIntensity(int x);
 	void ClampTFSliders(int x, int currentSlider, int direction);
+	void AdjustIntensityFocus(int x);
+	void ToggleIntensityOptimize(bool x);
 #pragma endregion TransferFuncTab
 
 private:

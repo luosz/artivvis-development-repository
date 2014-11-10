@@ -36,6 +36,7 @@ public:
 
 	GLuint GenerateSliceTexture();
 	glm::vec3 FindClosestCorner(Camera &camera);
+	glm::vec3 FindFarthestCorner(Camera &camera);
 };
 
 #endif

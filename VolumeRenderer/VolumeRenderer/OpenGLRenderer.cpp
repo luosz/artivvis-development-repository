@@ -13,13 +13,15 @@ void OpenGLRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volu
 	raycaster = new GPURaycaster();
 	raycaster->Init(screenWidth, screenHeight, volume);
 
-	transferFunction.Init(" ");
+	transferFunction.Init(" ", volume);
 }
 
 
 void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
 {
+	transferFunction.Update();
+
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);
 	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
-	
+
 }

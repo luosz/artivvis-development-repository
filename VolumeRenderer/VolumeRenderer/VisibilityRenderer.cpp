@@ -13,7 +13,7 @@ void VisibilityRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &
 	raycaster = new VisibilityRaycaster();
 	raycaster->Init(screenWidth, screenHeight, volume);
 
-	transferFunction.Init(" ");
+	transferFunction.Init(" ", volume);
 }
 
 

@@ -18,6 +18,10 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	boxCorners.push_back(glm::vec3(-1.0f, -1.0f, -1.0f));
 	boxCorners.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
 
+	opacityTex = GenerateSliceTexture();
+
+	
+
 	glGenFramebuffers (1, &frameBuffer);
 	glBindFramebuffer (GL_FRAMEBUFFER, frameBuffer);
 
@@ -27,14 +31,14 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	glRenderbufferStorage (GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
 	glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb);
 
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
+
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
 
 	currentSlice = 0;
 	numSlices = 256;
 	numBins = 256;
-	opacityTex = GenerateSliceTexture();
-
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
+	
 
 	visibilities.resize(numBins);
 	numVis.resize(numBins);
@@ -89,6 +93,26 @@ glm::vec3 VisibilityHistogram::FindClosestCorner(Camera &camera)
 	return boxCorners[minPoint];
 }
 
+glm::vec3 VisibilityHistogram::FindFarthestCorner(Camera &camera)
+{
+	int maxPoint = 0;
+	float maxDist = 0.0f;
+	float newDist;
+
+	for (int i=0; i<boxCorners.size(); i++)
+	{
+		newDist = glm::distance2(camera.position, boxCorners[i]);
+		
+		if (newDist > maxDist)
+		{
+			maxDist = newDist;
+			maxPoint = i;
+		}
+	}
+
+	return boxCorners[maxPoint];
+}
+
 __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *numInBin)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
@@ -105,9 +129,34 @@ __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *num
 		{
 //			printf("%d, %d, %d\n", tid, u, v);
 			int bin = scalar * 255.0f;
-//			printf("%f, %f, %f %f\n", color.x, color.y, color.z, color.w);
+//			if (scalar > 0.0f)
+//			if (u == 400 && v == 400)
+//				printf("%d: %f, %f, %f %f\n", bin, color.x, color.y, color.z, color.w);
 			atomicAdd(&(histBins[bin]), (float)color.x);
 			atomicAdd(&(numInBin[bin]), (int)1);
+		}
+	}
+}
+
+__global__ void CudaCheck(int xPixels, int yPixels)
+{
+	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if (tid < xPixels * yPixels)
+	{
+		int v = (int) tid / yPixels;
+		int u = tid % yPixels;
+
+		float4 color = tex2D(texRef, u, v);
+		float scalar = color.z;
+
+		if (color.x > 0.0f)
+		{
+//			printf("%d, %d, %d\n", tid, u, v);
+			int bin = scalar * 255.0f;
+//			if (scalar > 0.8f)
+//			if (u == 400 && v == 400)
+				printf("%d: %f, %f, %f %f\n", bin, color.x, color.y, color.z, color.w);
 		}
 	}
 }
@@ -126,7 +175,6 @@ __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 	}
 }
 
-
 void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
 {
 //	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
@@ -141,9 +189,8 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	GLuint shaderProgramID = shaderManager.UseShader(VisibilityShader);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
+	
 
 	int uniformLoc;
 
@@ -173,21 +220,29 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	glUniform1i(uniformLoc,2);
 	glBindTexture (GL_TEXTURE_2D, opacityTex);
 
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 	glm::vec3 closestCorner = FindClosestCorner(camera);
+	glm::vec3 farthestCorner = FindFarthestCorner(camera);
+
 	glm::vec3 camDirection = camera.GetViewDirection();
 	float dist = glm::dot(closestCorner - camera.position, camDirection);
 
 	glm::vec3 rightVec = glm::normalize(glm::cross(camDirection, glm::vec3(0.0f, 1.0f, 0.0f)));
 	glm::vec3 upVec = glm::normalize(glm::cross(camDirection, -rightVec));
 
+	float farDist = glm::dot(farthestCorner - camera.position, camDirection);
+	float sliceGap = (farDist - dist) / (float)numSlices; 
+
 	for (int i=0; i<numSlices; i++)
 	{
-		
-		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 //		dist += currentSlice * 0.005f;
-		dist += 0.005f;
+		dist += 0.01f;
+//		dist += sliceGap;
 
 		float extent = dist * glm::tan((camera.FoV / 2.0f) * (glm::pi<float>()/180.0f));
 		glm::vec3 centre = camera.position + (camDirection * dist);
@@ -231,6 +286,9 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 
 		HANDLE_ERROR( cudaUnbindTexture(texRef) );
 		HANDLE_ERROR( cudaGraphicsUnmapResources(1, &resource) );
+
+		cudaDeviceSynchronize();
+//		int a =0;
 		
 
 
@@ -247,8 +305,10 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 //		}
 	}
 
+//	glBindTexture (GL_TEXTURE_3D, 0);
+//	glBindTexture (GL_TEXTURE_2D, 0);
+//	glBindTexture (GL_TEXTURE_1D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
 	CudaNormalize<<< (numBins + 255) / 256, 256>>>(256, cudaHistBins, cudaNumInBin);
 
@@ -275,7 +335,8 @@ void VisibilityHistogram::DrawHistogram(ShaderManager shaderManager, Camera &cam
 	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
 
 	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
+	glm::mat4 tempView = glm::lookAt(glm::vec3(0.5f, 0.5f, 2.0f), glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f,1.0f,0.0f));
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &tempView[0][0]);
 
 	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
 	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
