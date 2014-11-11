@@ -18,7 +18,7 @@ public:
 	int numBins;
 	std::vector<glm::vec3> boxCorners;
 	GLuint frameBuffer;
-	GLuint opacityTex;
+	GLuint opacityTex1, opacityTex2;
 	int currentSlice;
 
 	std::vector<float> visibilities;

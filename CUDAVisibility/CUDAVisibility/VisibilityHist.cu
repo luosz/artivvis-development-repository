@@ -18,8 +18,8 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	boxCorners.push_back(glm::vec3(-1.0f, -1.0f, -1.0f));
 	boxCorners.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
 
-	opacityTex = GenerateSliceTexture();
-
+	opacityTex1 = GenerateSliceTexture();
+	opacityTex2 = GenerateSliceTexture();
 	
 
 	glGenFramebuffers (1, &frameBuffer);
@@ -31,12 +31,12 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	glRenderbufferStorage (GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
 	glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb);
 
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex1, 0);
 
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
 
 	currentSlice = 0;
-	numSlices = 256;
+	numSlices = 512;
 	numBins = 256;
 	
 
@@ -47,12 +47,6 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 
 	HANDLE_ERROR( cudaMalloc((void**)&cudaHistBins, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin, 256 * sizeof(int)) );
-
-//	thrust::device_vector<float> blah(100);
-//	cudaHistBins.resize(256);
-//	cudaNumInBin.resize(256);
-
-	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, opacityTex, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
 
 }
 
@@ -138,29 +132,6 @@ __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *num
 	}
 }
 
-__global__ void CudaCheck(int xPixels, int yPixels)
-{
-	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
-
-	if (tid < xPixels * yPixels)
-	{
-		int v = (int) tid / yPixels;
-		int u = tid % yPixels;
-
-		float4 color = tex2D(texRef, u, v);
-		float scalar = color.z;
-
-		if (color.x > 0.0f)
-		{
-//			printf("%d, %d, %d\n", tid, u, v);
-			int bin = scalar * 255.0f;
-//			if (scalar > 0.8f)
-//			if (u == 400 && v == 400)
-				printf("%d: %f, %f, %f %f\n", bin, color.x, color.y, color.z, color.w);
-		}
-	}
-}
-
 __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
@@ -169,7 +140,6 @@ __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 	{
 		if (numInBin[tid] > 0)
 		{
-//			printf("%d, %f, %d\n", tid, histBins[tid], numInBin[tid]);
 			histBins[tid] = histBins[tid] / numInBin[tid];
 		}
 	}
@@ -183,15 +153,13 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	HANDLE_ERROR( cudaMemset(cudaHistBins, 0, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMemset(cudaNumInBin, 0, 256 * sizeof(int)) );
 
-//	thrust::fill(cudaHistBins.begin(), cudaHistBins.end(), 0.0f);
-//	thrust::fill(cudaNumInBin.begin(), cudaNumInBin.end(), 0);
-
 	GLuint shaderProgramID = shaderManager.UseShader(VisibilityShader);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex, 0);
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, opacityTex2, 0);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-
 	int uniformLoc;
 
 	glm::mat4 model_mat = glm::mat4(1.0f);
@@ -215,15 +183,6 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	glUniform1i(uniformLoc,1);
 	glBindTexture (GL_TEXTURE_1D, transferFunction.tfTexture);
 
-	glActiveTexture (GL_TEXTURE2);
-	uniformLoc = glGetUniformLocation(shaderProgramID,"opacityTex");
-	glUniform1i(uniformLoc,2);
-	glBindTexture (GL_TEXTURE_2D, opacityTex);
-
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
 	glm::vec3 closestCorner = FindClosestCorner(camera);
 	glm::vec3 farthestCorner = FindFarthestCorner(camera);
 
@@ -236,12 +195,32 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	float farDist = glm::dot(farthestCorner - camera.position, camDirection);
 	float sliceGap = (farDist - dist) / (float)numSlices; 
 
+	GLuint readTex, writeTex;
+
 	for (int i=0; i<numSlices; i++)
 	{
-//		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (i % 2 == 0)
+		{
+			writeTex = opacityTex1;
+			readTex = opacityTex2;
+		}
+		else
+		{
+			writeTex = opacityTex2;
+			readTex = opacityTex1;
+		}
+
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, writeTex, 0);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glActiveTexture (GL_TEXTURE2);
+		glBindTexture (GL_TEXTURE_2D, readTex);
+		uniformLoc = glGetUniformLocation(shaderProgramID,"opacityTex");
+		glUniform1i(uniformLoc,2);
 
 //		dist += currentSlice * 0.005f;
-		dist += 0.01f;
+		dist += 0.005f;
 //		dist += sliceGap;
 
 		float extent = dist * glm::tan((camera.FoV / 2.0f) * (glm::pi<float>()/180.0f));
@@ -270,15 +249,11 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 
 //		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_FLOAT, pixelBuffer);
 
-//		glBindTexture(GL_TEXTURE_2D, 0);
 
-
+		HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, writeTex, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
 		HANDLE_ERROR( cudaGraphicsMapResources(1, &resource) );
-		cudaArray *arry = 0;
-		
+		cudaArray *arry = 0;	
 		HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&arry, resource, 0, 0) ); 
-
-
 		HANDLE_ERROR( cudaBindTextureToArray(texRef, arry) );
 
 		int numPixels = xPixels * yPixels;
@@ -286,12 +261,8 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 
 		HANDLE_ERROR( cudaUnbindTexture(texRef) );
 		HANDLE_ERROR( cudaGraphicsUnmapResources(1, &resource) );
-
-		cudaDeviceSynchronize();
-//		int a =0;
+		HANDLE_ERROR( cudaGraphicsUnregisterResource(resource) );
 		
-
-
 //		for (int j=0; j<xPixels*yPixels; j++)
 //		{
 //			float scalar = pixelBuffer[j*4 + 2];
@@ -305,9 +276,6 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 //		}
 	}
 
-//	glBindTexture (GL_TEXTURE_3D, 0);
-//	glBindTexture (GL_TEXTURE_2D, 0);
-//	glBindTexture (GL_TEXTURE_1D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	CudaNormalize<<< (numBins + 255) / 256, 256>>>(256, cudaHistBins, cudaNumInBin);

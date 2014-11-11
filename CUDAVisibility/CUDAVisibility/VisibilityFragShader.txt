@@ -28,10 +28,12 @@ void main()
 //	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
 //	float visibility = (1.0f - prevOpacity) * alpha;
 
+
+
 	float opacity = prevOpacity + alpha;
 
 	float visibility; 
-	
+
 	if (opacity > 1.0f)
 	{
 		opacity = 1.0f;
@@ -39,6 +41,7 @@ void main()
 	}
 	else
 		visibility = alpha;
+
 
 	vec4 final = vec4(visibility, opacity, scalar, 1.0f);
 
