@@ -8,11 +8,8 @@
 #include "VolumeDataset.h"
 #include "VisibilityHist.h"
 
-#define SCREEN_WIDTH 1600
+#define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
-
-#define SUB_WINDOW_WIDTH 800
-#define SUB_WINDOW_HEIGHT 800
 
 Camera camera;
 ShaderManager shaderManager;
@@ -20,8 +17,6 @@ GPURaycaster raycaster;
 TransferFunction transferFunction;
 VolumeDataset volume;
 VisibilityHistogram visibilityHistogram;
-
-GLuint mainWindow, subWindow1, subWindow2;
 
 // For mouse control
 int xclickedAt = -1;
@@ -38,32 +33,20 @@ void Init()
 	volume.Init();
 	volume.currTexture3D = volume.GenerateTexture();
 
-	camera.Init(SUB_WINDOW_WIDTH, SUB_WINDOW_HEIGHT);
+	camera.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 	shaderManager.Init();
 
 	transferFunction.Init(" ", volume);
 
-	visibilityHistogram.Init(SUB_WINDOW_WIDTH, SUB_WINDOW_HEIGHT);
-	raycaster.Init(SUB_WINDOW_WIDTH, SUB_WINDOW_HEIGHT);
+	visibilityHistogram.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
+	raycaster.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	showGraph = true;
-}
-
-void Display()
-{
-	glutSetWindow(mainWindow);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	
-
-	glutSwapBuffers();
+	showGraph = false;
 }
 
 
-void Display1()
+void Update()
 {
-	glutSetWindow(subWindow1);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -71,43 +54,16 @@ void Display1()
 	transferFunction.IntensityOptimize();
 //	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
 
-	GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
-	raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
+	if (showGraph)
+		visibilityHistogram.DrawHistogram(shaderManager, camera);
+	else
+	{
+		GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
+		raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
+	}
 
 	glutSwapBuffers();
 }
-
-
-void Display2()
-{
-	glutSetWindow(subWindow2);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	camera.Update();
-	transferFunction.IntensityOptimize();
-	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
-
-	visibilityHistogram.DrawHistogram(shaderManager, camera);
-
-	glutSwapBuffers();
-}
-
-
-
-
-// Update renderer and check for Qt events
-void Update()
-{
-	
-	
-	
-	Display();
-	Display1();
-	Display2();
-}
-
-
 
 
 // General Keyboard Input
@@ -221,6 +177,57 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    glutCreateWindow("Visibility Histogram");
+		
+	// Tell glut where the display function is
+	glutDisplayFunc(Update);
+	glutIdleFunc(Update);
+
+	// A call to glewInit() must be done after glut is initialized!
+    GLenum res = glewInit();
+	// Check for any errors
+    if (res != GLEW_OK) 
+	{
+		fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
+		return 1;
+    }
+	
+	// Initialize Renderer and Qt
+	Init();
+
+	glutKeyboardFunc(KeyboardFunc);
+	glutSpecialFunc(SpecialFunc);
+	glutMouseFunc(MouseButton);
+	glutMotionFunc(MouseMove);
+	glutMouseWheelFunc(MouseWheel);
+
+	// Begin infinite event loop
+	glutMainLoop();
+	
+    return 0;
+
+}
+
+
+
+
+
+
+//	Dual SubWindow Code
+
+/*
+#define SUB_WINDOW_WIDTH 800
+#define SUB_WINDOW_HEIGHT 800
+
+GLuint mainWindow, subWindow1, subWindow2;
+
+int main(int argc, char *argv[])
+{
+	
+	// Set up the window
+	glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     mainWindow = glutCreateWindow("Visibility Histogram");
 		
 	// Tell glut where the display function is
@@ -272,3 +279,62 @@ int main(int argc, char *argv[])
     return 0;
 
 }
+
+void Display()
+{
+	glutSetWindow(mainWindow);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	
+
+	glutSwapBuffers();
+}
+
+
+void Display1()
+{
+	glutSetWindow(subWindow1);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	camera.Update();
+	transferFunction.IntensityOptimize();
+//	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
+
+	GLuint shaderProgramID = shaderManager.UseShader(TransFuncShader);
+	raycaster.Raycast(volume, transferFunction, shaderProgramID, camera);
+
+	glutSwapBuffers();
+}
+
+
+void Display2()
+{
+	glutSetWindow(subWindow2);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	camera.Update();
+	transferFunction.IntensityOptimize();
+	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
+
+	visibilityHistogram.DrawHistogram(shaderManager, camera);
+
+	glutSwapBuffers();
+}
+
+
+
+
+// Update renderer and check for Qt events
+void Update()
+{
+	
+	
+	
+	Display();
+	Display1();
+	Display2();
+}
+*/

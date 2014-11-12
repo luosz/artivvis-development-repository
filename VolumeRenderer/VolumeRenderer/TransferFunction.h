@@ -9,6 +9,7 @@
 #include <GL/freeglut.h>
 #include "VolumeDataset.h"
 
+#define tfEPSILON glm::epsilon<float>()
 
 class TransferFunction
 {

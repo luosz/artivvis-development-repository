@@ -90,6 +90,7 @@ GLuint Shader::CompileShaders()
 	// Create two shader objects, one for the vertex, and one for the fragment shader
     AddShader(ID, pVS, GL_VERTEX_SHADER);
     AddShader(ID, pFS, GL_FRAGMENT_SHADER);
+	
 
     GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };

@@ -118,7 +118,7 @@ void QtWidget::AdjustTFIntensity(int x)
 			break;
 		}
 	}
-	transferFunction->LoadLookup();
+//	transferFunction->LoadLookup();
 }
 
 void QtWidget::AdjustIntensityFocus(int x)

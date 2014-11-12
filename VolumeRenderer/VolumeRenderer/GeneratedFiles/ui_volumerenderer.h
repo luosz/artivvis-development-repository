@@ -453,6 +453,7 @@ public:
         tfIntensity13 = new QSlider(tab_6);
         tfIntensity13->setObjectName(QStringLiteral("tfIntensity13"));
         tfIntensity13->setGeometry(QRect(290, 90, 91, 19));
+        tfIntensity13->setMaximum(100);
         tfIntensity13->setOrientation(Qt::Horizontal);
         tfIntensity13->setTickPosition(QSlider::TicksAbove);
         tfIntensity15 = new QSlider(tab_6);

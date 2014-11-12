@@ -3,8 +3,6 @@
 // Initialize view, projection and position
 void Camera::Init(int screenWidth, int screenHeight)
 {
-//	position =  glm::vec3(gridXRes / 2.0f, gridYRes / 2.0f, (gridZRes / 2.0f) + gridZRes);
-//	focus = glm::vec3(gridXRes / 2.0f, gridYRes / 2.0f, gridZRes / 2.0f);
 	position =  glm::vec3(0.0f, 0.0f, 4.0f);
 	focus = glm::vec3(0.0f);
 	distFromFocus = glm::distance(position, focus);
