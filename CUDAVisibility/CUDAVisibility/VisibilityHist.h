@@ -2,7 +2,6 @@
 #define VISIBILITY_HIST_H
 
 #include "VolumeDataset.h"
-#include "TransferFunction.h"
 #include "ShaderManager.h"
 #include "CudaHeaders.h"
 
@@ -31,12 +30,13 @@ public:
 
 
 	void Init(int screenWidth, int screenHeight);
-	void CalculateHistogram(VolumeDataset &volume, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera);
+	void CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera);
 	void DrawHistogram(ShaderManager shaderManager, Camera & camera);
 
 	GLuint GenerateSliceTexture();
 	glm::vec3 FindClosestCorner(Camera &camera);
 	glm::vec3 FindFarthestCorner(Camera &camera);
+
 };
 
 #endif

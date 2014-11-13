@@ -121,11 +121,11 @@ __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *num
 
 		if (scalar > 0.0f)
 		{
-//			printf("%d, %d, %d\n", tid, u, v);
 			int bin = scalar * 255.0f;
-//			if (scalar > 0.0f)
-//			if (u == 400 && v == 400)
-//				printf("%d: %f, %f, %f %f\n", bin, color.x, color.y, color.z, color.w);
+
+	//		if (u == 400 && v == 400)
+	//			printf("%d, %f\n", bin, color.x);
+
 			atomicAdd(&(histBins[bin]), (float)color.x);
 			atomicAdd(&(numInBin[bin]), (int)1);
 		}
@@ -140,12 +140,14 @@ __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 	{
 		if (numInBin[tid] > 0)
 		{
+		//	if (tid == 44)
+		//		printf("%d, %f\n", numInBin[tid], histBins[tid]);
 			histBins[tid] = histBins[tid] / numInBin[tid];
 		}
 	}
 }
 
-void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
+void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera)
 {
 //	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
 //	std::fill(numVis.begin(), numVis.end(), 0);
@@ -181,7 +183,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 	glActiveTexture (GL_TEXTURE1);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"transferFunc");
 	glUniform1i(uniformLoc,1);
-	glBindTexture (GL_TEXTURE_1D, transferFunction.tfTexture);
+	glBindTexture (GL_TEXTURE_1D, tfTexture);
 
 	glm::vec3 closestCorner = FindClosestCorner(camera);
 	glm::vec3 farthestCorner = FindFarthestCorner(camera);
@@ -220,7 +222,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, TransferFunc
 		glUniform1i(uniformLoc,2);
 
 //		dist += currentSlice * 0.005f;
-		dist += 0.005f;
+		dist += 0.01f;
 //		dist += sliceGap;
 
 		float extent = dist * glm::tan((camera.FoV / 2.0f) * (glm::pi<float>()/180.0f));
@@ -328,3 +330,7 @@ void VisibilityHistogram::DrawHistogram(ShaderManager shaderManager, Camera &cam
 
 	glEnd();
 }
+
+
+
+

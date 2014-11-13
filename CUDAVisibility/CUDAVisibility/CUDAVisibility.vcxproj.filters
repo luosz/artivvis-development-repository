@@ -39,6 +39,12 @@
     <ClCompile Include="VoxelReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IntensityTFOptimizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VisibilityTFOptimizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -69,6 +75,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VisibilityHist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TFOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntensityTFOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisibilityTFOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

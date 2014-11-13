@@ -51,8 +51,8 @@ void Update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	camera.Update();
-	transferFunction.IntensityOptimize();
-//	visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
+	visibilityHistogram.CalculateHistogram(volume, transferFunction.tfTexture, shaderManager, camera);
+	transferFunction.Optimize(visibilityHistogram);
 
 	if (showGraph)
 		visibilityHistogram.DrawHistogram(shaderManager, camera);
@@ -72,7 +72,7 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 	switch(key)
 	{
 		case 'm':
-			visibilityHistogram.CalculateHistogram(volume, transferFunction, shaderManager, camera);
+			visibilityHistogram.CalculateHistogram(volume, transferFunction.tfTexture, shaderManager, camera);
 			break;
 		case 'n':
 			if (showGraph)

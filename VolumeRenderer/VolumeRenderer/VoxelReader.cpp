@@ -20,7 +20,13 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	headerFile = folderPath + "TVlung.mhd";
 
 //	folderPath = "../../Samples/FiveJets/";
-//	headerFile = folderPath + "FiveJetsEnergy.mhd";
+//	headerFile = folderPath + "FiveJetsDensity.mhd";
+
+	folderPath = "../../Samples/Isabel/";
+	headerFile = folderPath + "IsabelCloud.mhd";
+
+//	folderPath = "../../Samples/TJet/";
+//	headerFile = folderPath + "TJet.mhd";
 
 //	folderPath = "../../Samples/Abdomen/";
 //	headerFile = folderPath + "Abdomen16.mhd";
@@ -37,8 +43,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/Bonsai/";
 //	headerFile = folderPath + "bonsai.mhd";
 
-	folderPath = "../../Samples/SmokeSim/";
-	headerFile = folderPath + "SmokeSim.mhd";
+//	folderPath = "../../Samples/SmokeSim/";
+//	headerFile = folderPath + "SmokeSim.mhd";
 
 //	folderPath = "../../Samples/CTknee/";
 //	headerFile = folderPath + "CTknee.mhd";

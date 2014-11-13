@@ -8,6 +8,9 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "VolumeDataset.h"
+#include "IntensityTFOptimizer.h"
+#include "VisibilityTFOptimizer.h"
+#include "VisibilityHist.h"
 
 class TransferFunction
 {
@@ -17,12 +20,8 @@ public:
 	int numIntensities;
 	GLuint tfTexture;
 
-	std::vector<int> frequencies;
-	std::vector<float> weights;
 	float targetIntensity;
-	int numVoxels;
-	int numIterations;
-	VolumeDataset *volume;
+	TFOptimizer *optimizer;
 
 	std::vector<glm::vec4> colorTable;
 
@@ -30,14 +29,7 @@ public:
 	void LoadXML(const char *filename);
 	void LoadLookup();
 
-	void IntensityOptimize();
-	float GetWeightedAreaEntropy(int index);
-	float GetWeightedEntropyOpacityByID(float intensity, int index);
-	void CalculateFrequencies();
-	float GetOpacityByInterp(float intensity, int index);
-	float GetWeightByInterp(float intensity, int index);
-	float GetWeight(int index);
-	float GetWeightedNeighbourArea(int index);
+	void Optimize(VisibilityHistogram &histogram);
 
 	glm::vec4 LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity);
 };

@@ -14,12 +14,6 @@ uniform float gradientStepSize;
 
 uniform vec3 lightPosition;
 
-uniform vec2 division1;
-uniform vec2 division2;
-
-uniform float opacity1;
-uniform float opacity2;
-
 vec3 CalculateNormal(vec3 texCoord)
 {
 	vec3 sample1, sample2;
@@ -82,7 +76,11 @@ void main()
 		normal = CalculateNormal(texCoord);
 		color = CalculateLighting(color, normal);
 
-		finalColor += color*opacity;
+		if ((absorption + opacity) > 1.0f)
+			finalColor += color*(1.0f - absorption);
+		else
+			finalColor += color*opacity;
+
 		absorption += opacity;
 
 		position = position + (direction * rayStepSize);
