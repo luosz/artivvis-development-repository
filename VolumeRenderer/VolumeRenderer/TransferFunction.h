@@ -14,6 +14,7 @@
 class TransferFunction
 {
 public:
+	std::vector<glm::vec4> origColors;
 	std::vector<glm::vec4> colors;
 	std::vector<float> intensities;
 	std::vector<int> frequencies;

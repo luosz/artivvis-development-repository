@@ -4,6 +4,10 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 {
 	colorTable.resize(256);
 	LoadXML(filename);
+
+	colors.resize(numIntensities);
+	memcpy(&colors[0], &origColors[0], numIntensities * sizeof(glm::vec4));
+
 	LoadLookup();
 
 	volume = &volume_;
@@ -11,7 +15,7 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	numVoxels = volume->xRes * volume->yRes * volume->zRes;
 	CalculateFrequencies();
 	weights.resize(numIntensities);
-	numIterations = 100;
+	numIterations = 1000;
 
 	targetIntensity = 0.4f;
 
@@ -30,8 +34,8 @@ void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
 //	auto r = doc.LoadFile("nucleon.tfi");
-	auto r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
-//	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
+//	auto r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
+	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;
@@ -50,7 +54,7 @@ void TransferFunction::LoadXML(const char *filename)
 		int b = atoi(key->FirstChildElement("colorL")->Attribute("b"));
 		int a = atoi(key->FirstChildElement("colorL")->Attribute("a"));
 
-		colors.push_back(glm::vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f));
+		origColors.push_back(glm::vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f));
 
 		std::cout << "intensity=" << intensity;
 		std::cout << "\tcolorL r=" << r << " g=" << g << " b=" << b << " a=" << a;
@@ -184,6 +188,7 @@ float TransferFunction::GetWeightedAreaEntropy(int index)
 
 void TransferFunction::IntensityOptimize()
 {
+	memcpy(&colors[0], &origColors[0], numIntensities * sizeof(glm::vec4));
 	CalculateFrequencies();
 
 	float sum = 0.0f;
