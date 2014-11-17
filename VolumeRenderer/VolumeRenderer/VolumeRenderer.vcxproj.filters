@@ -101,10 +101,10 @@
     <ClCompile Include="TransferFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VisibilityRenderer.cpp">
+    <ClCompile Include="IntensityTFOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VisibilityRaycaster.cpp">
+    <ClCompile Include="RegionVisibilityOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -183,10 +183,16 @@
     <ClInclude Include="TransferFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VisibilityRenderer.h">
+    <ClInclude Include="VisibilityHistogram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VisibilityRaycaster.h">
+    <ClInclude Include="CudaHeaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntensityTFOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionVisibilityOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -287,15 +293,26 @@
     <Text Include="TransFuncVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="VisibilityHistFragShader.txt">
+    <Text Include="VisibilityFragShader.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="VisibilityHistVertShader.txt">
+    <Text Include="VisibilityVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="RegionVisibilityFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="RegionVisibilityVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="VisibilityHistogram.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

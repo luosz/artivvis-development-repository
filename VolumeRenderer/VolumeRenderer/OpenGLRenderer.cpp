@@ -14,14 +14,25 @@ void OpenGLRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volu
 	raycaster->Init(screenWidth, screenHeight, volume);
 
 	transferFunction.Init(" ", volume);
+
+	visibilityHistogram.Init(screenWidth, screenHeight);
+
+	regionOptimizer.Init(transferFunction);
 }
 
 
 void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
 {
+
+//	visibilityHistogram.CalculateHistogram(volume, transferFunction.tfTexture, shaderManager, camera);
 	transferFunction.Update();
+
+	regionOptimizer.CalculateVisibility(shaderManager, camera, volume, transferFunction, raycaster);
+
 
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);
 	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
+
+//	visibilityHistogram.DrawHistogram(shaderManager, camera);
 
 }

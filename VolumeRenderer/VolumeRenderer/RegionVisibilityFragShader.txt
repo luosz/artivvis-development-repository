@@ -1,0 +1,100 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 eyeSpacePos;
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform sampler1D transferFunc;
+
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+uniform float gradientStepSize;
+
+uniform vec2 division1;
+uniform vec2 division2;
+uniform vec2 division3;
+uniform vec2 division4;
+
+void main()
+{
+	vec4 finalColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	vec3 position = facePos;
+	vec3 texCoord;
+
+	int numDiv1 = 0;
+	int numDiv2 = 0;
+	int numDiv3 = 0;
+	int numDiv4 = 0;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+
+	float prevOpacity = 0.0f;
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{		
+		texCoord = (position + 1.0f) / 2.0f; 
+
+		float scalar = texture(volume, texCoord).x;
+
+		float alpha = texture(transferFunc, scalar).w;
+
+		float opacity = prevOpacity + alpha;
+
+		float visibility; 
+
+		if (opacity > 1.0f)
+		{
+			opacity = 1.0f;
+			visibility = (1.0f - prevOpacity);
+		}
+		else
+			visibility = alpha;
+
+
+		if (scalar > division1.x && scalar < division1.y)
+		{
+			finalColor += vec4(visibility, 0.0f, 0.0f, 0.0f);
+			numDiv1++;			
+		}		
+		else if (scalar > division2.x && scalar < division2.y)
+		{	
+			finalColor += vec4(0.0f, visibility, 0.0f, 0.0f);
+			numDiv2++;
+		}
+		if (scalar > division3.x && scalar < division3.y)
+		{	
+			finalColor += vec4(0.0f, 0.0f, visibility, 0.0f);
+			numDiv3++;
+		}
+		else if (scalar > division4.x && scalar < division4.y)
+		{	
+			finalColor += vec4(0.0f, 0.0f, 0.0f, visibility);
+			numDiv4++;
+		}
+
+
+		prevOpacity = opacity;
+
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || opacity >= 1.0f)
+			break;
+	}
+
+//	if (numDiv1 > 0)
+//		finalColor.x /= numDiv1;
+//	if (numDiv2 > 0)
+//		finalColor.y /= numDiv2;
+//	if (numDiv3 > 0)
+//		finalColor.z /= numDiv3;
+//	if (numDiv4 > 0)
+//		finalColor.w /= numDiv4;
+
+
+	FragColor = finalColor;
+}

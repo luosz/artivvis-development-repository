@@ -23,6 +23,7 @@ public:
 	void Zoom(float zoomAmount);
 	void Translate(glm::vec3 translateAmount);
 	void Rotate(float rotateAmount);
+	glm::vec3 GetViewDirection();
 };
 
 

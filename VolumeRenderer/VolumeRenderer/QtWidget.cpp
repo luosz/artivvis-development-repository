@@ -27,6 +27,7 @@ void QtWidget::Init(VolumeRenderer &volumeRenderer)
 
 void QtWidget::CloseProgram()
 {
+	cudaDeviceReset();
 	exit(0);
 }
 

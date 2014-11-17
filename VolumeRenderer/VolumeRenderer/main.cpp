@@ -27,11 +27,9 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 {
 	switch(key)
 	{
-		case 'm':
-			volumeRenderer.renderer->transferFunction.IntensityOptimize();
-			break;
-		case 'w':
-			volumeRenderer.renderer->transferFunction.LoadLookup();
+		case 27:
+			cudaDeviceReset();
+			exit(0);
 			break;
 	}
 }

@@ -50,3 +50,9 @@ void Camera::Rotate(float rotateAmount)
 {
 	position = glm::rotateY(position, rotateAmount);
 }
+
+// Get current view direction
+glm::vec3 Camera::GetViewDirection()
+{
+	return glm::normalize(focus - position);
+}

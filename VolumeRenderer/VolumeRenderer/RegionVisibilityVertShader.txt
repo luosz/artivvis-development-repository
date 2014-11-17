@@ -3,12 +3,15 @@
 in vec3 vPosition;
 
 out vec3 facePos;
+out vec3 eyeSpacePos;
+
 
 uniform mat4 proj, view, model;
 
 void main()
 {
 	facePos = vPosition;
+	eyeSpacePos = mat3(view * model) * vPosition;
 
 	gl_Position = proj * view * model * vec4(vPosition.x,vPosition.y,vPosition.z,1.0);	
 }

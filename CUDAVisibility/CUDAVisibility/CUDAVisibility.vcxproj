@@ -23,6 +23,7 @@
     <ClCompile Include="GPURaycaster.cpp" />
     <ClCompile Include="IntensityTFOptimizer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RegionVisibility.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -36,6 +37,7 @@
     <ClInclude Include="CudaHeaders.h" />
     <ClInclude Include="GPURaycaster.h" />
     <ClInclude Include="IntensityTFOptimizer.h" />
+    <ClInclude Include="RegionVisibility.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="TFOptimizer.h" />

@@ -65,7 +65,10 @@ void ShaderManager::LoadShaders()
 	shader.Load("TransFuncVertShader.txt", "TransFuncFragShader.txt");
 	shaders.push_back(shader);
 
-	shader.Load("VisibilityHistVertShader.txt", "VisibilityHistFragShader.txt");
+	shader.Load("VisibilityVertShader.txt", "VisibilityFragShader.txt");
+	shaders.push_back(shader);
+
+	shader.Load("RegionVisibilityVertShader.txt", "RegionVisibilityFragShader.txt");
 	shaders.push_back(shader);
 
 	CompileShaders();

@@ -7,7 +7,8 @@
 
 enum ShaderType {	SimpleShader, TextureShader, VolumeShader, RaycastShader, LightingShader, OpacityShader, 
 					DepthShader, NormalsShader, DiffuseShader, ContourShader, ComparisonShader, LineDepthShader, 
-					XToonShader, MarchingSurfaceShader, ShadowShader, SmokeShader, TFShader, VisibilityHistShader};
+					XToonShader, MarchingSurfaceShader, ShadowShader, SmokeShader, TFShader, VisibilityShader,
+					RegionVisibilityShader};
 
 class ShaderManager
 {

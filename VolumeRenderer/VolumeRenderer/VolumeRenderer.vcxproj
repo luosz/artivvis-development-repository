@@ -25,6 +25,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 6.5.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -45,35 +46,41 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\External Resources\DevIL\include\IL;..\..\External Resources\glm;..\..\External Resources\glew-1.10.0\include;..\..\External Resources\freeglut\include;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\include;..\..\External Resources\DevIL\include\IL;..\..\External Resources\glm;..\..\External Resources\glew-1.10.0\include;..\..\External Resources\freeglut\include;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\External Resources\DevIL\lib;..\..\External Resources\glew-1.10.0\lib\Release\Win32;..\..\External Resources\freeglut\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\lib;..\..\External Resources\DevIL\lib;..\..\External Resources\glew-1.10.0\lib\Release\Win32;..\..\External Resources\freeglut\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies);freeglut.lib;glew32.lib;DevIL.lib;ILU.lib;ILUT.lib</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies);freeglut.lib;glew32.lib;DevIL.lib;ILU.lib;ILUT.lib;cudart.lib</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\External Resources\DevIL\include\IL;..\..\External Resources\glm;..\..\External Resources\glew-1.10.0\include;..\..\External Resources\freeglut\include;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\include;..\..\External Resources\DevIL\include\IL;..\..\External Resources\glm;..\..\External Resources\glew-1.10.0\include;..\..\External Resources\freeglut\include;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\External Resources\DevIL\lib;..\..\External Resources\glew-1.10.0\lib\Release\Win32;..\..\External Resources\freeglut\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\lib;..\..\External Resources\DevIL\lib;..\..\External Resources\glew-1.10.0\lib\Release\Win32;..\..\External Resources\freeglut\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies);freeglut.lib;glew32.lib;DevIL.lib;ILU.lib;ILUT.lib</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;%(AdditionalDependencies);freeglut.lib;glew32.lib;DevIL.lib;ILU.lib;ILUT.lib;cudart.lib</AdditionalDependencies>
     </Link>
+    <CudaCompile>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BurnsContours.cpp" />
@@ -94,16 +101,16 @@
     </ClCompile>
     <ClCompile Include="GPUContours.cpp" />
     <ClCompile Include="GPURaycaster.cpp" />
+    <ClCompile Include="IntensityTFOptimizer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MarchingCubesRenderer.cpp" />
     <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="QtWidget.cpp" />
+    <CudaCompile Include="RegionVisibilityOptimizer.cu" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
-    <ClCompile Include="VisibilityRaycaster.cpp" />
-    <ClCompile Include="VisibilityRenderer.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
     <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="VoxelReader.cpp" />
@@ -114,11 +121,11 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing QtWidget.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I.\..\..\External Resources\DevIL\include\IL" "-I.\..\..\External Resources\glm" "-I.\..\..\External Resources\glew-1.10.0\include" "-I.\..\..\External Resources\freeglut\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-IC:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\include" "-I.\..\..\External Resources\DevIL\include\IL" "-I.\..\..\External Resources\glm" "-I.\..\..\External Resources\glew-1.10.0\include" "-I.\..\..\External Resources\freeglut\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing QtWidget.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I.\..\..\External Resources\DevIL\include\IL" "-I.\..\..\External Resources\glm" "-I.\..\..\External Resources\glew-1.10.0\include" "-I.\..\..\External Resources\freeglut\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-IC:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\include" "-I.\..\..\External Resources\DevIL\include\IL" "-I.\..\..\External Resources\glm" "-I.\..\..\External Resources\glew-1.10.0\include" "-I.\..\..\External Resources\freeglut\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -139,20 +146,22 @@
     <ClInclude Include="ContourDrawer.h" />
     <ClInclude Include="CPURaycaster.h" />
     <ClInclude Include="CPURenderer.h" />
+    <ClInclude Include="CudaHeaders.h" />
     <ClInclude Include="GeneratedFiles\ui_volumerenderer.h" />
     <ClInclude Include="GLM.h" />
     <ClInclude Include="GPUContours.h" />
     <ClInclude Include="GPURaycaster.h" />
+    <ClInclude Include="IntensityTFOptimizer.h" />
     <ClInclude Include="MarchingCubesRenderer.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Raycaster.h" />
+    <ClInclude Include="RegionVisibilityOptimizer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransferFunction.h" />
-    <ClInclude Include="VisibilityRaycaster.h" />
-    <ClInclude Include="VisibilityRenderer.h" />
+    <ClInclude Include="VisibilityHistogram.h" />
     <ClInclude Include="VolumeDataset.h" />
     <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="VoxelReader.h" />
@@ -191,6 +200,8 @@
     <Text Include="OpacityVertShader.txt" />
     <Text Include="RaycastFragShader.txt" />
     <Text Include="RaycastVertShader.txt" />
+    <Text Include="RegionVisibilityFragShader.txt" />
+    <Text Include="RegionVisibilityVertShader.txt" />
     <Text Include="ShadowFragShader.txt" />
     <Text Include="ShadowVertShader.txt" />
     <Text Include="SimpleFragShader.txt" />
@@ -201,8 +212,8 @@
     <Text Include="TextureVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />
     <Text Include="TransFuncVertShader.txt" />
-    <Text Include="VisibilityHistFragShader.txt" />
-    <Text Include="VisibilityHistVertShader.txt" />
+    <Text Include="VisibilityFragShader.txt" />
+    <Text Include="VisibilityVertShader.txt" />
     <Text Include="XToonFragShader.txt" />
     <Text Include="XToonVertShader.txt" />
   </ItemGroup>
@@ -210,8 +221,12 @@
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="VisibilityHistogram.cu" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 6.5.targets" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
