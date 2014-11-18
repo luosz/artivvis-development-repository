@@ -80,12 +80,6 @@
     <ClCompile Include="TransferFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VisibilityRaycaster.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VisibilityRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VolumeDataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -106,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_volumerenderer.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IntensityTFOptimizer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,12 +158,6 @@
     <ClInclude Include="TransferFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VisibilityRaycaster.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VisibilityRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VolumeDataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -181,6 +172,18 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_volumerenderer.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaHeaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntensityTFOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionVisibilityOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisibilityHistogram.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -303,5 +306,9 @@
     <Text Include="MarchingSurfaceVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="RegionVisibilityOptimizer.cu" />
+    <CudaCompile Include="VisibilityHistogram.cu" />
   </ItemGroup>
 </Project>
