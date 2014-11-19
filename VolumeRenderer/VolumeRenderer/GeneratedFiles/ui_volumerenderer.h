@@ -538,7 +538,7 @@ public:
         QObject::connect(tfIntensity15, SIGNAL(sliderMoved(int)), VolumeRendererClass, SLOT(AdjustIntensityFocus(int)));
         QObject::connect(checkBox, SIGNAL(toggled(bool)), VolumeRendererClass, SLOT(ToggleIntensityOptimize(bool)));
 
-        tabWidget->setCurrentIndex(6);
+        tabWidget->setCurrentIndex(0);
         shaderComboBox->setCurrentIndex(0);
 
 

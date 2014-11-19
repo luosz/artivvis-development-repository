@@ -14,8 +14,6 @@ public:
 
 	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
-
-	
 };
 
 #endif

@@ -20,10 +20,10 @@ void GPURaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume
 		opacities.push_back(0.0f);
 	}
 
-	opacityDivisions[0] = glm::vec2(0.0f, 0.25f);
-	opacityDivisions[1] = glm::vec2(0.25f, 0.5f);
-	opacityDivisions[2] = glm::vec2(0.5f, 0.75f);
-	opacityDivisions[3] = glm::vec2(0.75f, 1.0f);
+	opacityDivisions[0] = glm::vec2(0.14f, 0.41f);
+	opacityDivisions[1] = glm::vec2(0.41f, 0.5f);
+	opacityDivisions[2] = glm::vec2(0.78f, 0.99f);
+	opacityDivisions[3] = glm::vec2(1.0f, 1.0f);
 
 	opacities[0] = 0.4f;
 	opacities[1] = 0.6f;

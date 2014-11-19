@@ -49,28 +49,31 @@ __global__ void CudaRegionEvaluate(int xPixels, int yPixels, float *cudaRegionVi
 
 		float4 color = tex2D(texRef2, u, v);
 
-		if (u == 400 && v == 400)
-				printf("%f, %f, %f, %f\n", color.x, color.y, color.z, color.w);
+//		if (u == 400 && v == 400)
+//				printf("%f, %f, %f, %f\n", color.x, color.y, color.z, color.w);
 
-		if (color.x > 0.0f)
+		if (color.x > 0.01f)
 		{
 			atomicAdd(&(cudaRegionVisibilities[0]), (float)color.x);
 			atomicAdd(&(cudaNumInRegion[0]), (int)1);
 		}
 
-		if (color.y > 0.0f)
+		if (color.y > 0.01f)
 		{
 			atomicAdd(&(cudaRegionVisibilities[1]), (float)color.x);
 			atomicAdd(&(cudaNumInRegion[1]), (int)1);
 		}
 
-		if (color.z > 0.0f)
+		if (color.z > 0.01f)
 		{
 			atomicAdd(&(cudaRegionVisibilities[2]), (float)color.x);
 			atomicAdd(&(cudaNumInRegion[2]), (int)1);
+
+//			if (color.z > 0.4f)
+//				printf("%d, %d, %f\n", u, v, color.z);
 		}
 
-		if (color.w > 0.0f)
+		if (color.w > 0.01f)
 		{
 			atomicAdd(&(cudaRegionVisibilities[3]), (float)color.x);
 			atomicAdd(&(cudaNumInRegion[3]), (int)1);
@@ -89,7 +92,12 @@ __global__ void CudaRegionNormalize(int numBins, float *cudaRegionVisibilities, 
 		{
 		//	if (tid == 44)
 		//		printf("%d, %f\n", numInBin[tid], histBins[tid]);
-			cudaRegionVisibilities[tid] = cudaRegionVisibilities[tid] / cudaNumInRegion[tid];
+			
+	
+			cudaRegionVisibilities[tid] = cudaRegionVisibilities[tid] / (cudaNumInRegion[tid]);
+	
+			printf("%d: %f, %d\n", tid, cudaRegionVisibilities[tid], cudaNumInRegion[tid]);
+		
 		}
 	}
 }

@@ -27,6 +27,7 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 {
 	switch(key)
 	{
+
 		case 27:
 			cudaDeviceReset();
 			exit(0);
