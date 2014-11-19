@@ -10,9 +10,10 @@
     <Link>
       <AdditionalDependencies>freeglut.lib;glew32.lib;glfw3.lib;OpenGL32.Lib;DevIL.lib;ILU.lib;ILUT.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>xcopy /f /y "..\gl\dll\$(Platform)\*.dll" "$(OutDir)"</Command>
-    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy /f /y "..\gl\dll\$(Platform)\*.dll" "$(OutDir)"
+	  %(Command)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
