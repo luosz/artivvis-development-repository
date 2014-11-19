@@ -10,9 +10,10 @@
     <Link>
       <AdditionalDependencies>AntTweakBar64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreLinkEvent>
-      <Command>xcopy /f /y "..\gl\AntTweakBar\dll\$(Platform)\*.dll" "$(OutDir)"</Command>
-    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>xcopy /f /y "..\gl\AntTweakBar\dll\$(Platform)\*.dll" "$(OutDir)"
+	  %(Command)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
