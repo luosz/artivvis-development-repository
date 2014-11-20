@@ -28,6 +28,8 @@ public:
 
 	void Init(TransferFunction &transferFunction);
 	void CalculateVisibility(ShaderManager &shaderManager, Camera &camera, VolumeDataset &volume, TransferFunction &transferFunction, Raycaster *raycaster);
+	void DrawHistogram(ShaderManager shaderManager, Camera &camera);
+	void RegionOptimize();
 };
 
 

@@ -49,33 +49,27 @@ __global__ void CudaRegionEvaluate(int xPixels, int yPixels, float *cudaRegionVi
 
 		float4 color = tex2D(texRef2, u, v);
 
-//		if (u == 400 && v == 400)
-//				printf("%f, %f, %f, %f\n", color.x, color.y, color.z, color.w);
-
-		if (color.x > 0.01f)
+		if (color.x > 0.0f)
 		{
 			atomicAdd(&(cudaRegionVisibilities[0]), (float)color.x);
 			atomicAdd(&(cudaNumInRegion[0]), (int)1);
 		}
 
-		if (color.y > 0.01f)
+		if (color.y > 0.0f)
 		{
-			atomicAdd(&(cudaRegionVisibilities[1]), (float)color.x);
+			atomicAdd(&(cudaRegionVisibilities[1]), (float)color.y);
 			atomicAdd(&(cudaNumInRegion[1]), (int)1);
 		}
 
-		if (color.z > 0.01f)
+		if (color.z > 0.0f)
 		{
-			atomicAdd(&(cudaRegionVisibilities[2]), (float)color.x);
+			atomicAdd(&(cudaRegionVisibilities[2]), (float)color.z);
 			atomicAdd(&(cudaNumInRegion[2]), (int)1);
-
-//			if (color.z > 0.4f)
-//				printf("%d, %d, %f\n", u, v, color.z);
 		}
 
-		if (color.w > 0.01f)
+		if (color.w > 0.0f)
 		{
-			atomicAdd(&(cudaRegionVisibilities[3]), (float)color.x);
+			atomicAdd(&(cudaRegionVisibilities[3]), (float)color.w);
 			atomicAdd(&(cudaNumInRegion[3]), (int)1);
 		}
 	}
@@ -90,14 +84,9 @@ __global__ void CudaRegionNormalize(int numBins, float *cudaRegionVisibilities, 
 	{
 		if (cudaNumInRegion[tid] > 0)
 		{
-		//	if (tid == 44)
-		//		printf("%d, %f\n", numInBin[tid], histBins[tid]);
-			
-	
 			cudaRegionVisibilities[tid] = cudaRegionVisibilities[tid] / (cudaNumInRegion[tid]);
 	
-			printf("%d: %f, %d\n", tid, cudaRegionVisibilities[tid], cudaNumInRegion[tid]);
-		
+			printf("%d: %f, %d\n", tid, cudaRegionVisibilities[tid], cudaNumInRegion[tid]);		
 		}
 	}
 }
@@ -138,3 +127,60 @@ void RegionVisibilityOptimizer::CalculateVisibility(ShaderManager &shaderManager
 	HANDLE_ERROR( cudaMemcpy(&regionVisibilities[0], cudaRegionVisibilities, numRegions * sizeof(float), cudaMemcpyDeviceToHost) );
 	cudaDeviceSynchronize();
 }
+
+
+
+void RegionVisibilityOptimizer::DrawHistogram(ShaderManager shaderManager, Camera &camera)
+{
+	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
+
+	int uniformLoc;
+
+	glm::mat4 model_mat = glm::mat4(1.0f);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
+	glm::mat4 tempView = glm::lookAt(glm::vec3(0.5f, 0.5f, 2.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f,1.0f,0.0f));
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &tempView[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
+
+
+	glBegin(GL_LINES);
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glVertex3f( -0.5f, -0.5f, 0.5f);
+	glVertex3f( -0.5f, 0.5f, 0.5f);
+
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+	glVertex3f(0.5f, -0.5f, 0.5f);
+
+	glEnd();
+
+
+	glBegin(GL_QUADS);
+
+	
+	for (int i=0; i<numRegions; i++)
+	{
+		if (i == 0)
+			glColor3f(0.75f, 0.0f, 1.0f);
+		else if (i == 1)
+			glColor3f(1.0f, 0.0f, 0.0f);
+		else if (i == 2)
+			glColor3f(0.0f, 1.0f, 0.0f);
+
+		glVertex3f((i / 4.0f) - 0.5f, -0.5f, 0.5f);
+		glVertex3f((i / 4.0f) - 0.5f, regionVisibilities[i] - 0.5f, 0.5f);
+		glVertex3f(((i+1) / 4.0f) - 0.5f, regionVisibilities[i] - 0.5f, 0.5f);
+		glVertex3f(((i+1) / 4.0f) - 0.5f, -0.5f, 0.5f);
+	}
+
+	glEnd();
+}
+
+
+
