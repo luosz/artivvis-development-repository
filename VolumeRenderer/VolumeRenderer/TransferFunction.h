@@ -27,13 +27,15 @@ public:
 
 	IntensityTFOptimizer *intensityOptimizer;
 
-	std::vector<glm::vec4> colorTable;
+	std::vector<glm::vec4> origColorTable;
+	std::vector<glm::vec4> currentColorTable;
 
 	void Init(const char *filename, VolumeDataset &volume_);
 	void Update();
 
 	void LoadXML(const char *filename);
-	void LoadLookup();
+	void LoadLookup(std::vector<glm::vec4> &colorTable);
+	void CopyToTex(std::vector<glm::vec4> &data);
 
 	glm::vec4 LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity);
 };

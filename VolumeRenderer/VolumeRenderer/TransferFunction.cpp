@@ -2,13 +2,22 @@
 
 void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 {
-	colorTable.resize(256);
+	origColorTable.resize(256);
+	currentColorTable.resize(256);
 	LoadXML(filename);
 
 	colors.resize(numIntensities);
 	memcpy(&colors[0], &origColors[0], numIntensities * sizeof(glm::vec4));
 
-	LoadLookup();
+	glGenTextures(1, &tfTexture);
+    glBindTexture(GL_TEXTURE_1D, tfTexture);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 256, 0, GL_RGBA, GL_FLOAT, 0); 
+	glBindTexture(GL_TEXTURE_1D, 0);
+
+	LoadLookup(origColorTable);
+	LoadLookup(currentColorTable);
 
 	intensityOptimizer = new IntensityTFOptimizer(volume_, numIntensities, &colors[0], &intensities[0]);
 
@@ -23,7 +32,7 @@ void TransferFunction::Update()
 	{
 		memcpy(&colors[0], &origColors[0], numIntensities * sizeof(glm::vec4));
 		intensityOptimizer->Optimize(targetIntensity);
-		LoadLookup();
+		LoadLookup(currentColorTable);
 	}
 }
 
@@ -65,7 +74,7 @@ void TransferFunction::LoadXML(const char *filename)
 	numIntensities = intensities.size();
 }
 
-void TransferFunction::LoadLookup()
+void TransferFunction::LoadLookup(std::vector<glm::vec4> &colorTable)
 {
 	glm::vec4 previousColor(0.0f);
 	float previousIntensity = 0.0f;
@@ -88,13 +97,16 @@ void TransferFunction::LoadLookup()
 			colorTable[i] = LERPColor(previousColor, glm::vec4(0.0f), previousIntensity, 1.0f, currentIntensity);
 	}
 
-	glGenTextures(1, &tfTexture);
-    glBindTexture(GL_TEXTURE_1D, tfTexture);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 256, 0, GL_RGBA, GL_FLOAT, &colorTable[0]); 
+	CopyToTex(colorTable);
+}
+
+void TransferFunction::CopyToTex(std::vector<glm::vec4> &data)
+{
+	glBindTexture(GL_TEXTURE_1D, tfTexture);
+	glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGBA, GL_FLOAT, &data[0]);
 	glBindTexture(GL_TEXTURE_1D, 0);
 }
+
 
 glm::vec4 TransferFunction::LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity)
 {

@@ -104,7 +104,7 @@
     <ClCompile Include="IntensityTFOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RegionVisibilityOptimizer.cpp">
+    <ClCompile Include="VisibilityTFOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -193,6 +193,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RegionVisibilityOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisibilityTFOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -312,6 +315,9 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="VisibilityHistogram.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RegionVisibilityOptimizer.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

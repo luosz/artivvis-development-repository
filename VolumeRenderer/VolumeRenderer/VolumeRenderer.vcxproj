@@ -111,6 +111,7 @@
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
+    <ClCompile Include="VisibilityTFOptimizer.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
     <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="VoxelReader.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransferFunction.h" />
     <ClInclude Include="VisibilityHistogram.h" />
+    <ClInclude Include="VisibilityTFOptimizer.h" />
     <ClInclude Include="VolumeDataset.h" />
     <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="VoxelReader.h" />
