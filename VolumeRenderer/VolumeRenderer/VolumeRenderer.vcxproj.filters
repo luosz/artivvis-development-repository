@@ -36,6 +36,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{a3a989df-f19d-4ed7-bbb5-5a7a26322266}</UniqueIdentifier>
     </Filter>
+    <Filter Include="../TransferFunctionEditor">
+      <UniqueIdentifier>{2cd066cb-bc88-4961-a8bc-a4d0d0e67d55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -107,6 +110,36 @@
     <ClCompile Include="VisibilityTFOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\TransferFunctionEditor\edge.cpp">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TransferFunctionEditor\graphwidget.cpp">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TransferFunctionEditor\node.cpp">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TransferFunctionEditor\tinyxml2.cpp">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TransferFunctionEditor\transferfunctioneditor.cpp">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_graphwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_graphwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_transferfunctioneditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_transferfunctioneditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_transferfunctioneditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="volumerenderer.ui">
@@ -117,6 +150,18 @@
     </CustomBuild>
     <CustomBuild Include="QtWidget.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\TransferFunctionEditor\graphwidget.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\TransferFunctionEditor\transferfunctioneditor.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\TransferFunctionEditor\transferfunctioneditor.qrc">
+      <Filter>../TransferFunctionEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\TransferFunctionEditor\transferfunctioneditor.ui">
+      <Filter>../TransferFunctionEditor</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +242,36 @@
     </ClInclude>
     <ClInclude Include="VisibilityTFOptimizer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\ControlEdge.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\ControlPoint.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\edge.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\import_transfer_function_editor.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\import_volume_renderer.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\node.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\tinyxml2.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\TransferFunctionScene.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\TransferFunctionView.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_transferfunctioneditor.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

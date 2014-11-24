@@ -171,7 +171,7 @@ public:
 #ifdef USED_BY_VOLUME_RENDERER
 		if (transfer_function)
 		{
-			std::cout << "transferFunction is not NULL" << std::endl;
+			std::cout << "TransferFunctionView::optimizeForIntensity transfer_function is not NULL" << std::endl;
 			transfer_function->optimizeIntensity = true;
 			transfer_function->numIntensities = numIntensities;
 			transfer_function->intensities = intensities;
