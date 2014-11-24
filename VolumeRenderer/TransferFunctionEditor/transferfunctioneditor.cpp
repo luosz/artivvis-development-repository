@@ -17,8 +17,6 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	openTransferFunctionFromVoreenXML(buffer);
 	tf.setTransferFunction(numIntensities, colors, intensities);
 	tf.drawTransferFunction();
-
-	tf.transferFunction = NULL;
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()
@@ -38,7 +36,6 @@ void TransferFunctionEditor::on_action_Open_Transfer_Function_triggered()
 		intensities.clear();
 		colors.clear();
 		openTransferFunctionFromVoreenXML(buffer);
-		//std::cout << numIntensities << " " << intensities.size() << " " << colors.size() << std::endl;
 		tf.setTransferFunction(numIntensities, colors, intensities);
 		tf.drawTransferFunction();
 	}

@@ -4,13 +4,15 @@
 #include <QMainWindow>
 #include <iostream>
 #include <QFileDialog>
+
+#include "import_volume_renderer.h"
+
 #include "glm/glm.hpp"
 #include "tinyxml2.h"
 #include "graphwidget.h"
 #include "ControlEdge.h"
 #include "ControlPoint.h"
 #include "TransferFunctionView.h"
-#include "../VolumeRenderer/VolumeRenderer.h"
 
 namespace Ui {
 class TransferFunctionEditor;
@@ -120,11 +122,13 @@ public:
 		}
 	}
 
-	void Init(VolumeRenderer volumeRenderer)
+#ifdef USED_BY_VOLUME_RENDERER
+	void init(VolumeRenderer &volumeRenderer)
 	{
 		std::cout << "TransferFunctionEditor::Init" << std::endl;
-		tf.transferFunction = &volumeRenderer.renderer->transferFunction;
+		tf.transfer_function = &volumeRenderer.renderer->transferFunction;
 	}
+#endif // USED_BY_VOLUME_RENDERER
 
 private slots:
     void on_action_Open_Transfer_Function_triggered();

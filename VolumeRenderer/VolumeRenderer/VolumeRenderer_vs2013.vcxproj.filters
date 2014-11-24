@@ -134,14 +134,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_transferfunctioneditor.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_TransferFunctionView.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_TransferFunctionView.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_transferfunctioneditor.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VisibilityTFOptimizer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_transferfunctioneditor.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisibilityTFOptimizer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

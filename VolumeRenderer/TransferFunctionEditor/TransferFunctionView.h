@@ -8,21 +8,18 @@
 #include <QMenu>
 #include <QSharedPointer>
 #include <glm/glm.hpp>
+
+#include "import_volume_renderer.h"
+
 #include "graphwidget.h"
 #include "node.h"
 #include "ControlPoint.h"
 #include "ControlEdge.h"
 #include "TransferFunctionScene.h"
-#include "../VolumeRenderer/TransferFunction.h"
-
-//class ControlPoint;
-//class ControlEdge;
 
 //! [0];
 class TransferFunctionView : public GraphWidget
 {
-    Q_OBJECT
-
 public:
     TransferFunctionView(QWidget *parent = 0) : GraphWidget(parent)
 	{
@@ -35,7 +32,9 @@ public:
 		std::cout << "sceneRect " << rect.left() << " " << rect.top()<<" "<<rect.width()<<" "<<rect.height() << std::endl;
 		scene()->clear();
 
-		transferFunction = NULL;
+#ifdef USED_BY_VOLUME_RENDERER
+		transfer_function = NULL;
+#endif // USED_BY_VOLUME_RENDERER
 	}
 
 	void setTransferFunction(int numIntensities, std::vector<glm::vec4> colors, std::vector<float> intensities)
@@ -161,16 +160,18 @@ public:
 	{
 		std::cout << "optimizeForIntensity"<<std::endl;
 		// optimize for selected intensity
-		if (transferFunction)
+#ifdef USED_BY_VOLUME_RENDERER
+		if (transfer_function)
 		{
 			std::cout << "transferFunction is not NULL" << std::endl;
-			transferFunction->numIntensities = numIntensities;
-			transferFunction->intensities = intensities;
-			transferFunction->origColors = colors;
-			transferFunction->colors = colors;
-			transferFunction->targetIntensity = intensities[index];
-			transferFunction->Update();
+			transfer_function->numIntensities = numIntensities;
+			transfer_function->intensities = intensities;
+			transfer_function->origColors = colors;
+			transfer_function->colors = colors;
+			transfer_function->targetIntensity = intensities[index];
+			transfer_function->Update();
 		}
+#endif // USED_BY_VOLUME_RENDERER
 	}
 
 	virtual void changeControlPointColor(int index, QColor color)
@@ -267,8 +268,10 @@ protected:
 	std::vector<float> intensities;
 	int selectedIndex;
 
+#ifdef USED_BY_VOLUME_RENDERER
 public:
-	TransferFunction *transferFunction;
+	TransferFunction *transfer_function;
+#endif // USED_BY_VOLUME_RENDERER
 };
 //! [0]
 
