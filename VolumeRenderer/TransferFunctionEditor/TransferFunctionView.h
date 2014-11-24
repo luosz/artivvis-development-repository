@@ -68,6 +68,14 @@ public:
 			}
 			node0 = node1;
 		}
+
+#ifdef USED_BY_VOLUME_RENDERER
+		transfer_function->numIntensities = numIntensities;
+		transfer_function->intensities = intensities;
+		transfer_function->origColors = colors;
+		transfer_function->colors = colors;
+		transfer_function->LoadLookup(transfer_function->currentColorTable);
+#endif // USED_BY_VOLUME_RENDERER
 	}
 
 	virtual void removeControlPoint(int index)
@@ -164,6 +172,7 @@ public:
 		if (transfer_function)
 		{
 			std::cout << "transferFunction is not NULL" << std::endl;
+			transfer_function->optimizeIntensity = true;
 			transfer_function->numIntensities = numIntensities;
 			transfer_function->intensities = intensities;
 			transfer_function->origColors = colors;

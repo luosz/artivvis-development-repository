@@ -245,6 +245,12 @@
     <ClInclude Include="VisibilityTFOptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\import_transfer_function_editor.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\import_volume_renderer.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtWidget.h">
