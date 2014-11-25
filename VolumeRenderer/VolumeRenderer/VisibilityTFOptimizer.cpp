@@ -11,13 +11,14 @@ void VisibilityTFOptimizer::Init()
 void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram &visibilityHistogram, TransferFunction &transferFunction)
 {
 	int iterations = 0;
+	float prevEnergy = 10000000.0f;
 
-	for (int i=0; i<visibilityHistogram.numBins; i++)
-	{
-		transferFunction.currentColorTable[i].a = 0.0f;
-	}
+//	for (int i=0; i<visibilityHistogram.numBins; i++)
+//	{
+//		transferFunction.currentColorTable[i].a = 0.0f;
+//	}
 
-	while (iterations < 1000)
+	while (iterations < 5000)
 	{
 		// Fits nicely because 1D transfer function is divided in 256 bins anyway, must change if different amount of bins
 		for (int i=0; i<visibilityHistogram.numBins; i++)
@@ -60,6 +61,14 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 			transferFunction.currentColorTable[i].a = glm::clamp(transferFunction.currentColorTable[i].a, 0.0f, 1.0f);
 		}
 
+		if (iterations % 10 == 0)
+			std::cout << iterations << ": " << energy << std::endl;
+
+		if (energy < 0.1f)
+			break;
+//		else
+//			prevEnergy = energy;
+//
 		iterations++;
 	}
 

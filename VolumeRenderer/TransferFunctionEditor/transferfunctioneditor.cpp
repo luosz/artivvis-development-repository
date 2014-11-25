@@ -16,7 +16,7 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	char* buffer = array.data();
 	openTransferFunctionFromVoreenXML(buffer);
 	tf.setTransferFunction(numIntensities, colors, intensities);
-	tf.drawTransferFunction();
+//	tf.drawTransferFunction();
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()

@@ -26,11 +26,11 @@ void OpenGLRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volu
 void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
 {
 
-	visibilityHistogram.CalculateHistogram(volume, transferFunction.tfTexture, shaderManager, camera);
+//	visibilityHistogram.CalculateHistogram(volume, transferFunction.tfTexture, shaderManager, camera);
 
 	transferFunction.Update();
 
-	visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction);
+//	visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction);
 
 	
 
@@ -40,7 +40,7 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);
 	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
 
-	visibilityHistogram.DrawHistogram(shaderManager, camera);
+//	visibilityHistogram.DrawHistogram(shaderManager, camera);
 //	regionOptimizer.DrawHistogram(shaderManager, camera);
 }
 

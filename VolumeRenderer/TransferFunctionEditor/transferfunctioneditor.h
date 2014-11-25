@@ -13,6 +13,7 @@
 #include "ControlEdge.h"
 #include "ControlPoint.h"
 #include "TransferFunctionView.h"
+#include "../VolumeRenderer/VolumeRenderer.h"
 
 namespace Ui {
 class TransferFunctionEditor;
@@ -122,13 +123,13 @@ public:
 		}
 	}
 
-#ifdef USED_BY_VOLUME_RENDERER
+//#ifdef USED_BY_VOLUME_RENDERER
 	void init(VolumeRenderer &volumeRenderer)
 	{
 		std::cout << "TransferFunctionEditor::Init" << std::endl;
 		tf.transfer_function = &volumeRenderer.renderer->transferFunction;
 	}
-#endif // USED_BY_VOLUME_RENDERER
+//#endif // USED_BY_VOLUME_RENDERER
 
 private slots:
     void on_action_Open_Transfer_Function_triggered();
