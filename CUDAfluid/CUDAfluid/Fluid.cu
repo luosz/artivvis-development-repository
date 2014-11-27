@@ -980,7 +980,7 @@ void Fluid::ConjugateGradient(CellDataMatrix &A, float *pressure, thrust::device
 		float max = thrust::reduce(dR.begin(), dR.end(), 0.0, max_functor());
 
 		if (max <= tolerance)
-			goto copy;
+			break;
 
 		dZ = dR;
 //		ApplyPreconditioner(A, dR, dZ);
@@ -996,7 +996,6 @@ void Fluid::ConjugateGradient(CellDataMatrix &A, float *pressure, thrust::device
 		sigma = sigmaNew;
 	}
 
-copy:
 
 	float *blah = thrust::raw_pointer_cast(dP.data());
 	HANDLE_ERROR( cudaMemcpy(pressure, blah, numGridCells * sizeof(float), cudaMemcpyDeviceToDevice) );

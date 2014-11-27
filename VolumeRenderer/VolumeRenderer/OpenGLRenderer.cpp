@@ -40,6 +40,7 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);
 	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
 
+//	visibilityOptimizer.DrawEnergy(shaderManager, camera);
 //	visibilityHistogram.DrawHistogram(shaderManager, camera);
 //	regionOptimizer.DrawHistogram(shaderManager, camera);
 }

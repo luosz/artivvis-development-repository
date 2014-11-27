@@ -10,6 +10,7 @@ QtWidget::~QtWidget()
 
 void QtWidget::Init(VolumeRenderer &volumeRenderer)
 {
+	VolumeRendererPtr = &volumeRenderer;
 	volume = &volumeRenderer.volume;
 	shaderManager = &volumeRenderer.shaderManager;
 	raycaster = volumeRenderer.renderer->raycaster;
@@ -23,6 +24,11 @@ void QtWidget::Init(VolumeRenderer &volumeRenderer)
 	InitOpacityTab();
 	InitRaycastTab();
 	InitTimingTab();
+}
+
+void QtWidget::ToggleGrabRegion(bool x)
+{
+	VolumeRendererPtr->grabRegion = x;
 }
 
 void QtWidget::CloseProgram()

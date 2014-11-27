@@ -36,7 +36,7 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
 
 	currentSlice = 0;
-	numSlices = 256;
+	numSlices = 512;
 	numBins = 256;
 	
 

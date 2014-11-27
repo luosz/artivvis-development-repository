@@ -1,8 +1,8 @@
 #include "Constants.h"
 
-const int gridXRes = 200;
-const int gridYRes = 200;
-const int gridZRes = 200;
+const int gridXRes = 100;
+const int gridYRes = 100;
+const int gridZRes = 100;
 
 const int numGridCells = gridXRes * gridYRes * gridZRes;
 const int numXFaces = (gridXRes + 1) * gridYRes * gridZRes;

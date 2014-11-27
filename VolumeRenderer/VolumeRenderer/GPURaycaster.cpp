@@ -28,6 +28,9 @@ void GPURaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume
 	opacities[0] = 0.4f;
 	opacities[1] = 0.6f;
 
+	clipPlaneDistance = 0.0f;
+	clipPlaneNormal = glm::vec3(0.0f, 0.0f, 1.0f);
+
 	xToon.ReadTexture();
 //	GenerateTextures(volume);
 }
@@ -150,6 +153,14 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 		uniformLoc = glGetUniformLocation(shaderProgramID, (std::string("opacity" + std::to_string(i+1))).c_str());
 		glUniform1f(uniformLoc, opacities[i]);
 	}
+
+	clipPlaneDistance = glm::clamp(clipPlaneDistance, 0.0f, 2.0f);
+	uniformLoc = glGetUniformLocation(shaderProgramID, "clipPlaneDistance");
+	glUniform1f(uniformLoc, clipPlaneDistance);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID,"clipPlaneNormal");
+	glUniform3f(uniformLoc, clipPlaneNormal.x, clipPlaneNormal.y, clipPlaneNormal.z);
+
 
 	// Final render is the front faces of a cube rendered
 	glBegin(GL_QUADS);

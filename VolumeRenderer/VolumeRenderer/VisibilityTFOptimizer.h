@@ -9,9 +9,11 @@ class VisibilityTFOptimizer
 {
 public:
 	std::vector<float> Es, Ev, Ec, energyFunc;
+	int iterations;
 
 	void Init();
 	void Optimize(VolumeDataset &volume, VisibilityHistogram &histogram, TransferFunction &transFunction);
+	void DrawEnergy(ShaderManager shaderManager, Camera &camera);
 };
 
 
