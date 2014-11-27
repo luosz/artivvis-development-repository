@@ -8,15 +8,11 @@
 #include <QMenu>
 #include <QSharedPointer>
 #include <glm/glm.hpp>
-
-#include "import_volume_renderer.h"
-
 #include "graphwidget.h"
 #include "node.h"
 #include "ControlPoint.h"
 #include "ControlEdge.h"
 #include "TransferFunctionScene.h"
-#include "../VolumeRenderer/TransferFunction.h"
 
 //! [0];
 class TransferFunctionView : public GraphWidget
@@ -33,9 +29,9 @@ public:
 		std::cout << "sceneRect " << rect.left() << " " << rect.top()<<" "<<rect.width()<<" "<<rect.height() << std::endl;
 		scene()->clear();
 
-//#ifdef USED_BY_VOLUME_RENDERER
+#ifndef NOT_USED_BY_VOLUME_RENDERER
 		transfer_function = NULL;
-//#endif // USED_BY_VOLUME_RENDERER
+#endif // NOT_USED_BY_VOLUME_RENDERER
 	}
 
 	void setTransferFunction(int numIntensities, std::vector<glm::vec4> colors, std::vector<float> intensities)
@@ -70,13 +66,20 @@ public:
 			node0 = node1;
 		}
 
-//#ifdef USED_BY_VOLUME_RENDERER
-		transfer_function->numIntensities = numIntensities;
-		transfer_function->intensities = intensities;
-		transfer_function->origColors = colors;
-		transfer_function->colors = colors;
-		transfer_function->LoadLookup(transfer_function->currentColorTable);
-//#endif // USED_BY_VOLUME_RENDERER
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+		if (transfer_function)
+		{
+			transfer_function->numIntensities = numIntensities;
+			transfer_function->intensities = intensities;
+			transfer_function->origColors = colors;
+			transfer_function->colors = colors;
+			transfer_function->LoadLookup(transfer_function->currentColorTable);
+		} 
+		else
+		{
+			std::cout<<"Error in drawTransferFunction: transfer_function is NULL."<<std::endl;
+		}
+#endif // NOT_USED_BY_VOLUME_RENDERER
 	}
 
 	virtual void removeControlPoint(int index)
@@ -167,12 +170,10 @@ public:
 
 	virtual void optimizeForIntensity(int index)
 	{
-		std::cout << "optimizeForIntensity"<<std::endl;
+#ifndef NOT_USED_BY_VOLUME_RENDERER
 		// optimize for selected intensity
-//#ifdef USED_BY_VOLUME_RENDERER
 		if (transfer_function)
 		{
-			std::cout << "TransferFunctionView::optimizeForIntensity transfer_function is not NULL" << std::endl;
 			transfer_function->optimizeIntensity = true;
 			transfer_function->numIntensities = numIntensities;
 			transfer_function->intensities = intensities;
@@ -180,8 +181,16 @@ public:
 			transfer_function->colors = colors;
 			transfer_function->targetIntensity = intensities[index];
 			transfer_function->Update();
+			numIntensities = transfer_function->numIntensities;
+			intensities = transfer_function->intensities;
+			colors = transfer_function->colors;
+			drawTransferFunction();
 		}
-//#endif // USED_BY_VOLUME_RENDERER
+		else
+		{
+			std::cout << "Error in optimizeForIntensity: transfer_function is NULL." << std::endl;
+		}
+#endif // NOT_USED_BY_VOLUME_RENDERER
 	}
 
 	virtual void changeControlPointColor(int index, QColor color)
@@ -278,10 +287,10 @@ protected:
 	std::vector<float> intensities;
 	int selectedIndex;
 
-//#ifdef USED_BY_VOLUME_RENDERER
+#ifndef NOT_USED_BY_VOLUME_RENDERER
 public:
 	TransferFunction *transfer_function;
-//#endif // USED_BY_VOLUME_RENDERER
+#endif // NOT_USED_BY_VOLUME_RENDERER
 };
 //! [0]
 
