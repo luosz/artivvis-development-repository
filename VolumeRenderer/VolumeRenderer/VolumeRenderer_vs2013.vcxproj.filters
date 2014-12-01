@@ -140,6 +140,9 @@
     <ClCompile Include="VisibilityTFOptimizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RegionGrabber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
@@ -250,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="..\TransferFunctionEditor\import_volume_renderer.h">
       <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionGrabber.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
