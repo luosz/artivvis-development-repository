@@ -40,7 +40,7 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 
 		float min = 0.0f;
 		float max = 1.0f;
-
+		
 		for (int i=0; i<transferFunction.numIntensities; i++)
 		{
 			Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
@@ -53,32 +53,22 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 
 		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
-			energyFunc[i] = (beta1 * Es[i]) + (beta2 * Ev[i]);		//  + (beta3 * Ec[i])
-			energy += (beta1 * Es[i]) + (beta2 * Ev[i]);
+			energyFunc[i] = (beta1 * Es[i]);// + (beta2 * Ev[i]);		//  + (beta3 * Ec[i])
+			energy += (beta1 * Es[i]);// + (beta2 * Ev[i]);  // 
 		}
 
-		float stepsize = 1.0f;
+		float stepsize = 0.1f;
 
 		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
-//			float gradient = (energyFunc[i + 1] - energyFunc[i - 1]);
-//
-//			if (gradient > 0.0f)
-//				transferFunction.currentColorTable[i].a -= stepsize;
-//			else if (gradient < 0.0f)
-//				transferFunction.currentColorTable[i].a += stepsize;
+			float gradient = beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a));
+//			float gradient = beta2 * transferFunction.origColorTable[i].a / transferFunction.currentColorTable[i].a;
 
-			if (i == 0)
-				transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i + 1] - energyFunc[i]);
-			else if (i == visibilityHistogram.numBins - 1)
-				transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i] - energyFunc[i - 1]);
-			else
-				transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i + 1] - energyFunc[i - 1]);
+			transferFunction.currentColorTable[i].a -= stepsize * gradient;
 
 			transferFunction.currentColorTable[i].a = glm::clamp(transferFunction.currentColorTable[i].a, 0.0f, 1.0f);
 		}
 
-//		if (iterations % 10 == 0)
 			std::cout << iterations << ": " << energy << std::endl;
 
 
@@ -87,6 +77,8 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 
 	transferFunction.CopyToTex(transferFunction.currentColorTable);
 }
+
+// + (beta2 * transferFunction.origColorTable[i].a * visibilityHistogram.visibilities[i] * glm::exp(-visibilityHistogram.visibilities[i]));
 
 
 void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &camera)
