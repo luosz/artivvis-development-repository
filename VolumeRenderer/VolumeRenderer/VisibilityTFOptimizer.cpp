@@ -4,22 +4,28 @@ void VisibilityTFOptimizer::Init()
 {
 	Es.resize(256);
 	Ev.resize(256);
+	Ec.resize(256);
 	energyFunc.resize(256);
+
+	iterations = 0;
 }
 
 
 void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram &visibilityHistogram, TransferFunction &transferFunction)
 {
-	int iterations = 0;
+	
 	float prevEnergy = 10000000.0f;
 
-//	for (int i=0; i<visibilityHistogram.numBins; i++)
+//	if (iterations == 0)
 //	{
-//		transferFunction.currentColorTable[i].a = 0.0f;
+//		for (int i=0; i<visibilityHistogram.numBins; i++)
+//		{
+//			transferFunction.currentColorTable[i].a = 0.0f;
+//		}
 //	}
 
-	while (iterations < 5000)
-	{
+//	while (iterations < 1)
+//	{
 		// Fits nicely because 1D transfer function is divided in 256 bins anyway, must change if different amount of bins
 		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
@@ -32,6 +38,14 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 			Ev[i] = -(transferFunction.origColorTable[i].a * visibilityHistogram.visibilities[i]);
 		}
 
+		float min = 0.0f;
+		float max = 1.0f;
+
+		for (int i=0; i<transferFunction.numIntensities; i++)
+		{
+			Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
+		}
+
 		float beta1 = 0.5f;
 		float beta2 = 0.5f;
 		float beta3 = 1.0f;
@@ -39,13 +53,13 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 
 		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
-			energyFunc[i] = (beta1 * Es[i]) + (beta2 * Ev[i]);
+			energyFunc[i] = (beta1 * Es[i]) + (beta2 * Ev[i]);		//  + (beta3 * Ec[i])
 			energy += (beta1 * Es[i]) + (beta2 * Ev[i]);
 		}
 
-		float stepsize = 0.1f;
+		float stepsize = 1.0f;
 
-		for (int i=1; i<visibilityHistogram.numBins - 1; i++)
+		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
 //			float gradient = (energyFunc[i + 1] - energyFunc[i - 1]);
 //
@@ -54,28 +68,64 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 //			else if (gradient < 0.0f)
 //				transferFunction.currentColorTable[i].a += stepsize;
 
-			
-
-			transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i + 1] - energyFunc[i - 1]);
+			if (i == 0)
+				transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i + 1] - energyFunc[i]);
+			else if (i == visibilityHistogram.numBins - 1)
+				transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i] - energyFunc[i - 1]);
+			else
+				transferFunction.currentColorTable[i].a -= stepsize * (energyFunc[i + 1] - energyFunc[i - 1]);
 
 			transferFunction.currentColorTable[i].a = glm::clamp(transferFunction.currentColorTable[i].a, 0.0f, 1.0f);
 		}
 
-		if (iterations % 10 == 0)
+//		if (iterations % 10 == 0)
 			std::cout << iterations << ": " << energy << std::endl;
 
-		if (energy < 0.1f)
-			break;
-//		else
-//			prevEnergy = energy;
-//
+
 		iterations++;
-	}
+//	}
 
 	transferFunction.CopyToTex(transferFunction.currentColorTable);
 }
 
 
+void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &camera)
+{
+	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
+
+	int uniformLoc;
+
+	glm::mat4 model_mat = glm::mat4(1.0f);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
+	glm::mat4 tempView = glm::lookAt(glm::vec3(0.5f, 0.5f, 2.0f), glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f,1.0f,0.0f));
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &tempView[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
+
+
+	glBegin(GL_LINES);
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	for (int i=0; i<256; i++)
+	{
+		glVertex3f(i / 255.0f, 0.0f, 0.0f);
+		glVertex3f(i / 255.0f, energyFunc[i], 0.0f);
+	}
+
+	glEnd();
+}
 
 
 

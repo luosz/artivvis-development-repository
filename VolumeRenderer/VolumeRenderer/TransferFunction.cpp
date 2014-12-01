@@ -110,7 +110,14 @@ void TransferFunction::CopyToTex(std::vector<glm::vec4> &data)
 
 glm::vec4 TransferFunction::LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity)
 {
-	float fraction = (currentIntensity - firstIntensity) / (secondIntensity - firstIntensity);
+	float difference = secondIntensity - firstIntensity;
 
-	return firstColor + ((secondColor - firstColor) * fraction);
+	if (difference > 0.0f)
+	{
+		float fraction = (currentIntensity - firstIntensity) / difference;
+
+		return firstColor + ((secondColor - firstColor) * fraction);
+	}
+	else
+		return firstColor;
 }

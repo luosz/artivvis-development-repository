@@ -140,6 +140,9 @@
     <ClCompile Include="GeneratedFiles\qrc_transferfunctioneditor.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="RegionGrabber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="volumerenderer.ui">
@@ -272,6 +275,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_transferfunctioneditor.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionGrabber.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

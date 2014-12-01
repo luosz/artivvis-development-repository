@@ -122,6 +122,7 @@ public:
     QLabel *tfIntLabel11;
     QLabel *label_10;
     QCheckBox *checkBox;
+    QCheckBox *GrabRegionCheckBox;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -481,9 +482,13 @@ public:
         checkBox->setObjectName(QStringLiteral("checkBox"));
         checkBox->setGeometry(QRect(310, 130, 121, 17));
         tabWidget->addTab(tab_6, QString());
+        GrabRegionCheckBox = new QCheckBox(centralWidget);
+        GrabRegionCheckBox->setObjectName(QStringLiteral("GrabRegionCheckBox"));
+        GrabRegionCheckBox->setGeometry(QRect(80, 260, 81, 17));
         VolumeRendererClass->setCentralWidget(centralWidget);
         tabWidget->raise();
         pushButton->raise();
+        GrabRegionCheckBox->raise();
         menuBar = new QMenuBar(VolumeRendererClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 520, 21));
@@ -537,6 +542,7 @@ public:
         QObject::connect(tfIntensity13, SIGNAL(sliderMoved(int)), VolumeRendererClass, SLOT(AdjustTFIntensity(int)));
         QObject::connect(tfIntensity15, SIGNAL(sliderMoved(int)), VolumeRendererClass, SLOT(AdjustIntensityFocus(int)));
         QObject::connect(checkBox, SIGNAL(toggled(bool)), VolumeRendererClass, SLOT(ToggleIntensityOptimize(bool)));
+        QObject::connect(GrabRegionCheckBox, SIGNAL(toggled(bool)), VolumeRendererClass, SLOT(ToggleGrabRegion(bool)));
 
         tabWidget->setCurrentIndex(0);
         shaderComboBox->setCurrentIndex(0);
@@ -611,6 +617,7 @@ public:
         label_10->setText(QApplication::translate("VolumeRendererClass", "Intensity Focus", 0));
         checkBox->setText(QApplication::translate("VolumeRendererClass", "Optimize Intensity", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("VolumeRendererClass", "TransferFunc", 0));
+        GrabRegionCheckBox->setText(QApplication::translate("VolumeRendererClass", "GrabRegion", 0));
     } // retranslateUi
 
 };

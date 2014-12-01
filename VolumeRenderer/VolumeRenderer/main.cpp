@@ -99,13 +99,25 @@ void MouseButton(int button, int state, int x, int y)
 			yclickedAt = y;
 		}
 	}
+
+	if (volumeRenderer.grabRegion)
+	{
+		if (button == GLUT_LEFT_BUTTON)
+		{
+			if (state == GLUT_DOWN)
+				volumeRenderer.OptimizeForSelectedRegion(x, y, SCREEN_WIDTH, SCREEN_HEIGHT);
+		}
+	}
 }
 
 
 // Mouse wheel to zoom camera
 void MouseWheel(int wheel, int direction, int x, int y) 
 {
-	volumeRenderer.camera.Zoom(-direction * 0.2f);	
+	if (volumeRenderer.grabRegion)
+		volumeRenderer.renderer->raycaster->clipPlaneDistance += (direction * 0.02f);
+	else
+		volumeRenderer.camera.Zoom(-direction * 0.2f);	
 }
 
 

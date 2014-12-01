@@ -74,6 +74,7 @@ public:
 			transfer_function->origColors = colors;
 			transfer_function->colors = colors;
 			transfer_function->LoadLookup(transfer_function->currentColorTable);
+			transfer_function->LoadLookup(transfer_function->origColorTable);
 		} 
 		else
 		{

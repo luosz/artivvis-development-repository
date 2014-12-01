@@ -17,6 +17,9 @@ public:
 	float cutOff;
 	float maxRange;
 
+	float clipPlaneDistance;
+	glm::vec3 clipPlaneNormal;
+
 	std::vector<glm::vec2> opacityDivisions;
 	std::vector<float> opacities;
 

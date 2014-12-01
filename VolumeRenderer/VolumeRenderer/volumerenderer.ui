@@ -1295,8 +1295,22 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QCheckBox" name="GrabRegionCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>260</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GrabRegion</string>
+    </property>
+   </widget>
    <zorder>tabWidget</zorder>
    <zorder>pushButton</zorder>
+   <zorder>GrabRegionCheckBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -1979,6 +1993,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>GrabRegionCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>VolumeRendererClass</receiver>
+   <slot>ToggleGrabRegion(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>303</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>298</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>CloseProgram()</slot>
@@ -2010,5 +2040,6 @@
   <slot>AdjustTFIntensity(int)</slot>
   <slot>AdjustIntensityFocus(int)</slot>
   <slot>ToggleIntensityOptimize(bool)</slot>
+  <slot>ToggleGrabRegion(bool)</slot>
  </slots>
 </ui>

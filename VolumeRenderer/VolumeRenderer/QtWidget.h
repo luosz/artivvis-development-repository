@@ -29,6 +29,7 @@ public:
 	void InitTransferFuncTab();
 
 public slots:
+	void ToggleGrabRegion(bool x);
 	void CloseProgram();
 
 #pragma region RegionsTab
@@ -83,6 +84,7 @@ public slots:
 #pragma endregion TransferFuncTab
 
 private:
+	VolumeRenderer *VolumeRendererPtr;
 	VolumeDataset *volume;
 	ShaderManager *shaderManager;
 	Raycaster *raycaster;

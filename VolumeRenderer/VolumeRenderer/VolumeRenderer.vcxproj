@@ -132,6 +132,7 @@
     <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="QtWidget.cpp" />
     <CudaCompile Include="RegionVisibilityOptimizer.cu" />
+    <ClCompile Include="RegionGrabber.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="MarchingCubesRenderer.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Raycaster.h" />
+    <ClInclude Include="RegionGrabber.h" />
     <ClInclude Include="RegionVisibilityOptimizer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
