@@ -12,7 +12,7 @@ public:
 	int iterations;
 
 	void Init();
-	void Optimize(VolumeDataset &volume, VisibilityHistogram &histogram, TransferFunction &transFunction);
+	void Optimize(VolumeDataset &volume, VisibilityHistogram &histogram, TransferFunction &transFunction, ShaderManager shaderManager, Camera &camera);
 	void DrawEnergy(ShaderManager shaderManager, Camera &camera);
 };
 

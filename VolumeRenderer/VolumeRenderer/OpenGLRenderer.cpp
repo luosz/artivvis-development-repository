@@ -30,7 +30,7 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 
 	transferFunction.Update();
 
-	visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction);
+	visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction, shaderManager, camera);
 
 	
 

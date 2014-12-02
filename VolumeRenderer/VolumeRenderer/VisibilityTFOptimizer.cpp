@@ -11,7 +11,7 @@ void VisibilityTFOptimizer::Init()
 }
 
 
-void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram &visibilityHistogram, TransferFunction &transferFunction)
+void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram &visibilityHistogram, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
 {
 	
 	float prevEnergy = 10000000.0f;
@@ -41,28 +41,41 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 		float min = 0.0f;
 		float max = 1.0f;
 		
-		for (int i=0; i<transferFunction.numIntensities; i++)
+//		for (int i=0; i<transferFunction.numIntensities; i++)
+//		{
+//			Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
+//		}
+
+		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
-			Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
+			Ev[i] = glm::pow((visibilityHistogram.visibilities[i] - transferFunction.currentColorTable[i].a), 2.0f);
 		}
 
-		float beta1 = 0.5f;
-		float beta2 = 0.5f;
+
+
+		float beta1 = 0.05f;
+		float beta2 = 0.95f;
 		float beta3 = 1.0f;
 		float energy = 0.0f;
 
 		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
-			energyFunc[i] = (beta1 * Es[i]);// + (beta2 * Ev[i]);		//  + (beta3 * Ec[i])
-			energy += (beta1 * Es[i]);// + (beta2 * Ev[i]);  // 
+			energyFunc[i] = (beta1 * Es[i]) + (beta2 * Ev[i]);		//  + (beta3 * Ec[i])
+			energy += (beta1 * Es[i]) + (beta2 * Ev[i]); 
+
+//			energyFunc[i] = Ev[i];
+//			energy += Ev[i]; 
+
 		}
 
 		float stepsize = 0.1f;
 
 		for (int i=0; i<visibilityHistogram.numBins; i++)
 		{
-			float gradient = beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a));
+//			float gradient = beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a));
 //			float gradient = beta2 * transferFunction.origColorTable[i].a / transferFunction.currentColorTable[i].a;
+
+			float gradient = (beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a))) + (beta2 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * visibilityHistogram.visibilities[i])));
 
 			transferFunction.currentColorTable[i].a -= stepsize * gradient;
 
@@ -113,7 +126,14 @@ void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &came
 	for (int i=0; i<256; i++)
 	{
 		glVertex3f(i / 255.0f, 0.0f, 0.0f);
-		glVertex3f(i / 255.0f, energyFunc[i], 0.0f);
+		glVertex3f(i / 255.0f, Es[i]*5.0f, 0.0f);
+	}
+
+	glColor3f(0.0f, 1.0f, 0.0f);
+	for (int i=0; i<256; i++)
+	{
+		glVertex3f(i / 255.0f, 0.0f, 0.0f);
+		glVertex3f(i / 255.0f, -Ev[i]*5.0f, 0.0f);
 	}
 
 	glEnd();
