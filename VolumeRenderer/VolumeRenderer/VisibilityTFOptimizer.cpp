@@ -2,10 +2,14 @@
 
 void VisibilityTFOptimizer::Init()
 {
-	Es.resize(256);
-	Ev.resize(256);
-	Ec.resize(256);
-	energyFunc.resize(256);
+	// Fits nicely because 1D transfer function is divided in 256 bins anyway, must change if different amount of bins
+	numBins = 256;
+
+	// Resize to match number of bins
+	Es.resize(numBins);
+	Ev.resize(numBins);
+	Ec.resize(numBins);
+	energyFunc.resize(numBins);
 
 	iterations = 0;
 }
@@ -13,85 +17,76 @@ void VisibilityTFOptimizer::Init()
 
 void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram &visibilityHistogram, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
 {
+	// Ma's energy function for user satisfaction - square distance between current transfer function and reference transfer function
+	for (int i=0; i<numBins; i++)
+	{
+		Es[i] = glm::pow((transferFunction.currentColorTable[i].a - transferFunction.origColorTable[i].a), 2.0f);
+	}
+
+	// Ma's energy function for visibility
+//	for (int i=0; i<numBins; i++)
+//	{
+//		Ev[i] = -(transferFunction.origColorTable[i].a * visibilityHistogram.visibilities[i]);
+//	}
+
+	// My energy function for visibility - square distance between current transfer function and visibility histogram
+	for (int i=0; i<numBins; i++)
+	{
+		Ev[i] = glm::pow((visibilityHistogram.visibilities[i] - transferFunction.currentColorTable[i].a), 2.0f);
+	}
+
+	float min = 0.0f;
+	float max = 1.0f;
 	
-	float prevEnergy = 10000000.0f;
-
-//	if (iterations == 0)
-//	{
-//		for (int i=0; i<visibilityHistogram.numBins; i++)
-//		{
-//			transferFunction.currentColorTable[i].a = 0.0f;
-//		}
-//	}
-
-//	while (iterations < 1)
-//	{
-		// Fits nicely because 1D transfer function is divided in 256 bins anyway, must change if different amount of bins
-		for (int i=0; i<visibilityHistogram.numBins; i++)
-		{
-			Es[i] = glm::pow((transferFunction.currentColorTable[i].a - transferFunction.origColorTable[i].a), 2.0f);
-		}
-
-
-		for (int i=0; i<visibilityHistogram.numBins; i++)
-		{
-			Ev[i] = -(transferFunction.origColorTable[i].a * visibilityHistogram.visibilities[i]);
-		}
-
-		float min = 0.0f;
-		float max = 1.0f;
-		
-//		for (int i=0; i<transferFunction.numIntensities; i++)
-//		{
-//			Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
-//		}
-
-		for (int i=0; i<visibilityHistogram.numBins; i++)
-		{
-			Ev[i] = glm::pow((visibilityHistogram.visibilities[i] - transferFunction.currentColorTable[i].a), 2.0f);
-		}
+	// Clamping energy for specific regions, I don't use it and instead just clamp opacity between 0 and 1 after optimization
+	for (int i=0; i<transferFunction.numIntensities; i++)
+	{
+		Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
+	}
 
 
 
-		float beta1 = 0.05f;
-		float beta2 = 0.95f;
-		float beta3 = 1.0f;
-		float energy = 0.0f;
+	// Weights of the different energy components
+	float beta1 = 0.05f;
+	float beta2 = 0.95f;
+	float beta3 = 0.0f;
+	float energy = 0.0f;
 
-		for (int i=0; i<visibilityHistogram.numBins; i++)
-		{
-			energyFunc[i] = (beta1 * Es[i]) + (beta2 * Ev[i]);		//  + (beta3 * Ec[i])
-			energy += (beta1 * Es[i]) + (beta2 * Ev[i]); 
-
-//			energyFunc[i] = Ev[i];
-//			energy += Ev[i]; 
-
-		}
-
-		float stepsize = 0.1f;
-
-		for (int i=0; i<visibilityHistogram.numBins; i++)
-		{
-//			float gradient = beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a));
-//			float gradient = beta2 * transferFunction.origColorTable[i].a / transferFunction.currentColorTable[i].a;
-
-			float gradient = (beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a))) + (beta2 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * visibilityHistogram.visibilities[i])));
-
-			transferFunction.currentColorTable[i].a -= stepsize * gradient;
-
-			transferFunction.currentColorTable[i].a = glm::clamp(transferFunction.currentColorTable[i].a, 0.0f, 1.0f);
-		}
-
-			std::cout << iterations << ": " << energy << std::endl;
+	// Accumulate for visualising on graph and observing overall energy drop
+	for (int i=0; i<numBins; i++)
+	{
+		energyFunc[i] = (beta1 * Es[i]) + (beta2 * Ev[i]) + (beta3 * Ec[i]);
+		energy += (beta1 * Es[i]) + (beta2 * Ev[i]) + (beta3 * Ec[i]);
+	}
 
 
-		iterations++;
-//	}
 
+
+	float stepsize = 0.05f;
+
+	for (int i=0; i<numBins; i++)
+	{
+		// Gradient is calculated by differentiating various energy components with respect to current opacity function
+		float gradient = (beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a))) + (beta2 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * visibilityHistogram.visibilities[i])));
+
+//		float gradient = (beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a)));
+
+		// Gradient descent to minimize energy function
+		transferFunction.currentColorTable[i].a -= stepsize * gradient;
+
+		// Clamp final values
+		transferFunction.currentColorTable[i].a = glm::clamp(transferFunction.currentColorTable[i].a, 0.0f, 1.0f);
+	}
+
+	// Print energy
+	std::cout << iterations << ": " << energy << std::endl;
+
+	iterations++;
+
+	// Copy updated opacity function to transfer function texture
 	transferFunction.CopyToTex(transferFunction.currentColorTable);
 }
 
-// + (beta2 * transferFunction.origColorTable[i].a * visibilityHistogram.visibilities[i] * glm::exp(-visibilityHistogram.visibilities[i]));
 
 
 void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &camera)
@@ -115,6 +110,7 @@ void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &came
 
 	glBegin(GL_LINES);
 
+	// Draw graph axes
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glVertex3f(0.0f, 0.0f, 0.0f);
 	glVertex3f(0.0f, 1.0f, 0.0f);
@@ -122,58 +118,21 @@ void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &came
 	glVertex3f(0.0f, 0.0f, 0.0f);
 	glVertex3f(1.0f, 0.0f, 0.0f);
 
-	glColor3f(0.0f, 0.0f, 1.0f);
-	for (int i=0; i<256; i++)
-	{
-		glVertex3f(i / 255.0f, 0.0f, 0.0f);
-		glVertex3f(i / 255.0f, Es[i]*5.0f, 0.0f);
-	}
+	// Draw user satisfaction energy
+//	glColor3f(0.0f, 0.0f, 1.0f);
+//	for (int i=0; i<256; i++)
+//	{
+//		glVertex3f(i / 255.0f, 0.0f, 0.0f);
+//		glVertex3f(i / 255.0f, Es[i]*5.0f, 0.0f);
+//	}
 
+	// Draw visibility energy
 	glColor3f(0.0f, 1.0f, 0.0f);
 	for (int i=0; i<256; i++)
 	{
 		glVertex3f(i / 255.0f, 0.0f, 0.0f);
-		glVertex3f(i / 255.0f, -Ev[i]*5.0f, 0.0f);
+		glVertex3f(i / 255.0f, -energyFunc[i]*2.0f, 0.0f);
 	}
 
 	glEnd();
 }
-
-
-
-
-/*
-float Es = 0.0f;
-
-	// Fits nicely because 1D transfer function is divided in 256 bins anyway, must change if different amount of bins
-	for (int i=0; i<visibilityHistogram.numBins; i++)
-	{
-		Es += glm::pow((transferFunction.currentColorTable[i].a - transferFunction.origColorTable[i].a), 2.0f);
-	}
-
-
-	float Ev = 0.0f;
-
-	for (int i=0; i<visibilityHistogram.numBins; i++)
-	{
-		Ev -= (transferFunction.origColorTable[i].a * visibilityHistogram.visibilities[i]);
-	}
-
-
-	float Ec = 0.0f;
-
-	float min = 0.0f;
-	float max = 1.0f;
-
-	for (int i=0; i<transferFunction.numIntensities; i++)
-	{
-		Ec += (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
-	}
-
-
-	float beta1 = 0.5f;
-	float beta2 = 0.5f;
-	float beta3 = 1.0f;
-
-	float energy = (beta1 * Es) + (beta2 * Ev) + (beta3 * Ec);
-	*/

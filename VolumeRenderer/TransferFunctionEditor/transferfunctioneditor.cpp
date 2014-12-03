@@ -11,8 +11,9 @@ TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 	ui->verticalLayout->addWidget(&tf);
 
 	// load default transfer function
-	filename = "../../transferfuncs/nucleon.tfi";
-//	filename = "../../transferfuncs/CT-Knee_spectrum_16_balance.tfi";
+//	filename = "../../transferfuncs/nucleon.tfi";
+	filename = "../../transferfuncs/CT-Knee_spectrum_16_balance.tfi";
+//	filename = "../../transferfuncs/00.tfi";
 	
 	QByteArray array = filename.toLocal8Bit();
 	char* buffer = array.data();

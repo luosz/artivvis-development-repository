@@ -7,6 +7,7 @@ RegionGrabber::RegionGrabber()
 
 float RegionGrabber::Grab(int mouseX, int mouseY, int screenWidth, int screenHeight, Camera &camera, glm::vec3 clipPlaneNormal, float clipPlaneDistance, VolumeDataset &volume)
 {
+	// Find position of mouse in 3D space by colliding it with a plane perpendicular to the camera and then cast a ray from the camera through that position
 	glm::vec3 camDirection = camera.GetViewDirection();
 
 	glm::vec3 rightVec = glm::normalize(glm::cross(camDirection, glm::vec3(0.0f, 1.0f, 0.0f)));
@@ -27,7 +28,7 @@ float RegionGrabber::Grab(int mouseX, int mouseY, int screenWidth, int screenHei
 	glm::vec3 mouseRayDir = glm::normalize(mousePos - camera.position);
 
 
-
+	// Clip plane always along the z axis, distance has to account for whether the camera is in front or behind
 	glm::vec3 planePos(0.0f);
 
 	if (camera.position.z > 0.0f)
@@ -36,7 +37,7 @@ float RegionGrabber::Grab(int mouseX, int mouseY, int screenWidth, int screenHei
 		planePos.z = -1.0f + (2.0f - clipPlaneDistance);
 
 
-
+	// Find where mouse ray collides with clipping plane
 	float d = glm::dot(clipPlaneNormal, planePos);
 
 	if (glm::dot(clipPlaneNormal, mouseRayDir) == 0.0f)
@@ -51,10 +52,13 @@ float RegionGrabber::Grab(int mouseX, int mouseY, int screenWidth, int screenHei
 
 	glm::vec3 contact = camera.position + newRay;
 
+	// Check if collision falls outside of volume
 	if (glm::abs(contact.x >= 1.0f) || glm::abs(contact.y >= 1.0f) || glm::abs(contact.z >= 1.0f))
 		return -1.0f;
 
 
+
+	// Find voxel which collisions occurs in
 	int xVoxel, yVoxel, zVoxel, index;
 
 	xVoxel = (int)((contact.x + 1.0f) / (2.0f / volume.xRes));
@@ -67,6 +71,8 @@ float RegionGrabber::Grab(int mouseX, int mouseY, int screenWidth, int screenHei
 		return -1.0f;
 	}
 
+
+	// Average intensity over adjacent voxels
 	float avgIntensity = 0.0f;
 
 	for (int i=-cubeWidth; i<=cubeWidth; i++)

@@ -182,6 +182,7 @@ public:
 			transfer_function->colors = colors;
 			transfer_function->targetIntensity = intensities[index];
 			transfer_function->Update();
+			transfer_function->optimizeIntensity = false;
 			numIntensities = transfer_function->numIntensities;
 			intensities = transfer_function->intensities;
 			colors = transfer_function->colors;

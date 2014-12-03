@@ -18,10 +18,11 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	boxCorners.push_back(glm::vec3(-1.0f, -1.0f, -1.0f));
 	boxCorners.push_back(glm::vec3(-1.0f, -1.0f, 1.0f));
 
+	// Generate two textures for alternating read and write on framebuffer
 	opacityTex1 = GenerateSliceTexture();
 	opacityTex2 = GenerateSliceTexture();
 	
-
+	// Generate framebuffer
 	glGenFramebuffers (1, &frameBuffer);
 	glBindFramebuffer (GL_FRAMEBUFFER, frameBuffer);
 
@@ -45,6 +46,7 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
 	std::fill(numVis.begin(), numVis.end(), 0);
 
+	// Allocate memory on GPU
 	HANDLE_ERROR( cudaMalloc((void**)&cudaHistBins, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin, 256 * sizeof(int)) );
 
@@ -66,7 +68,7 @@ GLuint VisibilityHistogram::GenerateSliceTexture()
 	return tex;
 }
 
-
+// Finds closest point from the camera the volume
 glm::vec3 VisibilityHistogram::FindClosestCorner(Camera &camera)
 {
 	int minPoint = 0;
@@ -87,6 +89,7 @@ glm::vec3 VisibilityHistogram::FindClosestCorner(Camera &camera)
 	return boxCorners[minPoint];
 }
 
+// Finds farthest point from the camera the volume
 glm::vec3 VisibilityHistogram::FindFarthestCorner(Camera &camera)
 {
 	int maxPoint = 0;
@@ -107,6 +110,7 @@ glm::vec3 VisibilityHistogram::FindFarthestCorner(Camera &camera)
 	return boxCorners[maxPoint];
 }
 
+// Uses atomic adds to accumulate visibility values for respective intensity values, read directly from texture memory
 __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *numInBin)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
@@ -132,6 +136,7 @@ __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *num
 	}
 }
 
+// Find average visbility for each bin
 __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
@@ -147,14 +152,18 @@ __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 	}
 }
 
+
+// Calculate visibility histogram
 void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera)
 {
 //	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
 //	std::fill(numVis.begin(), numVis.end(), 0);
 
+	// Set all values for GPU memory to zero
 	HANDLE_ERROR( cudaMemset(cudaHistBins, 0, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMemset(cudaNumInBin, 0, 256 * sizeof(int)) );
 
+	// Bind visibility shader and framebuffer with a write texture attached
 	GLuint shaderProgramID = shaderManager.UseShader(VisibilityShader);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -162,6 +171,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	// Pass in uniforms
 	int uniformLoc;
 
 	glm::mat4 model_mat = glm::mat4(1.0f);
@@ -185,12 +195,15 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	glUniform1i(uniformLoc,1);
 	glBindTexture (GL_TEXTURE_1D, tfTexture);
 
+
+	// Find closest point on volume to camera to start slicing there
 	glm::vec3 closestCorner = FindClosestCorner(camera);
 	glm::vec3 farthestCorner = FindFarthestCorner(camera);
 
 	glm::vec3 camDirection = camera.GetViewDirection();
 	float dist = glm::dot(closestCorner - camera.position, camDirection);
 
+	// Find perpendicular vectors to calculate slice corners
 	glm::vec3 rightVec = glm::normalize(glm::cross(camDirection, glm::vec3(0.0f, 1.0f, 0.0f)));
 	glm::vec3 upVec = glm::normalize(glm::cross(camDirection, -rightVec));
 
@@ -201,6 +214,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 
 	for (int i=0; i<numSlices; i++)
 	{
+		// Alternate read/write textures
 		if (i % 2 == 0)
 		{
 			writeTex = opacityTex1;
@@ -221,13 +235,15 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 		uniformLoc = glGetUniformLocation(shaderProgramID,"opacityTex");
 		glUniform1i(uniformLoc,2);
 
+		// Stepsize should match closely enough to to raycast stepsize if you want the visibiltiy histogram to match the visible image closely 
 //		dist += currentSlice * 0.005f;
-		dist += 0.01f;
+		dist += 0.005f;
 //		dist += sliceGap;
 
 		float extent = dist * glm::tan((camera.FoV / 2.0f) * (glm::pi<float>()/180.0f));
 		glm::vec3 centre = camera.position + (camDirection * dist);
 
+		// Calculate corners of slice using perpendicular vectors, my slice takes up entire window
 		glm::vec3 topLeft = centre + (extent * upVec) - (extent * rightVec);
 		glm::vec3 topRight = centre + (extent * upVec) + (extent * rightVec);
 		glm::vec3 bottomLeft = centre - (extent * upVec) - (extent * rightVec);
@@ -235,6 +251,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 
 		int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
 
+		// Initiated the screen aligned quad
 		glBegin(GL_QUADS);
 		glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
 		glVertex3f(topRight.x, topRight.y, topRight.z);
@@ -249,22 +266,28 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 		glVertex3f(bottomRight.x, bottomRight.y, bottomRight.z);
 		glEnd();
 
-//		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_FLOAT, pixelBuffer);
 
-
+		// Map cuda memory to texture memory, big time saver
 		HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, writeTex, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
 		HANDLE_ERROR( cudaGraphicsMapResources(1, &resource) );
 		cudaArray *arry = 0;	
 		HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&arry, resource, 0, 0) ); 
 		HANDLE_ERROR( cudaBindTextureToArray(texRef, arry) );
 
+		// Launch CUDA kernel to accumulate visbility values in parallel
 		int numPixels = xPixels * yPixels;
 		CudaEvaluate<<<(numPixels + 255) / 256, 256>>>(xPixels, yPixels, cudaHistBins, cudaNumInBin);
 
+		// Unbind and unmap, must be done before OpenGL uses texture memory again
 		HANDLE_ERROR( cudaUnbindTexture(texRef) );
 		HANDLE_ERROR( cudaGraphicsUnmapResources(1, &resource) );
 		HANDLE_ERROR( cudaGraphicsUnregisterResource(resource) );
+
+
+		// In CPU version must copy texture pixels back to CPU memory which is by far the biggest bottleneck
+//		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_FLOAT, pixelBuffer);
 		
+		// CPU accumulation
 //		for (int j=0; j<xPixels*yPixels; j++)
 //		{
 //			float scalar = pixelBuffer[j*4 + 2];
@@ -280,10 +303,14 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// Average visbilities
 	CudaNormalize<<< (numBins + 255) / 256, 256>>>(256, cudaHistBins, cudaNumInBin);
 
+	// Copy visibility info back to CPU memory for ease of access
 	HANDLE_ERROR( cudaMemcpy(&visibilities[0], cudaHistBins, 256 * sizeof(float), cudaMemcpyDeviceToHost) );
 
+
+	// CPU average visbilities
 //	for (int i=0; i<256; i++)
 //	{
 //		if (numVis[i] > 0.0f)
@@ -292,7 +319,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 }
 
 
-
+// Draw visibility histogram
 void VisibilityHistogram::DrawHistogram(ShaderManager shaderManager, Camera &camera)
 {
 	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
