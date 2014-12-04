@@ -44,8 +44,12 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QPushButton *diagonalButton;
     QPushButton *levelButton;
-    QPushButton *distributeHorizontallyButton;
     QPushButton *distributeVerticallyButton;
+    QPushButton *distributeHorizontallyButton;
+    QPushButton *peaksButton;
+    QPushButton *rampButton;
+    QPushButton *entropyButton;
+    QPushButton *visibilityButton;
 
     void setupUi(QMainWindow *TransferFunctionEditor)
     {
@@ -101,15 +105,35 @@ public:
 
         horizontalLayout_2->addWidget(levelButton);
 
+        distributeVerticallyButton = new QPushButton(dockWidgetContents);
+        distributeVerticallyButton->setObjectName(QStringLiteral("distributeVerticallyButton"));
+
+        horizontalLayout_2->addWidget(distributeVerticallyButton);
+
         distributeHorizontallyButton = new QPushButton(dockWidgetContents);
         distributeHorizontallyButton->setObjectName(QStringLiteral("distributeHorizontallyButton"));
 
         horizontalLayout_2->addWidget(distributeHorizontallyButton);
 
-        distributeVerticallyButton = new QPushButton(dockWidgetContents);
-        distributeVerticallyButton->setObjectName(QStringLiteral("distributeVerticallyButton"));
+        peaksButton = new QPushButton(dockWidgetContents);
+        peaksButton->setObjectName(QStringLiteral("peaksButton"));
 
-        horizontalLayout_2->addWidget(distributeVerticallyButton);
+        horizontalLayout_2->addWidget(peaksButton);
+
+        rampButton = new QPushButton(dockWidgetContents);
+        rampButton->setObjectName(QStringLiteral("rampButton"));
+
+        horizontalLayout_2->addWidget(rampButton);
+
+        entropyButton = new QPushButton(dockWidgetContents);
+        entropyButton->setObjectName(QStringLiteral("entropyButton"));
+
+        horizontalLayout_2->addWidget(entropyButton);
+
+        visibilityButton = new QPushButton(dockWidgetContents);
+        visibilityButton->setObjectName(QStringLiteral("visibilityButton"));
+
+        horizontalLayout_2->addWidget(visibilityButton);
 
         dockWidget->setWidget(dockWidgetContents);
         TransferFunctionEditor->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget);
@@ -129,10 +153,14 @@ public:
         action_Open_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Open Transfer Function...", 0));
         action_Save_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Save Transfer Function...", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
-        diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal ramp", 0));
+        diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", 0));
         levelButton->setText(QApplication::translate("TransferFunctionEditor", "level", 0));
-        distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "distribute horizontally", 0));
-        distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "distribute vertically", 0));
+        distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", 0));
+        distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "horizontal", 0));
+        peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
+        rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
+        entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));
+        visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", 0));
     } // retranslateUi
 
 };

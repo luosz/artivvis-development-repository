@@ -150,6 +150,14 @@ private slots:
     void on_levelButton_clicked();
 
     void on_diagonalButton_clicked();
+    void on_peaksButton_clicked();
+
+    void on_rampButton_clicked();
+
+    void on_entropyButton_clicked();
+
+    void on_visibilityButton_clicked();
+
 private:
     Ui::TransferFunctionEditor *ui;
 

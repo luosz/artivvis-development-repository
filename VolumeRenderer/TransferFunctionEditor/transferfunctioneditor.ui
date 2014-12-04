@@ -80,7 +80,7 @@
      <item>
       <widget class="QPushButton" name="diagonalButton">
        <property name="text">
-        <string>diagonal ramp</string>
+        <string>diagonal</string>
        </property>
       </widget>
      </item>
@@ -92,16 +92,44 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="distributeHorizontallyButton">
+      <widget class="QPushButton" name="distributeVerticallyButton">
        <property name="text">
-        <string>distribute horizontally</string>
+        <string>vertical</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="distributeVerticallyButton">
+      <widget class="QPushButton" name="distributeHorizontallyButton">
        <property name="text">
-        <string>distribute vertically</string>
+        <string>horizontal</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="peaksButton">
+       <property name="text">
+        <string>peaks</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="rampButton">
+       <property name="text">
+        <string>ramp</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="entropyButton">
+       <property name="text">
+        <string>entropy</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="visibilityButton">
+       <property name="text">
+        <string>visibility</string>
        </property>
       </widget>
      </item>

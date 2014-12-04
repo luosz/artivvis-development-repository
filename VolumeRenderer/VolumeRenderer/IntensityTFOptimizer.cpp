@@ -29,14 +29,13 @@ void IntensityTFOptimizer::CalculateFrequencies()
 
 float IntensityTFOptimizer::GetWeightedEntropyOpacityByID(float intensity, int index)
 {
-	float frequency = frequencies[intensity];
-	
+	int bin_index = static_cast<int>(intensity);
+	float frequency = frequencies[bin_index];
 	float probability = frequency / (float)numVoxels;
 
 	if (probability > glm::epsilon<float>())
 	{
 		float normalised = intensity / 255.0f;
-
 		return GetWeightByInterp(normalised, index) * GetOpacityByInterp(normalised, index) * probability * (-log(probability));
 	}
 	else

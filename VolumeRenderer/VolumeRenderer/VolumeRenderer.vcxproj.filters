@@ -279,7 +279,7 @@
     <ClInclude Include="RegionGrabber.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IntensityTFOptimizerPlus.h">
+    <ClInclude Include="IntensityTFOptimizerV2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

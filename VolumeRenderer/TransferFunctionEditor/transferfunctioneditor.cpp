@@ -77,3 +77,23 @@ void TransferFunctionEditor::on_diagonalButton_clicked()
 {
 	tf.makeRamp();
 }
+
+void TransferFunctionEditor::on_peaksButton_clicked()
+{
+
+}
+
+void TransferFunctionEditor::on_rampButton_clicked()
+{
+
+}
+
+void TransferFunctionEditor::on_entropyButton_clicked()
+{
+
+}
+
+void TransferFunctionEditor::on_visibilityButton_clicked()
+{
+
+}
