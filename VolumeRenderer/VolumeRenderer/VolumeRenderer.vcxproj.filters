@@ -279,6 +279,9 @@
     <ClInclude Include="RegionGrabber.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IntensityTFOptimizerPlus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="LightingFragShader.txt">

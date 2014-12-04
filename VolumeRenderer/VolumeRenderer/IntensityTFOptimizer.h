@@ -20,7 +20,7 @@ public:
 
 	IntensityTFOptimizer(VolumeDataset &volume_, int numIntensities_, glm::vec4 *colors_, float *intensities_);
 
-	void Optimize(float targetIntensity);
+	virtual void Optimize(float targetIntensity);
 
 	float GetWeightedAreaEntropy(int index);
 	float GetWeightedEntropyOpacityByID(float intensity, int index);

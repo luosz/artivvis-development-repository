@@ -209,6 +209,7 @@
     <ClInclude Include="GPUContours.h" />
     <ClInclude Include="GPURaycaster.h" />
     <ClInclude Include="IntensityTFOptimizer.h" />
+    <ClInclude Include="IntensityTFOptimizerPlus.h" />
     <ClInclude Include="MarchingCubesRenderer.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Raycaster.h" />
