@@ -19,6 +19,10 @@ public:
 	GLuint frameBuffer;
 	GLuint opacityTex1, opacityTex2;
 	int currentSlice;
+	
+	bool grabFrustum;
+	int mousePosX, mousePosY;
+	int frustumExtent;
 
 	std::vector<float> visibilities;
 	std::vector<int> numVis;

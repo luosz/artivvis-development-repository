@@ -9,8 +9,6 @@
 class OpenGLRenderer		:		public Renderer
 {
 public:
-
-	VisibilityHistogram visibilityHistogram;
 	RegionVisibilityOptimizer regionOptimizer;
 	VisibilityTFOptimizer visibilityOptimizer;
 

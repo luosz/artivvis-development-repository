@@ -13,6 +13,7 @@ class Renderer
 public:
 	Raycaster *raycaster;
 	TransferFunction transferFunction;
+	VisibilityHistogram visibilityHistogram;
 
 	virtual void Init(int screenWidth, int screenHeight, VolumeDataset &volume) = 0;
 	virtual void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera) = 0;

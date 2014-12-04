@@ -108,6 +108,19 @@ void MouseButton(int button, int state, int x, int y)
 				volumeRenderer.OptimizeForSelectedRegion(x, y, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 	}
+	else
+	{
+		if (button == GLUT_LEFT_BUTTON)
+		{
+			if (state == GLUT_DOWN)
+			{
+				volumeRenderer.renderer->visibilityHistogram.grabFrustum = true;
+				volumeRenderer.renderer->visibilityHistogram.mousePosX = x;
+				volumeRenderer.renderer->visibilityHistogram.mousePosY = y;
+				volumeRenderer.renderer->transferFunction.currentColorTable = volumeRenderer.renderer->transferFunction.origColorTable;
+			}
+		}
+	}
 }
 
 
