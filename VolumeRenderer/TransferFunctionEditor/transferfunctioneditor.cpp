@@ -127,6 +127,7 @@ void TransferFunctionEditor::on_checkBox_clicked()
 {
 	ui->checkBox_2->setChecked(false);
 	tf.is_ma_optimizer_enable = ui->checkBox->isChecked();
+	tf.is_luo_optimizer_enable = false;
 	std::cout << "Ma's optimizer " << (tf.isMaOptimizerEnable() ? "enabled" : "disabled") << std::endl;
 }
 
@@ -134,5 +135,6 @@ void TransferFunctionEditor::on_checkBox_2_clicked()
 {
 	ui->checkBox->setChecked(false);
 	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
+	tf.is_ma_optimizer_enable = false;
 	std::cout << "Luo's optimizer " << (tf.isLuoOptimizerEnable() ? "enabled" : "disabled") << std::endl;
 }

@@ -33,8 +33,9 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 	transferFunction.Update();
 
 	if (!transferFunction.tfView || transferFunction.tfView->isMaOptimizerEnable())
+	{
 		visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction, shaderManager, camera);
-
+	}
 
 //	regionOptimizer.CalculateVisibility(shaderManager, camera, volume, transferFunction, raycaster);
 

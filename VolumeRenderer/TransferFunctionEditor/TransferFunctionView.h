@@ -180,7 +180,7 @@ public:
 			//transfer_function->optimizeIntensity = true;
 			transfer_function->numIntensities = numIntensities;
 			transfer_function->intensities = intensities;
-			transfer_function->origColors = colors;
+			//transfer_function->origColors = colors;
 			transfer_function->colors = colors;
 		}
 #endif // NOT_USED_BY_VOLUME_RENDERER
