@@ -158,9 +158,14 @@ private slots:
 
     void on_visibilityButton_clicked();
 
+    void on_checkBox_clicked();
+
+    void on_checkBox_2_clicked();
+
 private:
     Ui::TransferFunctionEditor *ui;
 
+public:
     TransferFunctionView tf;
     int numIntensities;
     std::vector<glm::vec4> colors;

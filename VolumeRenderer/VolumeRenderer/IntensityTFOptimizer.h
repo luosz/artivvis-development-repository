@@ -18,7 +18,7 @@ public:
 	float *intensities;
 	int numIntensities;
 
-	IntensityTFOptimizer(VolumeDataset &volume_, int numIntensities_, glm::vec4 *colors_, float *intensities_);
+	IntensityTFOptimizer(VolumeDataset &volume_, int &numIntensities_, glm::vec4 *colors_, float *intensities_);
 
 	virtual void Optimize(float targetIntensity);
 

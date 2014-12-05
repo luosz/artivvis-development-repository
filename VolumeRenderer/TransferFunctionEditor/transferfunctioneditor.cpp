@@ -2,29 +2,32 @@
 #include "ui_transferfunctioneditor.h"
 
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TransferFunctionEditor)
+QMainWindow(parent),
+ui(new Ui::TransferFunctionEditor)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
 	// add transfer function widget
 	ui->verticalLayout->addWidget(&tf);
 
 	// load default transfer function
-//	filename = "../../transferfuncs/nucleon.tfi";
+	//	filename = "../../transferfuncs/nucleon.tfi";
 	filename = "../../transferfuncs/CT-Knee_spectrum_16_balance.tfi";
-//	filename = "../../transferfuncs/00.tfi";
-	
+	//	filename = "../../transferfuncs/00.tfi";
+
 	QByteArray array = filename.toLocal8Bit();
 	char* buffer = array.data();
 	openTransferFunctionFromVoreenXML(buffer);
 	tf.setTransferFunction(numIntensities, colors, intensities);
 	tf.drawTransferFunction();
+
+	tf.is_ma_optimizer_enable = ui->checkBox->isChecked();
+	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()
 {
-    delete ui;
+	delete ui;
 }
 
 void TransferFunctionEditor::on_action_Open_Transfer_Function_triggered()
@@ -75,7 +78,7 @@ void TransferFunctionEditor::on_levelButton_clicked()
 
 void TransferFunctionEditor::on_diagonalButton_clicked()
 {
-	tf.makeRamp();
+	tf.makeDiagonal();
 }
 
 void TransferFunctionEditor::on_peaksButton_clicked()
@@ -85,15 +88,51 @@ void TransferFunctionEditor::on_peaksButton_clicked()
 
 void TransferFunctionEditor::on_rampButton_clicked()
 {
-
+	tf.makeRamp();
 }
 
 void TransferFunctionEditor::on_entropyButton_clicked()
 {
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	if (tf.transfer_function)
+	{
+		tf.updateTransferFunctionFromView();
 
+		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+		tf.transfer_function->intensityOptimizerV2->BalanceEdges();
+		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
+
+		tf.updateViewFromTransferFunction();
+	}
+#endif // NOT_USED_BY_VOLUME_RENDERER
 }
 
 void TransferFunctionEditor::on_visibilityButton_clicked()
 {
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	if (tf.transfer_function)
+	{
+		tf.updateTransferFunctionFromView();
 
+		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+		tf.transfer_function->intensityOptimizerV2->BalanceVisibility();
+		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
+
+		tf.updateViewFromTransferFunction();
+	}
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_checkBox_clicked()
+{
+	ui->checkBox_2->setChecked(false);
+	tf.is_ma_optimizer_enable = ui->checkBox->isChecked();
+	std::cout << "Ma's optimizer " << (tf.isMaOptimizerEnable() ? "enabled" : "disabled") << std::endl;
+}
+
+void TransferFunctionEditor::on_checkBox_2_clicked()
+{
+	ui->checkBox->setChecked(false);
+	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
+	std::cout << "Luo's optimizer " << (tf.isLuoOptimizerEnable() ? "enabled" : "disabled") << std::endl;
 }

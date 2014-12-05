@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -20,6 +21,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
@@ -41,13 +43,19 @@ public:
     QStatusBar *statusBar;
     QDockWidget *dockWidget;
     QWidget *dockWidgetContents;
-    QHBoxLayout *horizontalLayout_2;
+    QVBoxLayout *verticalLayout_2;
+    QHBoxLayout *horizontalLayout_3;
     QPushButton *diagonalButton;
     QPushButton *levelButton;
+    QPushButton *rampButton;
     QPushButton *distributeVerticallyButton;
     QPushButton *distributeHorizontallyButton;
     QPushButton *peaksButton;
-    QPushButton *rampButton;
+    QHBoxLayout *horizontalLayout_4;
+    QCheckBox *checkBox;
+    QCheckBox *checkBox_2;
+    QHBoxLayout *horizontalLayout_2;
+    QSpinBox *spinBox;
     QPushButton *entropyButton;
     QPushButton *visibilityButton;
 
@@ -90,40 +98,77 @@ public:
         dockWidget->setObjectName(QStringLiteral("dockWidget"));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
-        horizontalLayout_2 = new QHBoxLayout(dockWidgetContents);
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(11);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
         diagonalButton = new QPushButton(dockWidgetContents);
         diagonalButton->setObjectName(QStringLiteral("diagonalButton"));
 
-        horizontalLayout_2->addWidget(diagonalButton);
+        horizontalLayout_3->addWidget(diagonalButton);
 
         levelButton = new QPushButton(dockWidgetContents);
         levelButton->setObjectName(QStringLiteral("levelButton"));
 
-        horizontalLayout_2->addWidget(levelButton);
-
-        distributeVerticallyButton = new QPushButton(dockWidgetContents);
-        distributeVerticallyButton->setObjectName(QStringLiteral("distributeVerticallyButton"));
-
-        horizontalLayout_2->addWidget(distributeVerticallyButton);
-
-        distributeHorizontallyButton = new QPushButton(dockWidgetContents);
-        distributeHorizontallyButton->setObjectName(QStringLiteral("distributeHorizontallyButton"));
-
-        horizontalLayout_2->addWidget(distributeHorizontallyButton);
-
-        peaksButton = new QPushButton(dockWidgetContents);
-        peaksButton->setObjectName(QStringLiteral("peaksButton"));
-
-        horizontalLayout_2->addWidget(peaksButton);
+        horizontalLayout_3->addWidget(levelButton);
 
         rampButton = new QPushButton(dockWidgetContents);
         rampButton->setObjectName(QStringLiteral("rampButton"));
 
-        horizontalLayout_2->addWidget(rampButton);
+        horizontalLayout_3->addWidget(rampButton);
+
+        distributeVerticallyButton = new QPushButton(dockWidgetContents);
+        distributeVerticallyButton->setObjectName(QStringLiteral("distributeVerticallyButton"));
+
+        horizontalLayout_3->addWidget(distributeVerticallyButton);
+
+        distributeHorizontallyButton = new QPushButton(dockWidgetContents);
+        distributeHorizontallyButton->setObjectName(QStringLiteral("distributeHorizontallyButton"));
+
+        horizontalLayout_3->addWidget(distributeHorizontallyButton);
+
+        peaksButton = new QPushButton(dockWidgetContents);
+        peaksButton->setObjectName(QStringLiteral("peaksButton"));
+
+        horizontalLayout_3->addWidget(peaksButton);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_3);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
+        checkBox = new QCheckBox(dockWidgetContents);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
+        checkBox->setChecked(true);
+
+        horizontalLayout_4->addWidget(checkBox);
+
+        checkBox_2 = new QCheckBox(dockWidgetContents);
+        checkBox_2->setObjectName(QStringLiteral("checkBox_2"));
+
+        horizontalLayout_4->addWidget(checkBox_2);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_4);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 0, 0, -1);
+        spinBox = new QSpinBox(dockWidgetContents);
+        spinBox->setObjectName(QStringLiteral("spinBox"));
+        spinBox->setMinimum(1);
+        spinBox->setMaximum(65536);
+        spinBox->setValue(1000);
+
+        horizontalLayout_2->addWidget(spinBox);
 
         entropyButton = new QPushButton(dockWidgetContents);
         entropyButton->setObjectName(QStringLiteral("entropyButton"));
@@ -134,6 +179,9 @@ public:
         visibilityButton->setObjectName(QStringLiteral("visibilityButton"));
 
         horizontalLayout_2->addWidget(visibilityButton);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_2);
 
         dockWidget->setWidget(dockWidgetContents);
         TransferFunctionEditor->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget);
@@ -155,10 +203,12 @@ public:
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
         diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", 0));
         levelButton->setText(QApplication::translate("TransferFunctionEditor", "level", 0));
+        rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
         distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", 0));
         distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "horizontal", 0));
         peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
-        rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
+        checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
+        checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));
         entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));
         visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", 0));
     } // retranslateUi

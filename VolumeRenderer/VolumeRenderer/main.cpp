@@ -1,7 +1,6 @@
 #include"VolumeRenderer.h"
 #include "QtWidget.h"
 #include <QtWidgets/QApplication>
-
 #include "../TransferFunctionEditor/import_transfer_function_editor.h"
 
 #define SCREEN_WIDTH 800
@@ -157,6 +156,7 @@ int main(int argc, char *argv[])
 	TransferFunctionEditor tf;
 	tf.init(volumeRenderer);
 	tf.show();
+	volumeRenderer.renderer->transferFunction.tfView = &tf.tf;
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);

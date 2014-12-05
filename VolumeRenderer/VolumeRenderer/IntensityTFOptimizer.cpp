@@ -1,6 +1,6 @@
 #include "IntensityTFOptimizer.h"
 
-IntensityTFOptimizer::IntensityTFOptimizer(VolumeDataset &volume_, int numIntensities_, glm::vec4 *colors_, float *intensities_)
+IntensityTFOptimizer::IntensityTFOptimizer(VolumeDataset &volume_, int &numIntensities_, glm::vec4 *colors_, float *intensities_)
 {
 	volume = &volume_;
 	numIntensities = numIntensities_;

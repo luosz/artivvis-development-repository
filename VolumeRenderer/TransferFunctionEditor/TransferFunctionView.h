@@ -32,6 +32,9 @@ public:
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 		transfer_function = NULL;
 #endif // NOT_USED_BY_VOLUME_RENDERER
+
+		is_ma_optimizer_enable = false;
+		is_luo_optimizer_enable = false;
 	}
 
 	void setTransferFunction(int numIntensities, std::vector<glm::vec4> colors, std::vector<float> intensities)
@@ -48,7 +51,7 @@ public:
 		intensities = this->intensities;
 	}
 
-	void drawTransferFunction()
+	virtual void drawTransferFunction()
 	{
 		auto size = this->size();
 		scene()->clear();
@@ -169,30 +172,62 @@ public:
 		this->selectedIndex = index;
 	}
 
+	virtual void updateTransferFunctionFromView()
+	{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+		if (transfer_function)
+		{
+			//transfer_function->optimizeIntensity = true;
+			transfer_function->numIntensities = numIntensities;
+			transfer_function->intensities = intensities;
+			transfer_function->origColors = colors;
+			transfer_function->colors = colors;
+		}
+#endif // NOT_USED_BY_VOLUME_RENDERER
+	}
+
+	virtual void updateViewFromTransferFunction()
+	{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+		if (transfer_function)
+		{
+			//transfer_function->optimizeIntensity = false;
+			numIntensities = transfer_function->numIntensities;
+			intensities = transfer_function->intensities;
+			colors = transfer_function->colors;
+			drawTransferFunction();
+		}
+#endif // NOT_USED_BY_VOLUME_RENDERER
+	}
+
 	virtual void optimizeForIntensity(int index)
 	{
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 		// optimize for selected intensity
 		if (transfer_function)
 		{
-			transfer_function->optimizeIntensity = true;
-			transfer_function->numIntensities = numIntensities;
-			transfer_function->intensities = intensities;
-			transfer_function->origColors = colors;
-			transfer_function->colors = colors;
+			updateTransferFunctionFromView();
 			transfer_function->targetIntensity = intensities[index];
-			transfer_function->Update();
-			transfer_function->optimizeIntensity = false;
-			numIntensities = transfer_function->numIntensities;
-			intensities = transfer_function->intensities;
-			colors = transfer_function->colors;
-			drawTransferFunction();
+			//transfer_function->Update();
+			transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
+			transfer_function->LoadLookup(transfer_function->currentColorTable);
+			updateViewFromTransferFunction();
 		}
 		else
 		{
 			std::cout << "Error in optimizeForIntensity: transfer_function is NULL." << std::endl;
 		}
 #endif // NOT_USED_BY_VOLUME_RENDERER
+	}
+
+	virtual bool isMaOptimizerEnable()
+	{
+		return is_ma_optimizer_enable;
+	}
+
+	virtual bool isLuoOptimizerEnable()
+	{
+		return is_luo_optimizer_enable;
 	}
 
 	virtual void changeControlPointColor(int index, QColor color)
@@ -243,7 +278,7 @@ public:
 		drawTransferFunction();
 	}
 
-	void makeRamp()
+	void makeDiagonal()
 	{
 		auto size = colors.size();
 		for (int i = 0; i < size; i++)
@@ -260,6 +295,24 @@ public:
 		for (int i = 0; i < size; i++)
 		{
 			colors[i].a = interval;
+		}
+		drawTransferFunction();
+	}
+
+	void makeRamp()
+	{
+		auto size = colors.size();
+		double interval = 1.0 / size;
+		for (int i = 0; i < size; i++)
+		{
+			if (i == 0 || i == size - 1)
+			{
+				colors[i].a = 0;
+			}
+			else
+			{
+				colors[i].a = interval;
+			}
 		}
 		drawTransferFunction();
 	}
@@ -283,11 +336,13 @@ protected:
 
 	virtual void timerEvent(QTimerEvent *event){}
 
-protected:
+public:
 	int numIntensities;
 	std::vector<glm::vec4> colors;
 	std::vector<float> intensities;
 	int selectedIndex;
+	bool is_ma_optimizer_enable;
+	bool is_luo_optimizer_enable;
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 public:

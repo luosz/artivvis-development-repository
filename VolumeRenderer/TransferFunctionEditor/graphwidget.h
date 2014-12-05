@@ -62,6 +62,11 @@ public:
 	virtual void setSelectedIndex(int index){}
 	virtual void optimizeForIntensity(int index){}
 	virtual void changeControlPointColor(int index, QColor color){}
+	virtual void drawTransferFunction(){}
+	virtual void updateTransferFunctionFromView(){}
+	virtual void updateViewFromTransferFunction(){}
+	virtual bool isMaOptimizerEnable(){ return false; }
+	virtual bool isLuoOptimizerEnable(){ return false; }
 
 public slots:
     void shuffle();

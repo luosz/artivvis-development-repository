@@ -19,6 +19,8 @@ void OpenGLRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volu
 
 	visibilityOptimizer.Init();
 
+	transferFunction.intensityOptimizerV2->SetVisibilityHistogram(visibilityHistogram);
+
 //	regionOptimizer.Init(transferFunction);
 }
 
@@ -30,12 +32,23 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 
 	transferFunction.Update();
 
-	visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction, shaderManager, camera);
+	if (!transferFunction.tfView || transferFunction.tfView->isMaOptimizerEnable())
+		visibilityOptimizer.Optimize(volume, visibilityHistogram, transferFunction, shaderManager, camera);
 
-	
 
 //	regionOptimizer.CalculateVisibility(shaderManager, camera, volume, transferFunction, raycaster);
 
+	if (transferFunction.tfView && transferFunction.tfView->isLuoOptimizerEnable())
+	{
+		// intensity and visibility optimization
+		if (transferFunction.tfView)
+		{
+			transferFunction.tfView->updateTransferFunctionFromView();
+			transferFunction.intensityOptimizerV2->BalanceVisibilityOnce();
+			transferFunction.LoadLookup(transferFunction.currentColorTable);
+			transferFunction.tfView->updateViewFromTransferFunction();
+		}
+	}
 
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);
 	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);

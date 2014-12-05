@@ -47,8 +47,8 @@ public:
 			{
 				auto visibility = visibilityHistogram->visibilities[bin_index];
 				float normalised = intensity / 255.0f;
-				return GetOpacityByInterp(normalised, index) * visibility;
-			} 
+				return GetOpacityByInterp(normalised, index) * visibility * frequency;
+			}
 			else
 			{
 				std::cout << "Error: visibilityHistogram is NULL" << std::endl;
@@ -297,6 +297,63 @@ public:
 	void SetVisibilityHistogram(VisibilityHistogram &visibilityHistogram)
 	{
 		this->visibilityHistogram = &visibilityHistogram;
+	}
+
+	void BalanceVisibilityOnce()
+	{
+		const float step_size = 1.0f / 255.0f;
+		std::vector<double> area_list;
+		double mean_area = 0;
+
+		for (int i = 0; i < numIntensities - 1; i++)
+		{
+			auto area = GetAreaVisibility(i);
+			area_list.push_back(area);
+			mean_area += area;
+		}
+		mean_area = mean_area / area_list.size();
+
+		for (int i = 0; i < area_list.size(); i++)
+		{
+			// move only non-zero control points
+			if (colors[i].a > glm::epsilon<float>())
+			{
+				if (area_list[i] > mean_area)
+				{
+					// get the upper vertex of an edge
+					auto max_index = i;
+					int max_index_next = max_index + 1;
+					float weight_max_1 = GetVisibilityOpacityByID(intensities[max_index] * 255.0f, max_index);
+					float weight_max_2 = GetVisibilityOpacityByID(intensities[max_index_next] * 255.0f, max_index_next);
+					if (colors[max_index_next].a > glm::epsilon<float>() && colors[max_index_next].a < 1.0f && weight_max_2 > weight_max_1)
+					{
+						max_index++;
+					}
+
+					float height_max = colors[max_index].a;
+					float height_max_new = height_max - step_size;
+					height_max_new = height_max_new < glm::epsilon<float>() ? glm::epsilon<float>() : height_max_new;
+					colors[max_index].a = height_max_new; // update opacity
+				}
+				if (area_list[i] < mean_area)
+				{
+					auto min_index = i;
+					// get the lower vertex of an edge
+					int min_index_next = min_index + 1;
+					float weight_min_1 = GetVisibilityOpacityByID(intensities[min_index] * 255.0f, min_index);
+					float weight_min_2 = GetVisibilityOpacityByID(intensities[min_index_next] * 255.0f, min_index_next);
+					if (colors[min_index_next].a > glm::epsilon<float>() && colors[min_index_next].a < 1.0f && weight_min_2 < weight_min_1)
+					{
+						min_index++;
+					}
+
+					float height_min = colors[min_index].a;
+					float height_min_new = height_min + step_size;
+					height_min_new = height_min_new > 1.0f ? 1.0f : height_min_new;
+					colors[min_index].a = height_min_new; // update opacity
+				}
+			}
+		}
 	}
 
 	void BalanceVisibility()
