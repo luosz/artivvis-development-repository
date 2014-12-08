@@ -19,7 +19,6 @@ ui(new Ui::TransferFunctionEditor)
 	char* buffer = array.data();
 	openTransferFunctionFromVoreenXML(buffer);
 	tf.setTransferFunction(numIntensities, colors, intensities);
-	tf.drawTransferFunction();
 
 	tf.is_ma_optimizer_enable = ui->checkBox->isChecked();
 	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
@@ -43,7 +42,6 @@ void TransferFunctionEditor::on_action_Open_Transfer_Function_triggered()
 		colors.clear();
 		openTransferFunctionFromVoreenXML(buffer);
 		tf.setTransferFunction(numIntensities, colors, intensities);
-		tf.drawTransferFunction();
 	}
 }
 
@@ -73,7 +71,7 @@ void TransferFunctionEditor::on_distributeVerticallyButton_clicked()
 
 void TransferFunctionEditor::on_levelButton_clicked()
 {
-	tf.makeLevel();
+	tf.makeLevel(ui->doubleSpinBox->value());
 }
 
 void TransferFunctionEditor::on_diagonalButton_clicked()
@@ -88,7 +86,7 @@ void TransferFunctionEditor::on_peaksButton_clicked()
 
 void TransferFunctionEditor::on_rampButton_clicked()
 {
-	tf.makeRamp();
+	tf.makeRamp(ui->doubleSpinBox->value());
 }
 
 void TransferFunctionEditor::on_entropyButton_clicked()

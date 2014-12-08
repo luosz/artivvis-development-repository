@@ -15,14 +15,17 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDockWidget>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -36,7 +39,12 @@ public:
     QAction *action_Save_Transfer_Function;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout;
+    QTabWidget *tabWidget;
+    QWidget *tab;
+    QHBoxLayout *horizontalLayout_5;
     QVBoxLayout *verticalLayout;
+    QWidget *tab_2;
+    QHBoxLayout *horizontalLayout_6;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QToolBar *mainToolBar;
@@ -45,11 +53,13 @@ public:
     QWidget *dockWidgetContents;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout_3;
-    QPushButton *diagonalButton;
-    QPushButton *levelButton;
+    QLabel *label;
+    QDoubleSpinBox *doubleSpinBox;
     QPushButton *rampButton;
-    QPushButton *distributeVerticallyButton;
+    QPushButton *levelButton;
     QPushButton *distributeHorizontallyButton;
+    QPushButton *distributeVerticallyButton;
+    QPushButton *diagonalButton;
     QPushButton *peaksButton;
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *checkBox;
@@ -75,11 +85,33 @@ public:
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        tabWidget = new QTabWidget(centralWidget);
+        tabWidget->setObjectName(QStringLiteral("tabWidget"));
+        tab = new QWidget();
+        tab->setObjectName(QStringLiteral("tab"));
+        horizontalLayout_5 = new QHBoxLayout(tab);
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
 
-        horizontalLayout->addLayout(verticalLayout);
+        horizontalLayout_5->addLayout(verticalLayout);
+
+        tabWidget->addTab(tab, QString());
+        tab_2 = new QWidget();
+        tab_2->setObjectName(QStringLiteral("tab_2"));
+        horizontalLayout_6 = new QHBoxLayout(tab_2);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setContentsMargins(0, 0, 0, 0);
+        tabWidget->addTab(tab_2, QString());
+
+        horizontalLayout->addWidget(tabWidget);
 
         TransferFunctionEditor->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TransferFunctionEditor);
@@ -107,30 +139,44 @@ public:
         horizontalLayout_3->setSpacing(11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
-        diagonalButton = new QPushButton(dockWidgetContents);
-        diagonalButton->setObjectName(QStringLiteral("diagonalButton"));
+        label = new QLabel(dockWidgetContents);
+        label->setObjectName(QStringLiteral("label"));
 
-        horizontalLayout_3->addWidget(diagonalButton);
+        horizontalLayout_3->addWidget(label);
 
-        levelButton = new QPushButton(dockWidgetContents);
-        levelButton->setObjectName(QStringLiteral("levelButton"));
+        doubleSpinBox = new QDoubleSpinBox(dockWidgetContents);
+        doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox"));
+        doubleSpinBox->setDecimals(2);
+        doubleSpinBox->setMaximum(1);
+        doubleSpinBox->setSingleStep(0.01);
+        doubleSpinBox->setValue(0.1);
 
-        horizontalLayout_3->addWidget(levelButton);
+        horizontalLayout_3->addWidget(doubleSpinBox);
 
         rampButton = new QPushButton(dockWidgetContents);
         rampButton->setObjectName(QStringLiteral("rampButton"));
 
         horizontalLayout_3->addWidget(rampButton);
 
-        distributeVerticallyButton = new QPushButton(dockWidgetContents);
-        distributeVerticallyButton->setObjectName(QStringLiteral("distributeVerticallyButton"));
+        levelButton = new QPushButton(dockWidgetContents);
+        levelButton->setObjectName(QStringLiteral("levelButton"));
 
-        horizontalLayout_3->addWidget(distributeVerticallyButton);
+        horizontalLayout_3->addWidget(levelButton);
 
         distributeHorizontallyButton = new QPushButton(dockWidgetContents);
         distributeHorizontallyButton->setObjectName(QStringLiteral("distributeHorizontallyButton"));
 
         horizontalLayout_3->addWidget(distributeHorizontallyButton);
+
+        distributeVerticallyButton = new QPushButton(dockWidgetContents);
+        distributeVerticallyButton->setObjectName(QStringLiteral("distributeVerticallyButton"));
+
+        horizontalLayout_3->addWidget(distributeVerticallyButton);
+
+        diagonalButton = new QPushButton(dockWidgetContents);
+        diagonalButton->setObjectName(QStringLiteral("diagonalButton"));
+
+        horizontalLayout_3->addWidget(diagonalButton);
 
         peaksButton = new QPushButton(dockWidgetContents);
         peaksButton->setObjectName(QStringLiteral("peaksButton"));
@@ -192,6 +238,9 @@ public:
 
         retranslateUi(TransferFunctionEditor);
 
+        tabWidget->setCurrentIndex(0);
+
+
         QMetaObject::connectSlotsByName(TransferFunctionEditor);
     } // setupUi
 
@@ -200,12 +249,15 @@ public:
         TransferFunctionEditor->setWindowTitle(QApplication::translate("TransferFunctionEditor", "Transfer Function Editor", 0));
         action_Open_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Open Transfer Function...", 0));
         action_Save_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Save Transfer Function...", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "Tab 1", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "Tab 2", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
-        diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", 0));
-        levelButton->setText(QApplication::translate("TransferFunctionEditor", "level", 0));
+        label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
         rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
-        distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", 0));
+        levelButton->setText(QApplication::translate("TransferFunctionEditor", "level", 0));
         distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "horizontal", 0));
+        distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", 0));
+        diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", 0));
         peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
         checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
         checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));

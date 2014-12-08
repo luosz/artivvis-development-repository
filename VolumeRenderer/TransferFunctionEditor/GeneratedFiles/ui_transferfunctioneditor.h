@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDockWidget>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
@@ -46,6 +47,7 @@ public:
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *diagonalButton;
+    QDoubleSpinBox *doubleSpinBox;
     QPushButton *levelButton;
     QPushButton *rampButton;
     QPushButton *distributeVerticallyButton;
@@ -111,6 +113,15 @@ public:
         diagonalButton->setObjectName(QStringLiteral("diagonalButton"));
 
         horizontalLayout_3->addWidget(diagonalButton);
+
+        doubleSpinBox = new QDoubleSpinBox(dockWidgetContents);
+        doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox"));
+        doubleSpinBox->setDecimals(2);
+        doubleSpinBox->setMaximum(1);
+        doubleSpinBox->setSingleStep(0.01);
+        doubleSpinBox->setValue(0.1);
+
+        horizontalLayout_3->addWidget(doubleSpinBox);
 
         levelButton = new QPushButton(dockWidgetContents);
         levelButton->setObjectName(QStringLiteral("levelButton"));

@@ -42,6 +42,7 @@ public:
 		this->numIntensities = numIntensities;
 		this->colors = colors;
 		this->intensities = intensities;
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	void getTransferFunction(int &numIntensities, std::vector<glm::vec4> &colors, std::vector<float> &intensities)
@@ -49,6 +50,12 @@ public:
 		numIntensities = this->numIntensities;
 		colors = this->colors;
 		intensities = this->intensities;
+	}
+
+	void updateTransferFunctionFromView_and_drawTransferFunction(bool upate_origColors = false)
+	{
+		updateTransferFunctionFromView(upate_origColors);
+		drawTransferFunction();
 	}
 
 	virtual void drawTransferFunction()
@@ -68,32 +75,16 @@ public:
 			}
 			node0 = node1;
 		}
-
-#ifndef NOT_USED_BY_VOLUME_RENDERER
-		if (transfer_function)
-		{
-			transfer_function->numIntensities = numIntensities;
-			transfer_function->intensities = intensities;
-			transfer_function->origColors = colors;
-			transfer_function->colors = colors;
-			transfer_function->LoadLookup(transfer_function->currentColorTable);
-			transfer_function->LoadLookup(transfer_function->origColorTable);
-		} 
-		else
-		{
-			std::cout<<"Error in drawTransferFunction: transfer_function is NULL."<<std::endl;
-		}
-#endif // NOT_USED_BY_VOLUME_RENDERER
 	}
 
 	virtual void removeControlPoint(int index)
 	{
-		std::cout << "removeControlPoint size before " << numIntensities << " after";
+		std::cout << "removeControlPoint size before " << numIntensities << " after ";
 		colors.erase(colors.begin() + index);
 		intensities.erase(intensities.begin() + index);
 		numIntensities = intensities.size();
-		drawTransferFunction();
 		std::cout << numIntensities << std::endl;
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	virtual void moveControlPoint(int index, double intensity, double opacity)
@@ -115,7 +106,7 @@ public:
 				intensities[i] = intensities[index];
 			}
 		}
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	virtual void addControlPoint(double intensity, double opacity)
@@ -164,7 +155,7 @@ public:
 			}
 		}
 		numIntensities = intensities.size();
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	virtual void setSelectedIndex(int index)
@@ -172,7 +163,7 @@ public:
 		this->selectedIndex = index;
 	}
 
-	virtual void updateTransferFunctionFromView()
+	virtual void updateTransferFunctionFromView(bool upate_origColors = false)
 	{
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 		if (transfer_function)
@@ -180,8 +171,12 @@ public:
 			//transfer_function->optimizeIntensity = true;
 			transfer_function->numIntensities = numIntensities;
 			transfer_function->intensities = intensities;
-			//transfer_function->origColors = colors;
 			transfer_function->colors = colors;
+			if (upate_origColors)
+			{
+				transfer_function->origColors = colors;
+			}
+			transfer_function->LoadLookup(transfer_function->currentColorTable);
 		}
 #endif // NOT_USED_BY_VOLUME_RENDERER
 	}
@@ -208,7 +203,6 @@ public:
 		{
 			updateTransferFunctionFromView();
 			transfer_function->targetIntensity = intensities[index];
-			//transfer_function->Update();
 			transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
 			transfer_function->LoadLookup(transfer_function->currentColorTable);
 			updateViewFromTransferFunction();
@@ -234,7 +228,7 @@ public:
 	{
 		glm::vec4 c(color.red() / 255.f, color.green() / 255.f, color.blue() / 255.f, colors[index].a);
 		colors[index] = c;
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	int getSelectedIndex()
@@ -263,7 +257,7 @@ public:
 		{
 			colors[i].a = min + i * interval;
 		}
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	void distrubuteHorizontally()
@@ -275,7 +269,7 @@ public:
 		{
 			intensities[i] = intensities[0] + i * interval;
 		}
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 	void makeDiagonal()
@@ -285,24 +279,22 @@ public:
 		{
 			colors[i].a = intensities[i];
 		}
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
-	void makeLevel()
+	void makeLevel(double opacity = 0.1)
 	{
 		auto size = colors.size();
-		double interval = 1.0 / size;
 		for (int i = 0; i < size; i++)
 		{
-			colors[i].a = interval;
+			colors[i].a = opacity;
 		}
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
-	void makeRamp()
+	void makeRamp(double opacity = 0.1)
 	{
 		auto size = colors.size();
-		double interval = 1.0 / size;
 		for (int i = 0; i < size; i++)
 		{
 			if (i == 0 || i == size - 1)
@@ -311,10 +303,10 @@ public:
 			}
 			else
 			{
-				colors[i].a = interval;
+				colors[i].a = opacity;
 			}
 		}
-		drawTransferFunction();
+		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
 protected:
