@@ -50,6 +50,8 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	HANDLE_ERROR( cudaMalloc((void**)&cudaHistBins, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin, 256 * sizeof(int)) );
 
+	grabFrustum = false;
+	frustumExtent = 5;
 }
 
 GLuint VisibilityHistogram::GenerateSliceTexture()
@@ -151,6 +153,37 @@ __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 		}
 	}
 }
+
+
+__global__ void CudaGrabFrustum(int numFrustumPixels, int frustumExtent, int mousePosX, int mousePosY, float *histBins, int *numInBin)
+{
+	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if (tid < numFrustumPixels)
+	{
+		int width = (frustumExtent * 2) + 1;
+
+		int bottomCornerX = mousePosX - frustumExtent;
+		int bottomCornerY = mousePosY - frustumExtent;
+
+		int v = ((int) tid / width) + bottomCornerY;
+		int u = (tid % width) + bottomCornerX;
+
+//		printf("%d: %d, %d - %d, %d\n", tid, u, v, mousePosX, mousePosY);
+
+		float4 color = tex2D(texRef, u, v);
+		float scalar = color.z;
+
+		if (scalar > 0.0f)
+		{
+			int bin = scalar * 255.0f;
+
+			atomicAdd(&(histBins[bin]), (float)color.x);
+			atomicAdd(&(numInBin[bin]), (int)1);
+		}
+	}
+}
+
 
 
 // Calculate visibility histogram
@@ -274,9 +307,17 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 		HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&arry, resource, 0, 0) ); 
 		HANDLE_ERROR( cudaBindTextureToArray(texRef, arry) );
 
-		// Launch CUDA kernel to accumulate visbility values in parallel
-		int numPixels = xPixels * yPixels;
-		CudaEvaluate<<<(numPixels + 255) / 256, 256>>>(xPixels, yPixels, cudaHistBins, cudaNumInBin);
+		if (!grabFrustum)
+		{
+			// Launch CUDA kernel to accumulate visbility values in parallel
+			int numPixels = xPixels * yPixels;
+			CudaEvaluate<<<(numPixels + 255) / 256, 256>>>(xPixels, yPixels, cudaHistBins, cudaNumInBin);
+		}
+		else
+		{
+			int numFrustumPixels = ((frustumExtent*2) + 1) * ((frustumExtent*2) + 1);
+			CudaGrabFrustum <<<(numFrustumPixels + 255) / 256, 256>>> (numFrustumPixels, frustumExtent, mousePosX, 800 - mousePosY, cudaHistBins, cudaNumInBin);
+		}
 
 		// Unbind and unmap, must be done before OpenGL uses texture memory again
 		HANDLE_ERROR( cudaUnbindTexture(texRef) );

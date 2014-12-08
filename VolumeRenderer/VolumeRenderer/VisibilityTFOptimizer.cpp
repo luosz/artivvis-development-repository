@@ -62,7 +62,7 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 
 
 
-	float stepsize = 0.05f;
+	float stepsize = 0.2f;
 
 	for (int i=0; i<numBins; i++)
 	{
