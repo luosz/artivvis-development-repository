@@ -45,13 +45,14 @@ public:
     QVBoxLayout *verticalLayout;
     QWidget *tab_2;
     QHBoxLayout *horizontalLayout_6;
+    QVBoxLayout *verticalLayout_2;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QDockWidget *dockWidget;
     QWidget *dockWidgetContents;
-    QVBoxLayout *verticalLayout_2;
+    QVBoxLayout *verticalLayout_0;
     QHBoxLayout *horizontalLayout_3;
     QLabel *label;
     QDoubleSpinBox *doubleSpinBox;
@@ -109,6 +110,12 @@ public:
         horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
         horizontalLayout_6->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+
+        horizontalLayout_6->addLayout(verticalLayout_2);
+
         tabWidget->addTab(tab_2, QString());
 
         horizontalLayout->addWidget(tabWidget);
@@ -130,11 +137,11 @@ public:
         dockWidget->setObjectName(QStringLiteral("dockWidget"));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
-        verticalLayout_2 = new QVBoxLayout(dockWidgetContents);
-        verticalLayout_2->setSpacing(6);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_0 = new QVBoxLayout(dockWidgetContents);
+        verticalLayout_0->setSpacing(6);
+        verticalLayout_0->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_0->setObjectName(QStringLiteral("verticalLayout_0"));
+        verticalLayout_0->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
@@ -184,7 +191,7 @@ public:
         horizontalLayout_3->addWidget(peaksButton);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_3);
+        verticalLayout_0->addLayout(horizontalLayout_3);
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
@@ -202,7 +209,7 @@ public:
         horizontalLayout_4->addWidget(checkBox_2);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_4);
+        verticalLayout_0->addLayout(horizontalLayout_4);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
@@ -227,7 +234,7 @@ public:
         horizontalLayout_2->addWidget(visibilityButton);
 
 
-        verticalLayout_2->addLayout(horizontalLayout_2);
+        verticalLayout_0->addLayout(horizontalLayout_2);
 
         dockWidget->setWidget(dockWidgetContents);
         TransferFunctionEditor->addDockWidget(static_cast<Qt::DockWidgetArea>(8), dockWidget);
@@ -238,7 +245,7 @@ public:
 
         retranslateUi(TransferFunctionEditor);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(TransferFunctionEditor);
@@ -249,8 +256,8 @@ public:
         TransferFunctionEditor->setWindowTitle(QApplication::translate("TransferFunctionEditor", "Transfer Function Editor", 0));
         action_Open_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Open Transfer Function...", 0));
         action_Save_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Save Transfer Function...", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "Tab 1", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "Tab 2", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "initial transfer function", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
         label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
         rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
