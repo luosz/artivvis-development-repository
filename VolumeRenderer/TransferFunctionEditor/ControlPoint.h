@@ -14,20 +14,25 @@
 #include <iostream>
 #include "edge.h"
 #include "node.h"
-#include "graphwidget.h"
+#include "AbstractGraphicsView.h"
 
 class ControlPoint : public Node
 {
 public:
-	ControlPoint(GraphWidget *graphWidget, int index, QColor &color = QColor(Qt::yellow)) : Node(static_cast<GraphWidget*>(graphWidget))
+	ControlPoint(AbstractGraphicsView *graphWidget, int index, QColor &color = QColor(Qt::yellow)) : Node(static_cast<GraphWidget*>(graphWidget))
 	{
-		this->color = color;
-		this->index = index;
+		this->_color = color;
+		this->_index = index;
+		view = graphWidget;
 	}
 
-	int getIndex()
+	virtual ~ControlPoint()
 	{
-		return this->index;
+	}
+
+	int index()
+	{
+		return this->_index;
 	}
 
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -40,12 +45,12 @@ public:
 		if (option->state & QStyle::State_Sunken) {
 			gradient.setCenter(3, 3);
 			gradient.setFocalPoint(3, 3);
-			gradient.setColorAt(1, QColor(color).light(120));
-			gradient.setColorAt(0, QColor(color.darker()).light(120));
+			gradient.setColorAt(1, QColor(_color).light(120));
+			gradient.setColorAt(0, QColor(_color.darker()).light(120));
 		}
 		else {
-			gradient.setColorAt(0, color);
-			gradient.setColorAt(1, color.darker());
+			gradient.setColorAt(0, _color);
+			gradient.setColorAt(1, _color.darker());
 		}
 		painter->setBrush(gradient);
 
@@ -57,7 +62,7 @@ protected:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		Node::mousePressEvent(event);
-		graph->setSelectedIndex(index);
+		view->setSelectedIndex(_index);
 		event->accept();
 	}
 
@@ -66,11 +71,11 @@ protected:
 		Node::mouseReleaseEvent(event);
 		if (!event->isAccepted() && event->button() == Qt::MouseButton::LeftButton)
 		{
-			auto size = graph->sceneRect();
+			auto size = view->sceneRect();
 			auto pos = event->scenePos();
 			auto intensity = pos.x() / size.width();
 			auto opacity = 1 - pos.y() / size.height();
-			graph->moveControlPoint(index, intensity, opacity);
+			view->moveControlPoint(_index, intensity, opacity);
 			event->accept();
 		}
 	}
@@ -85,18 +90,18 @@ protected:
 		QAction *selectedAction = menu.exec(event->screenPos());
 		if (selectedAction == removeAction)
 		{
-			graph->removeControlPoint(index);
+			view->removeControlPoint(_index);
 		}
 		else
 		{
 			if (selectedAction == changeAction)
 			{
 				// change control point color
-				auto c = QColorDialog::getColor(color, graph);
+				auto c = QColorDialog::getColor(_color, view);
 				if (c.isValid())
 				{
-					color = c;
-					graph->changeControlPointColor(index, color);
+					_color = c;
+					view->changeControlPointColor(_index, _color);
 				}
 			}
 			else
@@ -104,7 +109,7 @@ protected:
 				if (selectedAction == optimizeAction)
 				{
 					// optimize for intensity
-					graph->optimizeForIntensity(index);
+					view->optimizeForIntensity(_index);
 				}
 			}
 		}
@@ -112,8 +117,9 @@ protected:
 	}
 
 protected:
-	QColor color;
-	int index;
+	QColor _color;
+	int _index;
+	AbstractGraphicsView *view;
 };
 
 #endif // ControlPoint_H

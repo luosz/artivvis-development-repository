@@ -46,6 +46,9 @@ public:
     QWidget *tab_2;
     QHBoxLayout *horizontalLayout_6;
     QVBoxLayout *verticalLayout_2;
+    QWidget *tab_3;
+    QHBoxLayout *horizontalLayout_7;
+    QVBoxLayout *verticalLayout_3;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QToolBar *mainToolBar;
@@ -57,7 +60,7 @@ public:
     QLabel *label;
     QDoubleSpinBox *doubleSpinBox;
     QPushButton *rampButton;
-    QPushButton *levelButton;
+    QPushButton *flatButton;
     QPushButton *distributeHorizontallyButton;
     QPushButton *distributeVerticallyButton;
     QPushButton *diagonalButton;
@@ -74,7 +77,7 @@ public:
     {
         if (TransferFunctionEditor->objectName().isEmpty())
             TransferFunctionEditor->setObjectName(QStringLiteral("TransferFunctionEditor"));
-        TransferFunctionEditor->resize(640, 480);
+        TransferFunctionEditor->resize(728, 480);
         action_Open_Transfer_Function = new QAction(TransferFunctionEditor);
         action_Open_Transfer_Function->setObjectName(QStringLiteral("action_Open_Transfer_Function"));
         action_Save_Transfer_Function = new QAction(TransferFunctionEditor);
@@ -117,13 +120,27 @@ public:
         horizontalLayout_6->addLayout(verticalLayout_2);
 
         tabWidget->addTab(tab_2, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QStringLiteral("tab_3"));
+        horizontalLayout_7 = new QHBoxLayout(tab_3);
+        horizontalLayout_7->setSpacing(6);
+        horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
+        horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+
+        horizontalLayout_7->addLayout(verticalLayout_3);
+
+        tabWidget->addTab(tab_3, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
         TransferFunctionEditor->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(TransferFunctionEditor);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 640, 26));
+        menuBar->setGeometry(QRect(0, 0, 728, 26));
         menu_File = new QMenu(menuBar);
         menu_File->setObjectName(QStringLiteral("menu_File"));
         TransferFunctionEditor->setMenuBar(menuBar);
@@ -165,10 +182,10 @@ public:
 
         horizontalLayout_3->addWidget(rampButton);
 
-        levelButton = new QPushButton(dockWidgetContents);
-        levelButton->setObjectName(QStringLiteral("levelButton"));
+        flatButton = new QPushButton(dockWidgetContents);
+        flatButton->setObjectName(QStringLiteral("flatButton"));
 
-        horizontalLayout_3->addWidget(levelButton);
+        horizontalLayout_3->addWidget(flatButton);
 
         distributeHorizontallyButton = new QPushButton(dockWidgetContents);
         distributeHorizontallyButton->setObjectName(QStringLiteral("distributeHorizontallyButton"));
@@ -245,7 +262,7 @@ public:
 
         retranslateUi(TransferFunctionEditor);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(TransferFunctionEditor);
@@ -257,11 +274,12 @@ public:
         action_Open_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Open Transfer Function...", 0));
         action_Save_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Save Transfer Function...", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "initial transfer function", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "intensity histogram", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
         label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
         rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
-        levelButton->setText(QApplication::translate("TransferFunctionEditor", "level", 0));
+        flatButton->setText(QApplication::translate("TransferFunctionEditor", "flat", 0));
         distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "horizontal", 0));
         distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", 0));
         diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", 0));

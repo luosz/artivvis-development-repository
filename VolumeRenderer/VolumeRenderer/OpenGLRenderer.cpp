@@ -39,16 +39,19 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 
 //	regionOptimizer.CalculateVisibility(shaderManager, camera, volume, transferFunction, raycaster);
 
+	// intensity and visibility optimization
 	if (transferFunction.tfView && transferFunction.tfView->isLuoOptimizerEnable())
 	{
-		// intensity and visibility optimization
-		if (transferFunction.tfView)
-		{
-			transferFunction.tfView->updateTransferFunctionFromView();
-			transferFunction.intensityOptimizerV2->BalanceVisibilityOnce();
-			transferFunction.LoadLookup(transferFunction.currentColorTable);
-			transferFunction.tfView->updateViewFromTransferFunction();
-		}
+		transferFunction.tfView->updateTransferFunctionFromView();
+		transferFunction.intensityOptimizerV2->BalanceVisibilityOnce();
+		transferFunction.LoadLookup(transferFunction.currentColorTable);
+		transferFunction.tfView->updateViewFromTransferFunction();
+	}
+
+	if (transferFunction.visibilityView)
+	{
+		transferFunction.visibilityView->setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
+		transferFunction.visibilityView->draw();
 	}
 
 	GLuint shaderProgramID = shaderManager.UseShader(shaderManager.currentShader);

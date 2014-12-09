@@ -114,5 +114,14 @@
     <ClInclude Include="import_transfer_function_editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HistogramView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HistogramPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractGraphicsView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

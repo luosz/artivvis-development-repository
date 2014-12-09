@@ -3,12 +3,18 @@
 
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 QMainWindow(parent),
-ui(new Ui::TransferFunctionEditor)
+ui(new Ui::TransferFunctionEditor),
+intensity_histogram("Intensity Histogram"),
+visibility_histogram("Visibility Histogram")
 {
 	ui->setupUi(this);
 
 	// add transfer function widget
 	ui->verticalLayout->addWidget(&tf);
+
+	// add histogram widget
+	ui->verticalLayout_2->addWidget(&intensity_histogram);
+	ui->verticalLayout_3->addWidget(&visibility_histogram);
 
 	// load default transfer function
 	//	filename = "../../transferfuncs/nucleon.tfi";
@@ -20,8 +26,16 @@ ui(new Ui::TransferFunctionEditor)
 	openTransferFunctionFromVoreenXML(buffer);
 	tf.setTransferFunction(numIntensities, colors, intensities);
 
-	tf.is_ma_optimizer_enable = ui->checkBox->isChecked();
-	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
+	// set up histogram
+	auto n = 16;
+	for (int i = 0; i <= n;i++)
+	{
+		auto intensity = i / (float)n;
+		intensity_histogram.intensities.push_back(intensity);
+		intensity_histogram.frequencies.push_back(intensity*intensity);
+		visibility_histogram.intensities.push_back(intensity);
+		visibility_histogram.frequencies.push_back(intensity*intensity);
+	}
 }
 
 TransferFunctionEditor::~TransferFunctionEditor()
@@ -67,11 +81,6 @@ void TransferFunctionEditor::on_distributeHorizontallyButton_clicked()
 void TransferFunctionEditor::on_distributeVerticallyButton_clicked()
 {
 	tf.distributeVertically();
-}
-
-void TransferFunctionEditor::on_levelButton_clicked()
-{
-	tf.makeLevel(ui->doubleSpinBox->value());
 }
 
 void TransferFunctionEditor::on_diagonalButton_clicked()
@@ -135,4 +144,9 @@ void TransferFunctionEditor::on_checkBox_2_clicked()
 	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
 	tf.is_ma_optimizer_enable = false;
 	std::cout << "Luo's optimizer " << (tf.isLuoOptimizerEnable() ? "enabled" : "disabled") << std::endl;
+}
+
+void TransferFunctionEditor::on_flatButton_clicked()
+{
+	tf.makeFlat(ui->doubleSpinBox->value());
 }

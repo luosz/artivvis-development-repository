@@ -11,7 +11,7 @@
 #include "VisibilityHistogram.h"
 #include "IntensityTFOptimizer.h"
 #include "IntensityTFOptimizerV2.h"
-#include "../TransferFunctionEditor/graphwidget.h"
+#include "../TransferFunctionEditor/AbstractGraphicsView.h"
 
 #define tfEPSILON glm::epsilon<float>()
 
@@ -29,7 +29,8 @@ public:
 
 	IntensityTFOptimizer *intensityOptimizer;
 	IntensityTFOptimizerV2 *intensityOptimizerV2;
-	GraphWidget *tfView;
+	AbstractGraphicsView *tfView;
+	AbstractGraphicsView *visibilityView;
 
 	std::vector<glm::vec4> origColorTable;
 	std::vector<glm::vec4> currentColorTable;

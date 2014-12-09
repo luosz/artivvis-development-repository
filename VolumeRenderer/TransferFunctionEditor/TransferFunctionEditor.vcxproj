@@ -215,7 +215,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbstractGraphicsView.h" />
     <ClInclude Include="ControlEdge.h" />
+    <ClInclude Include="HistogramPoint.h" />
+    <ClInclude Include="HistogramView.h" />
     <ClInclude Include="import_transfer_function_editor.h" />
     <CustomBuild Include="ControlPoint.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

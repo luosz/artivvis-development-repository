@@ -23,6 +23,7 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	intensityOptimizerV2 = new IntensityTFOptimizerV2(volume_, numIntensities, &colors[0], &intensities[0]);
 
 	tfView = NULL;
+	visibilityView = NULL;
 
 	targetIntensity = 0.4f;
 	optimizeIntensity = false;

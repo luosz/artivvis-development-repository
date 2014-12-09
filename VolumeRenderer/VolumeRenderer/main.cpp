@@ -170,6 +170,7 @@ int main(int argc, char *argv[])
 	tf.init(volumeRenderer);
 	tf.show();
 	volumeRenderer.renderer->transferFunction.tfView = &tf.tf;
+	volumeRenderer.renderer->transferFunction.visibilityView = &tf.visibility_histogram;
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);

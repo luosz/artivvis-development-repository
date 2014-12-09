@@ -13,12 +13,13 @@
 #include "ControlPoint.h"
 #include "ControlEdge.h"
 #include "TransferFunctionScene.h"
+#include "AbstractGraphicsView.h"
 
 //! [0];
-class TransferFunctionView : public GraphWidget
+class TransferFunctionView : public AbstractGraphicsView
 {
 public:
-    TransferFunctionView(QWidget *parent = 0) : GraphWidget(parent)
+	TransferFunctionView(QWidget *parent = 0) : AbstractGraphicsView(parent)
 	{
 		auto size = this->size();
 		auto tfScene = static_cast<QGraphicsScene*>(new TransferFunctionScene(this));
@@ -35,6 +36,10 @@ public:
 
 		is_ma_optimizer_enable = false;
 		is_luo_optimizer_enable = false;
+	}
+
+	virtual ~TransferFunctionView()
+	{
 	}
 
 	void setTransferFunction(int numIntensities, std::vector<glm::vec4> colors, std::vector<float> intensities)
@@ -55,10 +60,10 @@ public:
 	void updateTransferFunctionFromView_and_drawTransferFunction(bool upate_origColors = false)
 	{
 		updateTransferFunctionFromView(upate_origColors);
-		drawTransferFunction();
+		draw();
 	}
 
-	virtual void drawTransferFunction()
+	virtual void draw()
 	{
 		auto size = this->size();
 		scene()->clear();
@@ -190,7 +195,7 @@ public:
 			numIntensities = transfer_function->numIntensities;
 			intensities = transfer_function->intensities;
 			colors = transfer_function->colors;
-			drawTransferFunction();
+			draw();
 		}
 #endif // NOT_USED_BY_VOLUME_RENDERER
 	}
@@ -282,7 +287,7 @@ public:
 		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
-	void makeLevel(double opacity = 0.1)
+	void makeFlat(double opacity = 0.1)
 	{
 		auto size = colors.size();
 		for (int i = 0; i < size; i++)
@@ -317,7 +322,7 @@ protected:
 		scene()->setSceneRect(0, 0, size.width(), size.height());
 		QRectF rect = this->sceneRect();
 		std::cout << "sceneRect " << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height() << std::endl;
-		drawTransferFunction();
+		draw();
 	}
 
 	virtual void drawBackground(QPainter *painter, const QRectF &rect)

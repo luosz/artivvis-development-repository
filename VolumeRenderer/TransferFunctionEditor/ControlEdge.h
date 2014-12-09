@@ -18,6 +18,10 @@ public:
 	{
 	}
 
+	virtual ~ControlEdge()
+	{
+	}
+
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 	{
 		if (!source || !dest)
