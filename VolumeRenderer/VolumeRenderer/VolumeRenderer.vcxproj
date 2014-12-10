@@ -168,6 +168,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\TransferFunctionEditor\AbstractGraphicsView.h" />
     <ClInclude Include="..\TransferFunctionEditor\ControlEdge.h" />
     <ClInclude Include="..\TransferFunctionEditor\ControlPoint.h" />
     <ClInclude Include="..\TransferFunctionEditor\edge.h" />
@@ -181,6 +182,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB "-IC:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5\include" "-I.\..\..\External Resources\DevIL\include\IL" "-I.\..\..\External Resources\glm" "-I.\..\..\External Resources\glew-1.10.0\include" "-I.\..\..\External Resources\freeglut\include" "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
+    <ClInclude Include="..\TransferFunctionEditor\HistogramView.h" />
     <ClInclude Include="..\TransferFunctionEditor\import_transfer_function_editor.h" />
     <ClInclude Include="..\TransferFunctionEditor\import_volume_renderer.h" />
     <ClInclude Include="..\TransferFunctionEditor\node.h" />

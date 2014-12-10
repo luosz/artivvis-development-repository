@@ -260,6 +260,12 @@
     <ClInclude Include="IntensityTFOptimizerV2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\HistogramView.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TransferFunctionEditor\AbstractGraphicsView.h">
+      <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtWidget.h">
