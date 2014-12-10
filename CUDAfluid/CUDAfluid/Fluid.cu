@@ -129,15 +129,32 @@ __global__ void CudaAddArtificialForces(SimData data)
 		}
 	}
 
-//	for (int i=-span; i<=span; i++)
+//	for (int j=-span; j<=span; j++)
 //	{
 //		for (int k=-span; k<=span; k++)
 //		{
-//			SetDataIJK(middleX + i,	0,	middleZ + k, data.gridRes, data.densities, 1.5f, 3);
-//			SetDataIJK(middleX + i,	0,	middleZ + k, data.gridRes, data.temperatures, 400.0f, 3);
+//			if (glm::distance(glm::vec2(j, k), glm::vec2(0, 0)) > span)
+//				continue;
 //
-//			SetDataIJK(middleX + i,	data.gridRes[1]-2,	middleZ + k, data.gridRes, data.densities, 1.5f, 3);
-//			SetDataIJK(middleX + i,	data.gridRes[1]-2,	middleZ + k, data.gridRes, data.temperatures, -200.0f, 3);
+//			SetDataIJK(0, middleY + j,	middleZ + k, data.gridRes, data.densities, 1.0f, 3);
+//			SetDataIJK(0, middleY + j,	middleZ + k, data.gridRes, data.temperatures, 0.0f, 3);
+//		}
+//	}
+//
+//	for (int i=0; i<data.gridRes[0] / 4; i++)
+//	{
+//		int coneCoefficient = ((float)i / (float)data.gridRes[0]) * span;
+//		coneCoefficient = 0;
+//
+//		for (int j=-span+coneCoefficient; j<=span-coneCoefficient; j++)
+//		{
+//			for (int k=-span+coneCoefficient; k<=span-coneCoefficient; k++)
+//			{
+//				if (glm::distance(glm::vec2(j, k), glm::vec2(0, 0)) > span)
+//					continue;
+//
+//				SetDataIJK(i, middleY + j,	middleZ + k, data.xFaceRes, data.xVelocities, 10.0f, 0);
+//			}
 //		}
 //	}
 }

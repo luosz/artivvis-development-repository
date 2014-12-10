@@ -19,12 +19,12 @@ struct MyFileSort : public std::binary_function<std::string, std::string, bool>
 
 int main(int argc, char** argv)
 {
-	string sourceFolder = "../../Samples/SmokeSim/SmokeSimRaw100600/";
-	string targetFileName = "../../Samples/SmokeSim/DSSmoke100600/dsSmoke.";
+	string sourceFolder = "../../Samples/SmokeSim/SmokeSimSideways/";
+	string targetFileName = "../../Samples/SmokeSim/DSSmokeSideways/dsSmoke.";
 
-	int xRes = 100;
-	int yRes = 100;
-	int zRes = 100;
+	int xRes = 80;
+	int yRes = 80;
+	int zRes = 80;
 	int numElements = xRes * yRes * zRes;
 	int bytesPerElement = 4;
 

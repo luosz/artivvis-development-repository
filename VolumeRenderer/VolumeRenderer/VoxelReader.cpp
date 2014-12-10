@@ -45,6 +45,9 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/SmokeSim/";
 //	headerFile = folderPath + "SmokeSim.mhd";
 
+//	folderPath = "../../Samples/SmokeSim/";
+//	headerFile = folderPath + "SmokeSimSideways.mhd";
+
 	folderPath = "../../Samples/CTknee/";
 	headerFile = folderPath + "CTknee.mhd";
 

@@ -39,7 +39,7 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 
 //	regionOptimizer.CalculateVisibility(shaderManager, camera, volume, transferFunction, raycaster);
 
-	// intensity and visibility optimization
+// intensity and visibility optimization
 	if (transferFunction.tfView && transferFunction.tfView->isLuoOptimizerEnable())
 	{
 		transferFunction.tfView->updateTransferFunctionFromView();

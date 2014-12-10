@@ -39,7 +39,7 @@ void Init()
 
 void CopyToFile()
 {
-	std::string targetFileName = "../../Samples/SmokeSim/SmokeSimRaw/smokeSim.";
+	std::string targetFileName = "../../Samples/SmokeSim/SmokeSimSideways/smokeSim.";
 
 	memcpy(buffer, &fluid.hostDensities[0], rawDataSize);
 
@@ -92,14 +92,6 @@ void Update()
 
 	glutSwapBuffers();
 
-//	glReadBuffer(GL_FRONT);
-//	glPixelStorei(GL_PACK_ALIGNMENT, 4);
-//	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-//	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-//	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-//	glReadPixels(0,0,SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixelBuffer);
-//
-//	CopyToVideoFile();
 }
 
 

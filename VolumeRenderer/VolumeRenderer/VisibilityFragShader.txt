@@ -9,6 +9,21 @@ uniform sampler2D opacityTex;
 
 out vec4 FragColor;
 
+vec3 CalculateNormal(vec3 texCoord)
+{
+	vec3 sample1, sample2;
+
+	sample1.x = texture(volume, texCoord - vec3(0.05f, 0.0f, 0.0f)).x;
+	sample2.x = texture(volume, texCoord + vec3(0.05f, 0.0f, 0.0f)).x;
+	sample1.y = texture(volume, texCoord - vec3(0.0f, 0.05f, 0.0f)).x;
+	sample2.y = texture(volume, texCoord + vec3(0.0f, 0.05f, 0.0f)).x;
+	sample1.z = texture(volume, texCoord - vec3(0.0f, 0.0f, 0.05f)).x;
+	sample2.z = texture(volume, texCoord + vec3(0.0f, 0.0f, 0.05f)).x;
+
+	return (sample2 - sample1);
+}
+
+
 void main()
 {
 
@@ -28,6 +43,7 @@ void main()
 //	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
 //	float visibility = (1.0f - prevOpacity) * alpha;
 
+	float gradient = length(CalculateNormal(texCoord));
 
 
 	float opacity = prevOpacity + alpha;
@@ -43,7 +59,7 @@ void main()
 		visibility = alpha;
 
 
-	vec4 final = vec4(visibility, opacity, scalar, 1.0f);
+	vec4 final = vec4(visibility, opacity, scalar, gradient);
 
 	FragColor = final;
 }
