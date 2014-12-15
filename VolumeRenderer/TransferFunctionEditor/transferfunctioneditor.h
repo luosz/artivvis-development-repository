@@ -139,32 +139,32 @@ public:
 
 		if (tf.transfer_function)
 		{
-			auto &frequencies = tf.transfer_function->intensityOptimizerV2->frequencies;
-			//std::cout << "frequencies size " << frequencies.size() << std::endl;
-			auto size = frequencies.size();
-			float max = 0;
-			for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
-			{
-				max = std::max((float)*i, max);
-			}
-			intensity_histogram.intensities.clear();
-			intensity_histogram.frequencies.clear();
-			for (int i = 0; i < size; i++)
-			{
-				intensity_histogram.intensities.push_back(i / (float)size);
-				intensity_histogram.frequencies.push_back(frequencies[i]/max);
-				//std::cout<<"frequencies "<<i<<" "<<frequencies[i]<<std::endl;
-			}
-			//intensity_histogram.draw();
-			auto &visibilities = tf.transfer_function->intensityOptimizerV2->visibilityHistogram->visibilities;
-			auto &numVis = tf.transfer_function->intensityOptimizerV2->visibilityHistogram->numVis;
-			visibility_histogram.intensities.clear();
-			visibility_histogram.frequencies.clear();
-			for (int i = 0; i < visibilities.size();i++)
-			{
-				visibility_histogram.intensities.push_back(i / (float)size);
-				visibility_histogram.frequencies.push_back(visibilities[i]);
-			}
+//			auto &frequencies = tf.transfer_function->intensityOptimizerV2->frequencies;
+//			//std::cout << "frequencies size " << frequencies.size() << std::endl;
+//			auto size = frequencies.size();
+//			float max = 0;
+//			for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
+//			{
+//				max = std::max((float)*i, max);
+//			}
+//			intensity_histogram.intensities.clear();
+//			intensity_histogram.frequencies.clear();
+//			for (int i = 0; i < size; i++)
+//			{
+//				intensity_histogram.intensities.push_back(i / (float)size);
+//				intensity_histogram.frequencies.push_back(frequencies[i]/max);
+//				//std::cout<<"frequencies "<<i<<" "<<frequencies[i]<<std::endl;
+//			}
+//			//intensity_histogram.draw();
+//			auto &visibilities = tf.transfer_function->intensityOptimizerV2->visibilityHistogram->visibilities;
+//			auto &numVis = tf.transfer_function->intensityOptimizerV2->visibilityHistogram->numVis;
+//			visibility_histogram.intensities.clear();
+//			visibility_histogram.frequencies.clear();
+//			for (int i = 0; i < visibilities.size();i++)
+//			{
+//				visibility_histogram.intensities.push_back(i / (float)size);
+//				visibility_histogram.frequencies.push_back(visibilities[i]);
+//			}
 			//visibility_histogram.draw();
 		}
 	}

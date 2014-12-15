@@ -18,7 +18,7 @@ public:
 
 	glm::vec3 lightPosition;
 
-	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);
+	CPURaycaster(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 
 	void GenerateTexture(int screenWidth, int screenHeight);

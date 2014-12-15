@@ -8,9 +8,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "VolumeDataset.h"
-#include "VisibilityHistogram.h"
-#include "IntensityTFOptimizer.h"
-#include "IntensityTFOptimizerV2.h"
 #include "../TransferFunctionEditor/AbstractGraphicsView.h"
 
 #define tfEPSILON glm::epsilon<float>()
@@ -27,8 +24,6 @@ public:
 	float targetIntensity;
 	bool optimizeIntensity;
 
-	IntensityTFOptimizer *intensityOptimizer;
-	IntensityTFOptimizerV2 *intensityOptimizerV2;
 	AbstractGraphicsView *tfView;
 	AbstractGraphicsView *visibilityView;
 

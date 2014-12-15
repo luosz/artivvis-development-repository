@@ -26,7 +26,6 @@ public:
 	int numXPixels;
 	int numYPixels;
 
-	virtual void Init(int screenWidth, int screenHeight, VolumeDataset &volume) = 0;
 	virtual void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera) = 0;
 };
 

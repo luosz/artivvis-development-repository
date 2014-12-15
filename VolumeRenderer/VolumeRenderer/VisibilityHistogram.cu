@@ -178,7 +178,7 @@ __global__ void CudaGrabFrustum(int numFrustumPixels, int frustumExtent, int mou
 		{
 			int bin = scalar * 255.0f;
 
-			atomicAdd(&(histBins[bin]), (float)color.w);
+			atomicAdd(&(histBins[bin]), (float)color.x);
 			atomicAdd(&(numInBin[bin]), (int)1);
 		}
 	}

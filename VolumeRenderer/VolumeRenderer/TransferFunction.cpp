@@ -19,9 +19,6 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	LoadLookup(origColorTable);
 	LoadLookup(currentColorTable);
 
-	intensityOptimizer = new IntensityTFOptimizer(volume_, numIntensities, &colors[0], &intensities[0]);
-	intensityOptimizerV2 = new IntensityTFOptimizerV2(volume_, numIntensities, &colors[0], &intensities[0]);
-
 	tfView = NULL;
 	visibilityView = NULL;
 
@@ -31,12 +28,7 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 
 void TransferFunction::Update()
 {
-	if (optimizeIntensity)
-	{
-		memcpy(&colors[0], &origColors[0], numIntensities * sizeof(glm::vec4));
-		intensityOptimizer->Optimize(targetIntensity);
-		LoadLookup(currentColorTable);
-	}
+
 }
 
 

@@ -127,6 +127,8 @@
     <ClCompile Include="GPUContours.cpp" />
     <ClCompile Include="GPURaycaster.cpp" />
     <ClCompile Include="IntensityTFOptimizer.cpp" />
+    <ClCompile Include="IntensityTFOptimizerV2.cpp" />
+    <ClCompile Include="JoesOGLRenderer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MarchingCubesRenderer.cpp" />
     <ClCompile Include="OpenGLRenderer.cpp" />
@@ -136,6 +138,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
+    <ClCompile Include="TomsOGLRenderer.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
     <ClCompile Include="VisibilityTFOptimizer.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
@@ -212,6 +215,7 @@
     <ClInclude Include="GPURaycaster.h" />
     <ClInclude Include="IntensityTFOptimizer.h" />
     <ClInclude Include="IntensityTFOptimizerV2.h" />
+    <ClInclude Include="JoesOGLRenderer.h" />
     <ClInclude Include="MarchingCubesRenderer.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Raycaster.h" />
@@ -220,7 +224,9 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
+    <ClInclude Include="TFOptimizer.h" />
     <ClInclude Include="tinyxml2.h" />
+    <ClInclude Include="TomsOGLRenderer.h" />
     <ClInclude Include="TransferFunction.h" />
     <ClInclude Include="VisibilityHistogram.h" />
     <ClInclude Include="VisibilityTFOptimizer.h" />

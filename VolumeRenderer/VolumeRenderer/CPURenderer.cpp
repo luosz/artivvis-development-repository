@@ -1,9 +1,8 @@
 #include "CPURenderer.h"
 
-void CPURenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
+CPURenderer::CPURenderer(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
-	raycaster = new CPURaycaster();
-	raycaster->Init(screenWidth, screenHeight, volume);
+	raycaster = new CPURaycaster(screenWidth, screenHeight, volume);
 }
 
 

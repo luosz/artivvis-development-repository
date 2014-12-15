@@ -1,6 +1,6 @@
 #include "GPURaycaster.h"
 
-void GPURaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
+GPURaycaster::GPURaycaster(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
 	maxRaySteps = 1000;
 	rayStepSize = 0.005f;

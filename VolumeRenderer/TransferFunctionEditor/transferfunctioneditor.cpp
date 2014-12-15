@@ -105,9 +105,9 @@ void TransferFunctionEditor::on_entropyButton_clicked()
 	{
 		tf.updateTransferFunctionFromView();
 
-		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-		tf.transfer_function->intensityOptimizerV2->BalanceEdges();
-		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
+//		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+//		tf.transfer_function->intensityOptimizerV2->BalanceEdges();
+//		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
 
 		tf.updateViewFromTransferFunction();
 	}
@@ -121,9 +121,9 @@ void TransferFunctionEditor::on_visibilityButton_clicked()
 	{
 		tf.updateTransferFunctionFromView();
 
-		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-		tf.transfer_function->intensityOptimizerV2->BalanceVisibility();
-		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
+//		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+//		tf.transfer_function->intensityOptimizerV2->BalanceVisibility();
+//		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
 
 		tf.updateViewFromTransferFunction();
 	}

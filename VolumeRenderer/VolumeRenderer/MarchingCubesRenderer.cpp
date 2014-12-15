@@ -3,8 +3,7 @@
 
 void MarchingCubesRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
-	raycaster = new GPURaycaster();
-	raycaster->Init(screenWidth, screenHeight, volume);
+	raycaster = new GPURaycaster(screenWidth, screenHeight, volume);
 
 	CalculateNormals(volume);
 	CalculateSurface(volume);

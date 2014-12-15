@@ -1,6 +1,6 @@
 #include "CPURaycaster.h"
 
-void CPURaycaster::Init(int screenWidth, int screenHeight, VolumeDataset &volume)
+CPURaycaster::CPURaycaster(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
 	maxRaySteps = 1000;
 	rayStepSize = 0.01f;

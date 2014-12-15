@@ -1,7 +1,13 @@
 #include "RegionVisibilityOptimizer.h"
 
-void RegionVisibilityOptimizer::Init(TransferFunction &transferFunction)
+RegionVisibilityOptimizer::RegionVisibilityOptimizer(VolumeDataset *volume_, TransferFunction *transferFunction_, Raycaster *raycaster_, ShaderManager *shaderManager_, Camera *camera_)
 {	
+	volume = volume_;
+	transferFunction = transferFunction_;
+	raycaster = raycaster_;
+	shaderManager = shaderManager_;
+	camera = camera_;
+
 	numRegions = 4;
 	xPixels = 800;
 	yPixels = 800;
@@ -20,11 +26,10 @@ void RegionVisibilityOptimizer::Init(TransferFunction &transferFunction)
 	glGenFramebuffers (1, &frameBuffer);
 	glBindFramebuffer (GL_FRAMEBUFFER, frameBuffer);
 
-	unsigned int rb = 0;
-	glGenRenderbuffers (1, &rb);
-	glBindRenderbuffer (GL_RENDERBUFFER, rb);
+	glGenRenderbuffers (1, &renderBuffer);
+	glBindRenderbuffer (GL_RENDERBUFFER, renderBuffer);
 	glRenderbufferStorage (GL_RENDERBUFFER, GL_DEPTH_COMPONENT, xPixels, yPixels);
-	glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb);
+	glFramebufferRenderbuffer (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer);
 
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTex, 0);
 
@@ -33,6 +38,15 @@ void RegionVisibilityOptimizer::Init(TransferFunction &transferFunction)
 	HANDLE_ERROR( cudaMalloc((void**)&cudaRegionVisibilities, numRegions * sizeof(float)) );
 	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInRegion, numRegions * sizeof(float)) );
 	regionVisibilities.resize(numRegions);
+}
+
+RegionVisibilityOptimizer::~RegionVisibilityOptimizer()
+{
+	glDeleteTextures(1, &bufferTex);
+	glDeleteFramebuffers(1, &frameBuffer);
+	glDeleteRenderbuffers(1, &renderBuffer);
+	HANDLE_ERROR( cudaFree(&cudaRegionVisibilities));
+	HANDLE_ERROR( cudaFree(&cudaNumInRegion));
 }
 
 
@@ -84,27 +98,29 @@ __global__ void CudaRegionNormalize(int numBins, float *cudaRegionVisibilities, 
 	{
 		if (cudaNumInRegion[tid] > 0)
 		{
-			cudaRegionVisibilities[tid] = cudaRegionVisibilities[tid] / (cudaNumInRegion[tid]);
-	
-			printf("%d: %f, %d\n", tid, cudaRegionVisibilities[tid], cudaNumInRegion[tid]);		
+			cudaRegionVisibilities[tid] = cudaRegionVisibilities[tid] / (cudaNumInRegion[tid]);	
 		}
 	}
 }
 
+void RegionVisibilityOptimizer::Optimize()
+{
+	CalculateVisibility();
+}
 
-void RegionVisibilityOptimizer::CalculateVisibility(ShaderManager &shaderManager, Camera &camera, VolumeDataset &volume, TransferFunction &transferFunction,  Raycaster *raycaster)
+void RegionVisibilityOptimizer::CalculateVisibility()
 {
 	HANDLE_ERROR( cudaMemset(cudaRegionVisibilities, 0, numRegions * sizeof(float)) );
 	HANDLE_ERROR( cudaMemset(cudaNumInRegion, 0, numRegions * sizeof(int)) );
 
-	GLuint shaderProgramID = shaderManager.UseShader(RegionVisibilityShader);
+	GLuint shaderProgramID = shaderManager->UseShader(RegionVisibilityShader);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferTex, 0);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
+	raycaster->Raycast(*volume, *transferFunction, shaderProgramID, *camera);
 
 
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, bufferTex, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
@@ -130,7 +146,7 @@ void RegionVisibilityOptimizer::CalculateVisibility(ShaderManager &shaderManager
 
 
 
-void RegionVisibilityOptimizer::DrawHistogram(ShaderManager shaderManager, Camera &camera)
+void RegionVisibilityOptimizer::Draw(ShaderManager &shaderManager, Camera &camera)
 {
 	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
 
@@ -181,6 +197,5 @@ void RegionVisibilityOptimizer::DrawHistogram(ShaderManager shaderManager, Camer
 
 	glEnd();
 }
-
 
 

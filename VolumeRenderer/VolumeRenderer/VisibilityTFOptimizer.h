@@ -1,20 +1,23 @@
 #ifndef VISIBILITY_OPTIMIZER
 #define VISIBILITY_OPTIMIZER
 
-#include "VolumeDataset.h"
-#include "TransferFunction.h"
-#include "VisibilityHistogram.h"
+#include "TFOptimizer.h"
 
-class VisibilityTFOptimizer
+class VisibilityTFOptimizer     :     public TFOptimizer
 {
 public:
+	VisibilityTFOptimizer(VolumeDataset *volume_, VisibilityHistogram *visibilityHistogram_, TransferFunction *transferFunction_);
+	void Optimize();
+	void Draw(ShaderManager &shaderManager, Camera &camera);
+
+
 	std::vector<float> Es, Ev, Ec, energyFunc;
 	int iterations;
 	int numBins;
 
-	void Init();
-	void Optimize(VolumeDataset &volume, VisibilityHistogram &histogram, TransferFunction &transFunction, ShaderManager shaderManager, Camera &camera);
-	void DrawEnergy(ShaderManager shaderManager, Camera &camera);
+	VolumeDataset *volume;
+	TransferFunction *transferFunction;
+	VisibilityHistogram *visibilityHistogram;	
 };
 
 
