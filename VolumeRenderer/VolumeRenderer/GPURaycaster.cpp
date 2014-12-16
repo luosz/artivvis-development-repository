@@ -96,7 +96,7 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
 
 	glActiveTexture (GL_TEXTURE0);
-	uniformLoc = glGetUniformLocation(shaderProgramID,"3dVolume");
+	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
 	glUniform1i(uniformLoc,0);
 	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
 
