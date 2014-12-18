@@ -8,8 +8,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	shaderManager.Init();
 	volume.Init();
 
-	renderer = new OpenGLRenderer();
-	renderer->Init(screenWidth, screenHeight, volume);
+	renderer = new TomsOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
 
 	grabRegion = false;
 }
@@ -38,8 +37,5 @@ void VolumeRenderer::OptimizeForSelectedRegion(int mouseX, int mouseY, int scree
 	if (avgIntensity == -1.0f)
 		return;
 
-	renderer->transferFunction.optimizeIntensity = true;
 	renderer->transferFunction.targetIntensity = avgIntensity;
-	renderer->transferFunction.Update();
-	renderer->transferFunction.optimizeIntensity = false;
 }

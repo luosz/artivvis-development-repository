@@ -143,6 +143,15 @@
     <ClCompile Include="RegionGrabber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IntensityTFOptimizerV2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TomsOGLRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JoesOGLRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="volumerenderer.ui">
@@ -287,6 +296,15 @@
     </ClInclude>
     <ClInclude Include="..\TransferFunctionEditor\AbstractGraphicsView.h">
       <Filter>../TransferFunctionEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TFOptimizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TomsOGLRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JoesOGLRenderer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

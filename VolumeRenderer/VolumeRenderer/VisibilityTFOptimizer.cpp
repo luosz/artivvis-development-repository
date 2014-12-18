@@ -1,7 +1,11 @@
 #include "VisibilityTFOptimizer.h"
 
-void VisibilityTFOptimizer::Init()
+VisibilityTFOptimizer::VisibilityTFOptimizer(VolumeDataset *volume_, VisibilityHistogram *visibilityHistogram_, TransferFunction *transferFunction_)
 {
+	volume = volume_;
+	visibilityHistogram = visibilityHistogram_;
+	transferFunction = transferFunction_;
+
 	// Fits nicely because 1D transfer function is divided in 256 bins anyway, must change if different amount of bins
 	numBins = 256;
 
@@ -15,12 +19,12 @@ void VisibilityTFOptimizer::Init()
 }
 
 
-void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram &visibilityHistogram, TransferFunction &transferFunction, ShaderManager shaderManager, Camera &camera)
+void VisibilityTFOptimizer::Optimize()
 {
 	// Ma's energy function for user satisfaction - square distance between current transfer function and reference transfer function
 	for (int i=0; i<numBins; i++)
 	{
-		Es[i] = glm::pow((transferFunction.currentColorTable[i].a - transferFunction.origColorTable[i].a), 2.0f);
+		Es[i] = glm::pow((transferFunction->currentColorTable[i].a - transferFunction->origColorTable[i].a), 2.0f);
 	}
 
 	// Ma's energy function for visibility
@@ -32,16 +36,16 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 	// My energy function for visibility - square distance between current transfer function and visibility histogram
 	for (int i=0; i<numBins; i++)
 	{
-		Ev[i] = glm::pow((visibilityHistogram.visibilities[i] - transferFunction.currentColorTable[i].a), 2.0f);
+		Ev[i] = glm::pow((visibilityHistogram->visibilities[i] - transferFunction->currentColorTable[i].a), 2.0f);
 	}
 
 	float min = 0.0f;
 	float max = 1.0f;
 	
 	// Clamping energy for specific regions, I don't use it and instead just clamp opacity between 0 and 1 after optimization
-	for (int i=0; i<transferFunction.numIntensities; i++)
+	for (int i=0; i<transferFunction->numIntensities; i++)
 	{
-		Ec[i] = (glm::pow(glm::max((min - transferFunction.colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction.colors[i].a - max), 0.0f), 2.0f));
+		Ec[i] = (glm::pow(glm::max((min - transferFunction->colors[i].a), 0.0f), 2.0f) + glm::pow(glm::max((transferFunction->colors[i].a - max), 0.0f), 2.0f));
 	}
 
 
@@ -67,15 +71,15 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 	for (int i=0; i<numBins; i++)
 	{
 		// Gradient is calculated by differentiating various energy components with respect to current opacity function
-		float gradient = (beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a))) + (beta2 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * visibilityHistogram.visibilities[i])));
+		float gradient = (beta1 * ((2.0f * transferFunction->currentColorTable[i].a) - (2.0f * transferFunction->origColorTable[i].a))) + (beta2 * ((2.0f * transferFunction->currentColorTable[i].a) - (2.0f * visibilityHistogram->visibilities[i])));
 
 //		float gradient = (beta1 * ((2.0f * transferFunction.currentColorTable[i].a) - (2.0f * transferFunction.origColorTable[i].a)));
 
 		// Gradient descent to minimize energy function
-		transferFunction.currentColorTable[i].a -= stepsize * gradient;
+		transferFunction->currentColorTable[i].a -= stepsize * gradient;
 
 		// Clamp final values
-		transferFunction.currentColorTable[i].a = glm::clamp(transferFunction.currentColorTable[i].a, 0.0f, 1.0f);
+		transferFunction->currentColorTable[i].a = glm::clamp(transferFunction->currentColorTable[i].a, 0.0f, 1.0f);
 	}
 
 	// Print energy
@@ -84,12 +88,12 @@ void VisibilityTFOptimizer::Optimize(VolumeDataset &volume, VisibilityHistogram 
 	iterations++;
 
 	// Copy updated opacity function to transfer function texture
-	transferFunction.CopyToTex(transferFunction.currentColorTable);
+	transferFunction->CopyToTex(transferFunction->currentColorTable);
 }
 
 
-
-void VisibilityTFOptimizer::DrawEnergy(ShaderManager shaderManager, Camera &camera)
+// Draw Energy
+void VisibilityTFOptimizer::Draw(ShaderManager &shaderManager, Camera &camera)
 {
 	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
 

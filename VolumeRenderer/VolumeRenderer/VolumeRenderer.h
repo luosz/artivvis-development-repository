@@ -8,6 +8,8 @@
 #include "MarchingCubesRenderer.h"
 #include "CPURenderer.h"
 #include "RegionGrabber.h"
+#include "TomsOGLRenderer.h"
+#include "JoesOGLRenderer.h"
 
 class VolumeRenderer
 {

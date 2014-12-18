@@ -5,16 +5,14 @@
 #include "VisibilityHistogram.h"
 #include "RegionVisibilityOptimizer.h"
 #include "VisibilityTFOptimizer.h"
+#include "IntensityTFOptimizer.h"
+#include "IntensityTFOptimizerV2.h"
 
 class OpenGLRenderer		:		public Renderer
 {
 public:
-	RegionVisibilityOptimizer regionOptimizer;
-	VisibilityTFOptimizer visibilityOptimizer;
-
-
-	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);
-	void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
+	OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
+	virtual void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
 };
 
 #endif

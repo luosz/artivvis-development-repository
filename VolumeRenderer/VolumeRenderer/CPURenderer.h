@@ -7,7 +7,7 @@ class CPURenderer		:		public Renderer
 {
 public:
 
-	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);
+	CPURenderer(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
 };
 

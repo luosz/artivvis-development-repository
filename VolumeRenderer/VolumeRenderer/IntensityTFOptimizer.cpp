@@ -1,15 +1,13 @@
 #include "IntensityTFOptimizer.h"
 
-IntensityTFOptimizer::IntensityTFOptimizer(VolumeDataset &volume_, int &numIntensities_, glm::vec4 *colors_, float *intensities_)
+IntensityTFOptimizer::IntensityTFOptimizer(VolumeDataset *volume_, TransferFunction *transferFunction_)
 {
-	volume = &volume_;
-	numIntensities = numIntensities_;
-	colors = colors_;
-	intensities= intensities_;
+	volume = volume_;
+	transferFunction = transferFunction_;
 
 	frequencies.resize(256);
 	CalculateFrequencies();
-	weights.resize(numIntensities);
+	weights.resize(transferFunction->numIntensities);
 	numIterations = 1000;
 }
 
@@ -93,8 +91,21 @@ float IntensityTFOptimizer::GetWeightedAreaEntropy(int index)
 	return sum;
 }
 
+void IntensityTFOptimizer::Optimize()
+{
+	memcpy(&transferFunction->colors[0], &transferFunction->origColors[0], transferFunction->numIntensities * sizeof(glm::vec4));
+	numIntensities = transferFunction->numIntensities;
+	colors = &transferFunction->colors[0];
+	intensities = &transferFunction->intensities[0];
+	targetIntensity = transferFunction->targetIntensity;
+	
+	OptimizeForIntensity();
 
-void IntensityTFOptimizer::Optimize(float targetIntensity)
+	transferFunction->LoadLookup(transferFunction->currentColorTable);
+}
+
+
+void IntensityTFOptimizer::OptimizeForIntensity()
 {
 	float sum = 0.0f;
 

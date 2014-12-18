@@ -207,9 +207,9 @@ public:
 		if (transfer_function)
 		{
 			updateTransferFunctionFromView();
-			transfer_function->targetIntensity = intensities[index];
-			transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
-			transfer_function->LoadLookup(transfer_function->currentColorTable);
+//			transfer_function->targetIntensity = intensities[index];
+//			transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
+//			transfer_function->LoadLookup(transfer_function->currentColorTable);
 			updateViewFromTransferFunction();
 		}
 		else
