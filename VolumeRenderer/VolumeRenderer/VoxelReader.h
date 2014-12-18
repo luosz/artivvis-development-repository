@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <Windows.h>
+//#include <Windows.h>
 #include <algorithm>
 #include <string>
 #include <vector>
