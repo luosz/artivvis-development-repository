@@ -8,6 +8,7 @@
 #include <vector>
 #include "VolumeDataset.h"
 #include "TransferFunction.h"
+#include "CudaHeaders.h"
 
 
 struct Block
@@ -48,10 +49,19 @@ public:
 	glm::vec3 lightPosition;
 
 	std::vector<Block> blocks;
+	int blockRes;
 	int numBlocks;
+	int numXBlocks, numYBlocks, numZBlocks;
+
+	void TemporalCoherence(VolumeDataset &volume);
+	cudaGraphicsResource_t resource;
+	void GPUPredict(VolumeDataset &volume);
+	void CPUPredict(VolumeDataset &volume);
 
 	BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
+	
+	void BlockRaycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 };
 
 #endif

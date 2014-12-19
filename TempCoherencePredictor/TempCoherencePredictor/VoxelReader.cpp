@@ -6,8 +6,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/TVvort/";
 //	headerFile = folderPath + "TVvort.mhd";
 
-	folderPath = "../../Samples/Nucleon/";
-	headerFile = folderPath + "nucleon.mhd";
+//	folderPath = "../../Samples/Nucleon/";
+//	headerFile = folderPath + "nucleon.mhd";
 
 //	folderPath = "../../Samples/CThead/";
 //	headerFile = folderPath + "CThead.mhd";
@@ -42,8 +42,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/Bonsai/";
 //	headerFile = folderPath + "bonsai.mhd";
 
-//	folderPath = "../../Samples/SmokeSim/";
-//	headerFile = folderPath + "SmokeSim.mhd";
+	folderPath = "../../Samples/SmokeSim/";
+	headerFile = folderPath + "SmokeSim.mhd";
 
 //	folderPath = "../../Samples/SmokeSim/";
 //	headerFile = folderPath + "SmokeSimSideways.mhd";
@@ -141,8 +141,8 @@ struct MyFileSort : public std::binary_function<std::string, std::string, bool>
 // Reads in the raw binary data using properties copied in from header
 void VoxelReader::ReadRaw(VolumeProperties &properties)
 {
-//	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
-	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement;
+	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
+//	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement;
 	properties.bufferAddress = new GLubyte [bufferSize];
 	int numBytesInBufferFilled = 0;
 	
@@ -163,17 +163,16 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 		
 		sort(files.begin(), files.end(), MyFileSort());
 
-//		for (int i=0; i<files.size(); i++)
-//		{
-//			std::string currentFile(properties.rawFilePath + "/" + files[i]); 
-//			CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
-//		}
-
 		for (int i=0; i<files.size(); i++)
 			files[i] = std::string(properties.rawFilePath + "/" + files[i]);
 
-		std::string currentFile(properties.rawFilePath + "/" + files[0]); 
-		CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
+		for (int i=0; i<files.size(); i++)
+		{
+			CopyFileToBuffer(files[i], numBytesInBufferFilled, properties);
+		}
+
+//		std::string currentFile(properties.rawFilePath + "/" + files[0]); 
+//		CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
 	}
 	else
 	{

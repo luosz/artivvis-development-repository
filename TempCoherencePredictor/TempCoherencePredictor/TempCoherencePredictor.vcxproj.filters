@@ -36,9 +36,6 @@
     <ClCompile Include="VoxelReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BlockRaycaster.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,5 +94,10 @@
     <Text Include="BlockVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="BlockRaycaster.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

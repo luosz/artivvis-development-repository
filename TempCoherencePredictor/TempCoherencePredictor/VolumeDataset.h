@@ -16,7 +16,7 @@ class VolumeDataset
 public:
 	GLubyte *memblock3D;
 	GLuint currTexture3D;
-	GLuint nextTexture3D;
+	GLuint prevTexture3D;
 
 	int timesteps;
 	float timePerFrame;

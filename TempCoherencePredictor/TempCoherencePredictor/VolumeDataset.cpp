@@ -20,6 +20,8 @@ void VolumeDataset::Init()
 	currentTimestep = 0;
 	oldTime = clock();
 
+	prevTexture3D = GenerateTexture();
+	currTexture3D = GenerateTexture();
 }
 
 
@@ -83,13 +85,9 @@ GLuint VolumeDataset::GenerateTexture()
 		glPixelStoref(GL_UNPACK_SWAP_BYTES, true);
 
 	if (elementType == "MET_UCHAR")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8,xRes, yRes, zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, memblock3D);
-
-	else if (elementType == "SHORT")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_UNSIGNED_SHORT, memblock3D);
-
-	else if (elementType == "FLOAT")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_FLOAT, memblock3D);
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, xRes, yRes, zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (memblock3D + (textureSize * currentTimestep)));
+	else
+		std::cout << "Only working with uchar datasets at the moment" << std::endl;
 
 	glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
 	
@@ -101,13 +99,8 @@ GLuint VolumeDataset::GenerateTexture()
 
 void VolumeDataset::UpdateTexture()
 {
-	glDeleteTextures(1, &currTexture3D);
-	currTexture3D = nextTexture3D;
+	glDeleteTextures(1, &prevTexture3D);
+	prevTexture3D = currTexture3D;
 
-	if (currentTimestep < timesteps-1)
-		voxelReader.CopyFileToBuffer(memblock3D, currentTimestep+1);
-	else
-		voxelReader.CopyFileToBuffer(memblock3D, 0);
-
-	nextTexture3D = GenerateTexture();
+	currTexture3D = GenerateTexture();
 }

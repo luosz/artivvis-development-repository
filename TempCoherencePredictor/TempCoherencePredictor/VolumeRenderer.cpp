@@ -2,19 +2,11 @@
 
 void VolumeRenderer::Init(int screenWidth, int screenHeight)
 {
-//	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 	camera.Init(screenWidth, screenHeight);
 	shaderManager.Init();
 	volume.Init();
-
-	volume.currTexture3D = volume.GenerateTexture();
-
-	if (volume.timesteps > 1)
-	{
-		volume.voxelReader.CopyFileToBuffer(volume.memblock3D, 1);
-		volume.nextTexture3D = volume.GenerateTexture();
-	}
 
 	raycaster = new BlockRaycaster(screenWidth, screenHeight, volume);
 
@@ -30,8 +22,9 @@ void VolumeRenderer::Update()
 
 	camera.Update();
 	volume.Update();
+	raycaster->TemporalCoherence(volume);
 
-	GLuint shaderProgramID = shaderManager.UseShader(BlockShader);
+	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
 	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
 
 	glutSwapBuffers();
