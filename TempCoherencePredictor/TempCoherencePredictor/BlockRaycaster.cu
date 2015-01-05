@@ -1,6 +1,8 @@
 #include "BlockRaycaster.h"
 
-texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> texRef;
+texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> prevTexRef;
+texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> currTexRef;
+texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 
 BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
@@ -29,87 +31,184 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 				blocks.push_back(Block(blockRes, i, j, k, xVoxelWidth, yVoxelWidth, zVoxelWidth));
 			}
 
+	currentTimestep = 0;
+	oldTime = clock();
 
+	textureSize = volume.xRes * volume.yRes * volume.zRes * volume.bytesPerElement;
+	prevTexture3D = GenerateTexture(volume);
+	currTexture3D = GenerateTexture(volume);
+	nextTexture3D = GenerateTexture(volume);
+
+	for (int i=0; i<3; i++)
+		cudaResources.push_back(cudaGraphicsResource_t());
+
+	prevTempVolume = new GLubyte[volume.numVoxels * volume.bytesPerElement];
+	currTempVolume = new GLubyte[volume.numVoxels * volume.bytesPerElement];
+	nextTempVolume = new GLubyte[volume.numVoxels * volume.bytesPerElement];
+
+	epsilon = 3;
 }
 
-__global__ void CudaPredict(int numBlocks, int xBlocks, int yBlocks, int zBlocks, int blockRes)
+__global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
 
-	if (tid < numBlocks)
+	if (tid < numVoxels)
 	{
-		int z = tid / (xBlocks * yBlocks);
-		int remainder = tid % (xBlocks * yBlocks);
+		int z = tid / (xRes * yRes);
+		int remainder = tid % (xRes * yRes);
 
-		int y = remainder / xBlocks;
+		int y = remainder / xRes;
 
-		int x = remainder % xBlocks;
+		int x = remainder % xRes;
 
-		int xMin = x * blockRes;
-		int yMin = y * blockRes;
-		int zMin = z * blockRes;
+		unsigned char prevVal, currVal, nextVal;
 
-		unsigned char scalar;
+		prevVal = tex3D(prevTexRef, x, y, z);
+		currVal = tex3D(currTexRef, x, y, z);
 
-		for (int k=0; k<blockRes; k++)
-			for (int j=0; j<blockRes; j++)
-				for (int i=0; i<blockRes; i++)
-				{
-					scalar = tex3D(texRef, xMin + i, yMin + j, zMin + k);
-				}
+//		surf3Dread(&temp1, surface, x, y, z);
 
-		
-//		scalar = tex3D(texRef, 50, 50, 50);
-//		if (scalar < 256 && scalar > 0)
-//			printf("%d: %u\n", tid, scalar);
+		nextVal = (2 * currVal) - prevVal;
+
+		surf3Dwrite(nextVal, surface, x, y, z);
+
+//		if (x == 60 && y == 5 && z == 60)
+//			printf("%u, %u, %u\n", temp1, nextVal, temp2);
 	}
 }
 
 void BlockRaycaster::GPUPredict(VolumeDataset &volume)
 {
-	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&resource, volume.prevTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
-	HANDLE_ERROR( cudaGraphicsMapResources(1, &resource) );
-	cudaArray *arry = 0;	
-	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&arry, resource, 0, 0) ); 
-	HANDLE_ERROR( cudaBindTextureToArray(texRef, arry) );
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], prevTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[1], currTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[2], nextTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsSurfaceLoadStore) );
 
-	CudaPredict <<<(numBlocks + 255) / 256, 256>>>(numBlocks, numXBlocks, numYBlocks, numZBlocks, blockRes);
+	HANDLE_ERROR( cudaGraphicsMapResources(3, &cudaResources[0]) );
+
+	cudaArray *prevArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&prevArry, cudaResources[0], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(prevTexRef, prevArry) );
+
+	cudaArray *currArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&currArry, cudaResources[1], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(currTexRef, currArry) );
+
+	cudaArray *nextArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[2], 0, 0) ); 
+//	HANDLE_ERROR( cudaBindTextureToArray(nextTexRef, nextArry) );
+
+	cudaResourceDesc wdsc;
+	wdsc.resType = cudaResourceTypeArray;
+	wdsc.res.array.array = nextArry;
+	cudaSurfaceObject_t writeSurface;
+	HANDLE_ERROR( cudaCreateSurfaceObject(&writeSurface, &wdsc) );
+
+	CudaPredict <<<(volume.numVoxels + 255) / 256, 256>>>(volume.numVoxels, volume.xRes, volume.yRes, volume.zRes, writeSurface);
 
 	// Unbind and unmap, must be done before OpenGL uses texture memory again
-	HANDLE_ERROR( cudaUnbindTexture(texRef) );
-	HANDLE_ERROR( cudaGraphicsUnmapResources(1, &resource) );
-	HANDLE_ERROR( cudaGraphicsUnregisterResource(resource) );
+	HANDLE_ERROR( cudaUnbindTexture(prevTexRef) );
+	HANDLE_ERROR( cudaUnbindTexture(currTexRef) );
+	HANDLE_ERROR( cudaUnbindTexture(nextTexRef) );
+
+	HANDLE_ERROR( cudaGraphicsUnmapResources(3, &cudaResources[0]) );
+
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[1]) );
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[2]) );
+
+}
+
+
+bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
+{
+	bool similar = true;
+
+	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
+
+	int xMin = x * blockRes;
+	int yMin = y * blockRes;
+	int zMin = z * blockRes;
+
+	unsigned char oldVal, currVal;
+	int ID;
+
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
+			{
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				unsigned char p = nextTempVolume[ID];
+				unsigned char n = nextVolume[ID];
+
+				int diff =  p - n;
+				int absDiff = glm::abs(diff);
+
+				if (absDiff > epsilon)
+				{
+					similar = false;
+					currTempVolume[ID] = n;
+//					return false;
+				}
+//				else if ((absDiff > 0) && (n <= 1))
+//				{
+//					similar = false;
+//					currTempVolume[ID] = n;
+////					return false;
+//				}
+
+			}
+
+	return similar;
 }
 
 
 void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 {
-	int prevTimestep;
+	int prevTimestep = currentTimestep - 2;
+	int currTimestep = currentTimestep - 1;
 
-	if (volume.currentTimestep == 0)
-		prevTimestep = 0;
-	else
-		prevTimestep = volume.currentTimestep - 1;
+	GLubyte *prevVolume = volume.memblock3D + (prevTimestep * volume.numVoxels);
+	GLubyte *currVolume = volume.memblock3D + (currTimestep * volume.numVoxels);
 
-	GLubyte *volumeStart = volume.memblock3D + (prevTimestep * volume.xRes *volume.yRes * volume.zRes * volume.bytesPerElement);
+	for (int i=0; i<volume.numVoxels; i++)
+	{
+		
+//		tempVolume[i] = (2 * prevVolume[i]) - tempVolume[i];
+
+		nextTempVolume[i] = (2 * currTempVolume[i]) - prevTempVolume[i];
+
+		prevTempVolume[i] = currTempVolume[i];
+		currTempVolume[i] = nextTempVolume[i];
+	}
+
+	glBindTexture(GL_TEXTURE_3D, nextTexture3D);
 
 	for (int z=0; z<numZBlocks; z++)
 		for (int y =0; y<numYBlocks; y++)
 			for (int x=0; x<numXBlocks; x++)
 			{
-				int xMin = x * blockRes;
-				int yMin = y * blockRes;
-				int zMin = z * blockRes;
-				unsigned char scalar;
-
-				for (int k=0; k<blockRes; k++)
-					for (int j=0; j<blockRes; j++)
-						for (int i=0; i<blockRes; i++)
+				if (BlockCompare(volume, x, y, z) == false)
+				{
+					for (int k=0; k<blockRes; k++)
+						for (int j=0; j<blockRes; j++)
 						{
-							scalar = volumeStart[(xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes)];
+							GLubyte *mainBlockAddress = volume.memblock3D + (currentTimestep * volume.numVoxels) + (x * blockRes) + (((y * blockRes) + j) * volume.xRes) + (((z * blockRes) + k) * volume.xRes * volume.yRes);
+
+							glTexSubImage3D(GL_TEXTURE_3D, 0, (x * blockRes), (y * blockRes) + j, (z * blockRes) + k, blockRes, 1, 1, GL_RED, GL_UNSIGNED_BYTE, mainBlockAddress);
+
+//							GLubyte *tempBlockAddress = currTempVolume + (x * blockRes) + (((y * blockRes) + j) * volume.xRes) + (((z * blockRes) + k) * volume.xRes * volume.yRes);
+//							memcpy(tempBlockAddress, mainBlockAddress, blockRes * sizeof(GLubyte));
 						}
+				}
+
 			}
-			 
+	
+	glBindTexture(GL_TEXTURE_3D, 0);	 
 
 //	scalar = volumeStart[50 + (50 * volume.xRes) + (50 * volume.xRes * volume.yRes)];
 //	std::cout << "CPU: " << (int)scalar << std::endl;
@@ -118,8 +217,81 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 
 void BlockRaycaster::TemporalCoherence(VolumeDataset &volume)
 {
-	GPUPredict(volume);
-	CPUPredict(volume);
+	if (volume.timesteps > 1)
+	{
+		clock_t currentTime = clock();
+		float time = (currentTime - oldTime) / (float) CLOCKS_PER_SEC;
+
+		if (time > volume.timePerFrame)
+		{
+			if (currentTimestep < volume.timesteps - 1)
+				currentTimestep++;
+			else
+				currentTimestep = 0;
+
+			oldTime = currentTime;
+
+			GLuint temp = prevTexture3D;
+			prevTexture3D = currTexture3D;
+			currTexture3D = nextTexture3D;
+			nextTexture3D = temp;
+
+			if (currentTimestep < 2)
+			{
+				glBindTexture(GL_TEXTURE_3D, nextTexture3D);
+				glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
+				glBindTexture(GL_TEXTURE_3D, 0);
+
+//				tempVolume = volume.memblock3D + (textureSize * currentTimestep);
+
+				if (currentTimestep == 1)
+				{
+					for (int i=0; i<volume.numVoxels; i++)
+					{
+						prevTempVolume[i] = volume.memblock3D[i];
+						currTempVolume[i] = volume.memblock3D[textureSize + i];
+					}
+						
+				}
+			}
+			else
+			{
+				GPUPredict(volume);
+				CPUPredict(volume);
+			}
+			
+		}
+	}	
+}
+
+
+GLuint BlockRaycaster::GenerateTexture(VolumeDataset &volume)
+{
+	GLuint tex;
+
+	glEnable(GL_TEXTURE_3D);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_3D, tex);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
+
+	glBindTexture(GL_TEXTURE_3D, 0);
+
+	return tex;
+}
+
+
+void BlockRaycaster::UpdateTexture(VolumeDataset &volume)
+{
+	glDeleteTextures(1, &prevTexture3D);
+	prevTexture3D = currTexture3D;
+
+	currTexture3D = GenerateTexture(volume);
 }
 
 
@@ -142,7 +314,7 @@ void BlockRaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFu
 	glActiveTexture (GL_TEXTURE0);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
 	glUniform1i(uniformLoc,0);
-	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
+	glBindTexture (GL_TEXTURE_3D, currTexture3D);
 
 	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
 	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
@@ -229,7 +401,7 @@ void BlockRaycaster::BlockRaycast(VolumeDataset &volume, TransferFunction &trans
 	glActiveTexture (GL_TEXTURE0);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
 	glUniform1i(uniformLoc,0);
-	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
+	glBindTexture (GL_TEXTURE_3D, currTexture3D);
 
 	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
 	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
@@ -299,3 +471,40 @@ void BlockRaycaster::BlockRaycast(VolumeDataset &volume, TransferFunction &trans
 
 	glBindTexture(GL_TEXTURE_3D, 0);
 }
+
+
+
+/*
+__global__ void CudaPredict(int numBlocks, int xBlocks, int yBlocks, int zBlocks, int blockRes)
+{
+	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if (tid < numBlocks)
+	{
+		int z = tid / (xBlocks * yBlocks);
+		int remainder = tid % (xBlocks * yBlocks);
+
+		int y = remainder / xBlocks;
+
+		int x = remainder % xBlocks;
+
+		int xMin = x * blockRes;
+		int yMin = y * blockRes;
+		int zMin = z * blockRes;
+
+		unsigned char scalar;
+
+		for (int k=0; k<blockRes; k++)
+			for (int j=0; j<blockRes; j++)
+				for (int i=0; i<blockRes; i++)
+				{
+					scalar = tex3D(prevTexRef, xMin + i, yMin + j, zMin + k);
+				}
+
+		
+//		scalar = tex3D(texRef, 50, 50, 50);
+//		if (scalar < 256 && scalar > 0)
+//			printf("%d: %u\n", tid, scalar);
+	}
+}
+*/

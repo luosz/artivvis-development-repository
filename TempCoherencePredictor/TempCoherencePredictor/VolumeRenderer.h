@@ -20,6 +20,8 @@ public:
 	void Init(int screenWidth, int screenHeight);
 	void Update();
 
+	
+
 };
 
 

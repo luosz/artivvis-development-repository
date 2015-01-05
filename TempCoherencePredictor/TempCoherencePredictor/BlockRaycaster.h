@@ -53,15 +53,33 @@ public:
 	int numBlocks;
 	int numXBlocks, numYBlocks, numZBlocks;
 
+	int textureSize;
+	GLuint currTexture3D;
+	GLuint prevTexture3D;
+	GLuint nextTexture3D;
+	GLubyte *prevTempVolume;
+	GLubyte *currTempVolume;
+	GLubyte *nextTempVolume;
+	int epsilon;
+
+	int currentTimestep;
+	clock_t oldTime;
+
+	std::vector<cudaGraphicsResource_t> cudaResources;
+	bool *cudaBlockNeedsCopy;
+
 	void TemporalCoherence(VolumeDataset &volume);
-	cudaGraphicsResource_t resource;
 	void GPUPredict(VolumeDataset &volume);
 	void CPUPredict(VolumeDataset &volume);
+	bool BlockCompare(VolumeDataset &volume, int x, int y, int z);
 
 	BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 	
 	void BlockRaycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
+
+	GLuint GenerateTexture(VolumeDataset &volume);
+	void UpdateTexture(VolumeDataset &volume);
 };
 
 #endif

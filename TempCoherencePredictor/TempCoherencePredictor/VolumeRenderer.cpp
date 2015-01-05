@@ -8,6 +8,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	shaderManager.Init();
 	volume.Init();
 
+
 	raycaster = new BlockRaycaster(screenWidth, screenHeight, volume);
 
 	transferFunction.Init(" ", volume);
@@ -21,7 +22,8 @@ void VolumeRenderer::Update()
 	
 
 	camera.Update();
-	volume.Update();
+	
+
 	raycaster->TemporalCoherence(volume);
 
 	GLuint shaderProgramID = shaderManager.UseShader(TFShader);

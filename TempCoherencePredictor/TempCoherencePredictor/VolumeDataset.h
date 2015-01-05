@@ -15,8 +15,6 @@ class VolumeDataset
 {
 public:
 	GLubyte *memblock3D;
-	GLuint currTexture3D;
-	GLuint prevTexture3D;
 
 	int timesteps;
 	float timePerFrame;
@@ -25,17 +23,13 @@ public:
 	int bytesPerElement;
 	bool littleEndian;
 	std::string elementType;
-
-	int currentTimestep;
-	clock_t oldTime;
+	int numVoxels;
 
 	VoxelReader voxelReader;
 
 	void Init();
-	void Update();
-	void ReverseEndianness();
-	GLuint GenerateTexture();
-	void UpdateTexture();
+
+
 };
 
 
