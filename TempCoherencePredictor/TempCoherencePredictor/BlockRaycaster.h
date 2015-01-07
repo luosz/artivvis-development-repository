@@ -10,6 +10,7 @@
 #include "TransferFunction.h"
 #include "CudaHeaders.h"
 
+#define EXTRAP_CONST 2
 
 struct Block
 {
@@ -57,10 +58,12 @@ public:
 	GLuint currTexture3D;
 	GLuint prevTexture3D;
 	GLuint nextTexture3D;
-	GLubyte *prevTempVolume;
-	GLubyte *currTempVolume;
-	GLubyte *nextTempVolume;
+	unsigned char *prevTempVolume;
+	unsigned char *currTempVolume;
+	unsigned char *nextTempVolume;
 	int epsilon;
+	float extrapConst;
+	int numBlocksCopied, numBlocksExtrapolated;
 
 	int currentTimestep;
 	clock_t oldTime;
