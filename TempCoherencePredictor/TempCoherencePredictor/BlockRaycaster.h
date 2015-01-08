@@ -41,6 +41,21 @@ struct Block
 	}
 };
 
+
+struct BlockID
+{
+	int x, y, z;
+
+	BlockID() { }
+
+	BlockID(int x_, int y_, int z_)
+	{
+		x = x_;
+		y = y_;
+		z = z_;
+	}
+};
+
 class BlockRaycaster
 {
 public:
@@ -69,12 +84,20 @@ public:
 	clock_t oldTime;
 
 	std::vector<cudaGraphicsResource_t> cudaResources;
-	bool *cudaBlockNeedsCopy;
+	
+	std::vector<BlockID> blocksToBeCopied;
+	unsigned char *chunkToBeCopied;
+	unsigned char *cudaCopiedChunk;
+
 
 	void TemporalCoherence(VolumeDataset &volume);
 	void GPUPredict(VolumeDataset &volume);
 	void CPUPredict(VolumeDataset &volume);
 	bool BlockCompare(VolumeDataset &volume, int x, int y, int z);
+
+	void CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z);
+	void CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z);
+	void CopyChunkToGPU(VolumeDataset &volume);
 
 	BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset &volume);
 	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
@@ -82,7 +105,6 @@ public:
 	void BlockRaycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 
 	GLuint GenerateTexture(VolumeDataset &volume);
-	void UpdateTexture(VolumeDataset &volume);
 };
 
 #endif

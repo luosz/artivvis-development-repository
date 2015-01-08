@@ -12,7 +12,9 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 
 	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
 
+	epsilon = 6;
 	blockRes = 8;
+
 	numXBlocks = glm::ceil((float)volume.xRes / (float)blockRes);
 	numYBlocks = glm::ceil((float)volume.yRes / (float)blockRes);
 	numZBlocks = glm::ceil((float)volume.zRes / (float)blockRes);
@@ -45,8 +47,11 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 	prevTempVolume = new unsigned char[volume.numVoxels * volume.bytesPerElement];
 	currTempVolume = new unsigned char[volume.numVoxels * volume.bytesPerElement];
 	nextTempVolume = new unsigned char[volume.numVoxels * volume.bytesPerElement];
+	chunkToBeCopied = new unsigned char[numBlocks * blockRes * blockRes * blockRes];
 
-	epsilon = 3;
+	HANDLE_ERROR( cudaMalloc((void**)&cudaCopiedChunk, numBlocks * blockRes * blockRes * blockRes) );
+
+	blocksToBeCopied.resize(numBlocks);
 }
 
 __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface)
@@ -163,6 +168,50 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	return false;
 }
 
+void BlockRaycaster::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
+{
+	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
+	cudaPos offset = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToDevice;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.dstPos = offset;
+	cudaCpyParams.dstArray = nextArry;
+	
+	cudaCpyParams.srcPos = offset;
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
+
+	cudaMemcpy3D(&cudaCpyParams);
+}
+
+void BlockRaycaster::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z)
+{
+	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
+	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+//	if (x == numXBlocks - 1)
+//		extent.width = volume.xRes % blockRes;
+//	if (y == numYBlocks - 1)
+//		extent.height = volume.yRes % blockRes;
+//	if (z == numZBlocks - 1)
+//		extent.depth = volume.zRes % blockRes;
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToHost;
+	cudaCpyParams.extent = extent;
+
+
+	cudaCpyParams.dstPos = make_cudaPos((numBlocksCopied * blockRes), 0, 0);
+	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
+	
+	cudaCpyParams.srcPos = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
+
+	cudaMemcpy3D(&cudaCpyParams) ;
+}
 
 void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 {
@@ -181,11 +230,6 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 		currTempVolume[i] = nextTempVolume[i];
 	}
 
-	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], nextTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
-	HANDLE_ERROR( cudaGraphicsMapResources(1, &cudaResources[0]) );
-	cudaArray *nextArry = 0;	
-	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[0], 0, 0) ); 
-	HANDLE_ERROR( cudaBindTextureToArray(nextTexRef, nextArry) );
 
 	for (int z=0; z<numZBlocks; z++)
 		for (int y =0; y<numYBlocks; y++)
@@ -193,32 +237,59 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 			{
 				if (BlockCompare(volume, x, y, z) == false)
 				{
+					blocksToBeCopied[numBlocksCopied] = BlockID(x, y, z);
+					CopyBlockToChunk(volume, x, y, z);
+
 					numBlocksCopied++;
-
-					GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
-					cudaPos offset = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
-					cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
-
-					cudaMemcpy3DParms cudaCpyParams = {0};
-					cudaCpyParams.kind = cudaMemcpyHostToDevice;
-					cudaCpyParams.extent = extent;
-
-					cudaCpyParams.dstPos = offset;
-					cudaCpyParams.dstArray = nextArry;
-					
-					cudaCpyParams.srcPos = offset;
-					cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
-
-					cudaMemcpy3D(&cudaCpyParams);
 				}
 				else
 					numBlocksExtrapolated++;
-			}
+			} 
+}
+
+
+void BlockRaycaster::CopyChunkToGPU(VolumeDataset &volume)
+{
+	cudaExtent extent = make_cudaExtent(numBlocksCopied * blockRes, blockRes, blockRes);
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToDevice;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
+
+	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)cudaCopiedChunk, numBlocks * blockRes, blockRes, blockRes);
 	
+	cudaMemcpy3D(&cudaCpyParams);
+
+
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], nextTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
+	HANDLE_ERROR( cudaGraphicsMapResources(1, &cudaResources[0]) );
+	cudaArray *nextArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[0], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(nextTexRef, nextArry) );
+
+
+	extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+	cudaCpyParams = cudaMemcpy3DParms();
+	cudaCpyParams.kind = cudaMemcpyDeviceToDevice;
+	cudaCpyParams.extent = extent;
+
+	for (int i=0; i<numBlocksCopied; i++)
+	{
+		cudaCpyParams.srcPos = make_cudaPos((i * blockRes), 0, 0);
+		cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)cudaCopiedChunk, numBlocks * blockRes, blockRes, blockRes);
 		
+		cudaCpyParams.dstPos = make_cudaPos((blocksToBeCopied[i].x * blockRes), (blocksToBeCopied[i].y * blockRes), (blocksToBeCopied[i].z * blockRes));
+		cudaCpyParams.dstArray = nextArry;
+
+		cudaMemcpy3D(&cudaCpyParams) ;
+	}
+
 	HANDLE_ERROR( cudaUnbindTexture(nextTexRef) );
 	HANDLE_ERROR( cudaGraphicsUnmapResources(1, &cudaResources[0]) );
-	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );	 
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );
 }
 
 
@@ -257,14 +328,15 @@ void BlockRaycaster::TemporalCoherence(VolumeDataset &volume)
 					{
 						prevTempVolume[i] = volume.memblock3D[i];
 						currTempVolume[i] = volume.memblock3D[textureSize + i];
-					}
-						
+					}						
 				}
 			}
 			else
 			{
 				GPUPredict(volume);
 				CPUPredict(volume);
+
+				CopyChunkToGPU(volume);
 
 
 //				glBindTexture(GL_TEXTURE_3D, nextTexture3D);
@@ -297,14 +369,6 @@ GLuint BlockRaycaster::GenerateTexture(VolumeDataset &volume)
 	return tex;
 }
 
-
-void BlockRaycaster::UpdateTexture(VolumeDataset &volume)
-{
-	glDeleteTextures(1, &prevTexture3D);
-	prevTexture3D = currTexture3D;
-
-	currTexture3D = GenerateTexture(volume);
-}
 
 
 
@@ -484,39 +548,3 @@ void BlockRaycaster::BlockRaycast(VolumeDataset &volume, TransferFunction &trans
 	glBindTexture(GL_TEXTURE_3D, 0);
 }
 
-
-
-/*
-__global__ void CudaPredict(int numBlocks, int xBlocks, int yBlocks, int zBlocks, int blockRes)
-{
-	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
-
-	if (tid < numBlocks)
-	{
-		int z = tid / (xBlocks * yBlocks);
-		int remainder = tid % (xBlocks * yBlocks);
-
-		int y = remainder / xBlocks;
-
-		int x = remainder % xBlocks;
-
-		int xMin = x * blockRes;
-		int yMin = y * blockRes;
-		int zMin = z * blockRes;
-
-		unsigned char scalar;
-
-		for (int k=0; k<blockRes; k++)
-			for (int j=0; j<blockRes; j++)
-				for (int i=0; i<blockRes; i++)
-				{
-					scalar = tex3D(prevTexRef, xMin + i, yMin + j, zMin + k);
-				}
-
-		
-//		scalar = tex3D(texRef, 50, 50, 50);
-//		if (scalar < 256 && scalar > 0)
-//			printf("%d: %u\n", tid, scalar);
-	}
-}
-*/
