@@ -89,6 +89,10 @@ public:
 	unsigned char *chunkToBeCopied;
 	unsigned char *cudaCopiedChunk;
 
+	int alpha;
+	int maxFrequency;
+	int nonZeroFrequencies;
+	std::vector<int> frequencyHistogram;
 
 	void TemporalCoherence(VolumeDataset &volume);
 	void GPUPredict(VolumeDataset &volume);

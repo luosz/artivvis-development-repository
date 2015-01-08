@@ -12,8 +12,9 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 
 	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
 
-	epsilon = 6;
+	epsilon = 3;
 	blockRes = 8;
+	alpha = 6;
 
 	numXBlocks = glm::ceil((float)volume.xRes / (float)blockRes);
 	numYBlocks = glm::ceil((float)volume.yRes / (float)blockRes);
@@ -52,6 +53,8 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 	HANDLE_ERROR( cudaMalloc((void**)&cudaCopiedChunk, numBlocks * blockRes * blockRes * blockRes) );
 
 	blocksToBeCopied.resize(numBlocks);
+
+	frequencyHistogram.resize(256);
 }
 
 __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface)
@@ -119,7 +122,7 @@ void BlockRaycaster::GPUPredict(VolumeDataset &volume)
 
 }
 
-
+/*
 bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
@@ -129,6 +132,9 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	int zMin = z * blockRes;
 
 	int ID;
+	float omega, beta;
+	float top, bottom;
+	top = bottom = 0.0f;
 
 	for (int k=0; k<blockRes; k++)
 		for (int j=0; j<blockRes; j++)
@@ -142,17 +148,35 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 				unsigned char p = nextTempVolume[ID];
 				unsigned char n = nextVolume[ID];
 
-				int diff =  p - n;
-				int absDiff = glm::abs(diff);
+				if (n > 10)
+					int a = 0;
 
-				if (absDiff > epsilon)
-					goto copy;
+				if (n <= alpha)
+					beta = (float)n / float(alpha);
+				else
+					beta = ((float)(255 - n)) / ((float)(255 - alpha));
+
+//				omega = beta * ((float)frequencyHistogram[n] / (float) maxFrequency);
+
+				omega = beta;
+
+				int diff =  n - p;
+				
+				top += omega * glm::pow(diff, 2);
+
+				bottom += omega;
 			}
 
-	return true;
+//	bottom *= nonZeroFrequencies;
+	bottom *= blockRes * blockRes * blockRes;
 
-	// Put a goto to avoid an extra if, only gets here if entire block needs to be copied
-	copy:
+	float similar = glm::sqrt(top / bottom);
+//	similar = glm::sqrt(top);
+
+	if (similar < (float)epsilon)
+		return true;
+
+
 	for (int k=0; k<blockRes; k++)
 		for (int j=0; j<blockRes; j++)
 			for (int i=0; i<blockRes; i++)
@@ -167,6 +191,8 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 	return false;
 }
+*/
+
 
 void BlockRaycaster::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
 {
@@ -203,23 +229,18 @@ void BlockRaycaster::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z
 	cudaCpyParams.kind = cudaMemcpyHostToHost;
 	cudaCpyParams.extent = extent;
 
+	cudaCpyParams.srcPos = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
 
 	cudaCpyParams.dstPos = make_cudaPos((numBlocksCopied * blockRes), 0, 0);
 	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
 	
-	cudaCpyParams.srcPos = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
-	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
-
 	cudaMemcpy3D(&cudaCpyParams) ;
 }
 
 void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 {
-	int prevTimestep = currentTimestep - 2;
-	int currTimestep = currentTimestep - 1;
-
-	GLubyte *prevVolume = volume.memblock3D + (prevTimestep * volume.numVoxels);
-	GLubyte *currVolume = volume.memblock3D + (currTimestep * volume.numVoxels);
+	std::fill(frequencyHistogram.begin(), frequencyHistogram.end(), 0);
 
 	for (int i=0; i<volume.numVoxels; i++)
 	{
@@ -228,8 +249,18 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 
 		prevTempVolume[i] = currTempVolume[i];
 		currTempVolume[i] = nextTempVolume[i];
+
+//		int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
+//		frequencyHistogram[bucket]++;
 	}
 
+//	maxFrequency = nonZeroFrequencies = 0;
+//	for (int i=0; i<256; i++)
+//	{
+//		int freq = frequencyHistogram[i];
+//		maxFrequency = glm::max(maxFrequency, freq);
+//		nonZeroFrequencies += freq;
+//	}
 
 	for (int z=0; z<numZBlocks; z++)
 		for (int y =0; y<numYBlocks; y++)
@@ -304,7 +335,7 @@ void BlockRaycaster::TemporalCoherence(VolumeDataset &volume)
 		{
 			numBlocksCopied = numBlocksExtrapolated = 0;
 
-			if (currentTimestep < volume.timesteps - 1)
+			if (currentTimestep < volume.timesteps - 2)
 				currentTimestep++;
 			else
 				currentTimestep = 0;
@@ -548,3 +579,52 @@ void BlockRaycaster::BlockRaycast(VolumeDataset &volume, TransferFunction &trans
 	glBindTexture(GL_TEXTURE_3D, 0);
 }
 
+
+
+bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
+{
+	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
+
+	int xMin = x * blockRes;
+	int yMin = y * blockRes;
+	int zMin = z * blockRes;
+
+	int ID;
+
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
+			{
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				unsigned char p = nextTempVolume[ID];
+				unsigned char n = nextVolume[ID];
+
+				int diff =  p - n;
+				int absDiff = glm::abs(diff);
+
+				if (absDiff > epsilon)
+					goto copy;
+			}
+
+	return true;
+
+	// Put a goto to avoid an extra if, only gets here if entire block needs to be copied
+	copy:
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
+			{
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				currTempVolume[ID] = nextVolume[ID];
+			}
+
+	return false;
+}
