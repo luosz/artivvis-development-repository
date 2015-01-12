@@ -27,10 +27,10 @@ visibility_histogram("Visibility Histogram")
 	tf.setTransferFunction(numIntensities, colors, intensities);
 
 	// set up histogram
-	auto n = 16;
+	int n = 16;
 	for (int i = 0; i <= n;i++)
 	{
-		auto intensity = i / (float)n;
+		float intensity = i / (float)n;
 		intensity_histogram.intensities.push_back(intensity);
 		intensity_histogram.frequencies.push_back(intensity*intensity);
 		visibility_histogram.intensities.push_back(intensity);

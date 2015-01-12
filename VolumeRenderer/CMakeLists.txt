@@ -7,6 +7,7 @@ set(CMAKE_AUTOMOC ON)
 
 ## Cache variables (user input may be needed)
 set(VOLUME_RENDERER_SRC "VolumeRenderer/" CACHE STRING "Source code directory." FORCE)
+set(TRANSFER_FUNCTION_EDITOR_SRC "TransferFunctionEditor/" CACHE STRING "Source code directory." FORCE)
 set(GLM_SRC "gl/glm/" CACHE STRING "Source headers for the GLM." FORCE)
 set(DEVIL_SRC "gl/include/IL/" CACHE STRING "Source headers for the DevIL library.")
 set(INCLUDE_DIR "gl/include" CACHE STRING "Source headers for the additional includes." FORCE)
@@ -31,15 +32,25 @@ include_directories(${INCLUDE_DIR})
 include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/)
 include_directories(${VOLUME_RENDERER_SRC}GeneratedFiles/)
 
-add_definitions( -Wfatal-errors -DGLM_FORCE_RADIANS)
+add_definitions( -Wfatal-errors -DGLM_FORCE_RADIANS )
 
 FILE(GLOB SOURCES 
-	"${VOLUME_RENDERER_SRC}*.cu" 
-	"${VOLUME_RENDERER_SRC}*.cpp" 
-	"${VOLUME_RENDERER_SRC}*.c" 
+	"${INCLUDE_DIR}/tinyxml2.cpp"
+	"${VOLUME_RENDERER_SRC}*.cu"
+	"${VOLUME_RENDERER_SRC}*.cpp"
 	"${VOLUME_RENDERER_SRC}*.h"
+	"${TRANSFER_FUNCTION_EDITOR_SRC}*.cpp"
+	"${TRANSFER_FUNCTION_EDITOR_SRC}*.h"
 )
 add_executable(VolumeRenderer ${SOURCES})
+
+FILE(GLOB CU_SOURCES 
+	"${VOLUME_RENDERER_SRC}*.cu"
+)
+
+SET(CUDA_NVCC_FLAGS "--compiler-options '-fPIC'" CACHE STRING "nvcc flags" FORCE)
+cuda_include_directories(${Qt5Widgets_INCLUDE_DIRS})
+cuda_compile(CUDA_OBJECTS ${CU_SOURCES})
 
 link_directories(${CUDA_LIB_DIR})
 
@@ -51,4 +62,6 @@ target_link_libraries(
 	${GLUT_LIBRARIES} 
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARIES}
+	${IL_LIBRARIES}
+	${CUDA_OBJECTS}
 )
