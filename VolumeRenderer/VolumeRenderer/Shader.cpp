@@ -23,7 +23,7 @@ void Shader::Load(string vName, string fName)
 		readFileV.close();
 	} else 
 	{
-		cout << "Unable to open shader file" << endl;
+		cout << "Unable to open vert shader file: " << vName.c_str() << endl;
 	}
 	ifstream readFileF;
 	readFileF.open(fName.c_str());
@@ -43,7 +43,7 @@ void Shader::Load(string vName, string fName)
 		readFileF.close();
 	} else 
 	{
-		cout << "Unable to open shader file" << endl;
+		cout << "Unable to open frag shader file: " << fName.c_str() << endl;
 	}
 }
 

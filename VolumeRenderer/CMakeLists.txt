@@ -31,9 +31,15 @@ include_directories(${DEVIL_SRC})
 include_directories(${INCLUDE_DIR})
 include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/)
 include_directories(${VOLUME_RENDERER_SRC}GeneratedFiles/)
+link_directories(${CUDA_LIB_DIR})
 
-add_definitions( -Wfatal-errors -DGLM_FORCE_RADIANS )
+## Addind definition to fail on first error. Makes it easier to read.
+add_definitions( -Wfatal-errors )
 
+## Adding definition to suppress GLM internal warning.
+add_definitions( -DGLM_FORCE_RADIANS )
+
+## Find standard C objects to build
 FILE(GLOB SOURCES 
 	"${INCLUDE_DIR}/tinyxml2.cpp"
 	"${VOLUME_RENDERER_SRC}*.cu"
@@ -44,16 +50,15 @@ FILE(GLOB SOURCES
 )
 add_executable(VolumeRenderer ${SOURCES})
 
+## Build CUDA Objects
 FILE(GLOB CU_SOURCES 
 	"${VOLUME_RENDERER_SRC}*.cu"
 )
-
 SET(CUDA_NVCC_FLAGS "--compiler-options '-fPIC'" CACHE STRING "nvcc flags" FORCE)
 cuda_include_directories(${Qt5Widgets_INCLUDE_DIRS})
 cuda_compile(CUDA_OBJECTS ${CU_SOURCES})
 
-link_directories(${CUDA_LIB_DIR})
-
+## Build everything
 target_link_libraries(
 	VolumeRenderer 
 	Qt5::Core 
@@ -65,3 +70,7 @@ target_link_libraries(
 	${IL_LIBRARIES}
 	${CUDA_OBJECTS}
 )
+
+## Copy shader files to executable directory
+file(GLOB SHADER_FILES "${VOLUME_RENDERER_SRC}*.txt")
+file(COPY ${SHADER_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

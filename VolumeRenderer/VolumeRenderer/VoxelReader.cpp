@@ -66,7 +66,7 @@ void VoxelReader::ReadMHD(std::string folderPath, std::string headerFile, Volume
 
 	if (!myFile.is_open())
 	{
-		std::cout << "Failed to open File" << std::endl;
+		std::cout << "[VoxelReader] Failed to open file: " << headerFile.c_str() << std::endl;
 		return;
 	}
 
