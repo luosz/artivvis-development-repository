@@ -10,6 +10,7 @@
 #include "XToon.h"
 #include "Raycaster.h"
 #include "GPUContours.h"
+#include <string>
 
 class GPURaycaster		:		public Raycaster
 {

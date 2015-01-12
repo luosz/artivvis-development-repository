@@ -18,7 +18,7 @@ public:
 	HistogramView(std::string name = "", QWidget *parent = 0) : AbstractGraphicsView(parent)
 	{
 		setName(name);
-		auto size = this->size();
+		QSize size = this->size();
 		std::cout << _name << " HistogramView size " << size.width() << " " << size.height() << "\t";
 		scene()->setSceneRect(0, 0, size.width(), size.height());
 		QRectF rect = this->sceneRect();
@@ -32,16 +32,16 @@ public:
 
 	virtual void draw()
 	{
-		auto size = this->size();
+		QSize size = this->size();
 		scene()->clear();
 		HistogramPoint *node0 = NULL;
-		auto numIntensities = intensities.size();
+		int numIntensities = intensities.size();
 		for (int i = 0; i < numIntensities; i++)
 		{
 			QColor color;
-			auto gray = i / (float)numIntensities;
+			float gray = i / (float)numIntensities;
 			color.setHsvF(gray, gray, gray);
-			auto node1 = new HistogramPoint(this, i, color);
+			HistogramPoint* node1 = new HistogramPoint(this, i, color);
 			scene()->addItem(node1);
 			node1->setPos(intensities[i] * size.width(), (1 - frequencies[i]) * size.height());
 			if (i >= 1)
@@ -60,7 +60,7 @@ public:
 		}
 		intensities.clear();
 		frequencies.clear();
-		auto size = visibilities.size();
+		int size = visibilities.size();
 		for (int i = 0; i < visibilities.size(); i++)
 		{
 			intensities.push_back(i / (float)size);
@@ -77,7 +77,7 @@ protected:
 
 	virtual void resizeEvent(QResizeEvent * event)
 	{
-		auto size = event->size();
+		QSize size = event->size();
 		std::cout << "HistogramView::resizeEvent size " << size.width() << " " << size.height() << "\t";
 		scene()->setSceneRect(0, 0, size.width(), size.height());
 		QRectF rect = this->sceneRect();

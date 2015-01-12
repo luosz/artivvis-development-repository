@@ -147,10 +147,14 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 
 	for (int i=0; i<opacityDivisions.size(); i++)
 	{
-		uniformLoc = glGetUniformLocation(shaderProgramID, (std::string("division" + std::to_string(i+1))).c_str());
+		std::ostringstream div_ss;
+		div_ss << "division" << i + 1;
+		uniformLoc = glGetUniformLocation(shaderProgramID, div_ss.str().c_str());
 		glUniform2f(uniformLoc, opacityDivisions[i].x, opacityDivisions[i].y);
 
-		uniformLoc = glGetUniformLocation(shaderProgramID, (std::string("opacity" + std::to_string(i+1))).c_str());
+		std::ostringstream opa_ss;
+		opa_ss << "division" << i + 1;
+		uniformLoc = glGetUniformLocation(shaderProgramID, div_ss.str().c_str());
 		glUniform1f(uniformLoc, opacities[i]);
 	}
 

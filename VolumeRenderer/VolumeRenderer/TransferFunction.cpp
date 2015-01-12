@@ -37,15 +37,15 @@ void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
 //	auto r = doc.LoadFile("nucleon.tfi");
-	auto r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
+	tinyxml2::XMLError r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
 //	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;
 
-	auto transFuncIntensity = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity");
+	tinyxml2::XMLElement* transFuncIntensity = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity");
 
-	auto key = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity")->FirstChildElement("Keys")->FirstChildElement("key");
+	tinyxml2::XMLElement* key = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity")->FirstChildElement("Keys")->FirstChildElement("key");
 
 	while (key)
 	{

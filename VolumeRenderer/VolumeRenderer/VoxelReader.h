@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 //#include <Windows.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <tinydir.h>
 #include <algorithm>
 #include <string>
 #include <vector>

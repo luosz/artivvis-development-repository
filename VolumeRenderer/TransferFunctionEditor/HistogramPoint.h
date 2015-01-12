@@ -11,10 +11,10 @@ public:
 	HistogramPoint() : Node(NULL)
 	{
 		_index = -1;
-		_color = QColor(Qt::GlobalColor::white);
+		_color = QColor(Qt::white);
 	}
 
-	HistogramPoint(GraphWidget *graphWidget, int index, QColor &color = QColor(Qt::yellow)) : Node(static_cast<GraphWidget*>(graphWidget))
+	HistogramPoint(GraphWidget *graphWidget, int index, QColor color = QColor(Qt::yellow)) : Node(static_cast<GraphWidget*>(graphWidget))
 	{
 		this->_color = color;
 		this->_index = index;
@@ -58,4 +58,4 @@ protected:
 	int _index;
 };
 
-#endif HistogramPoint_h
+#endif

@@ -6,7 +6,7 @@ using namespace std;
 void Shader::Load(string vName, string fName)
 {
 	ifstream readFileV;
-	readFileV.open(vName);
+	readFileV.open(vName.c_str());
 	int i = 0;
 
 	if (readFileV.is_open())
@@ -26,7 +26,7 @@ void Shader::Load(string vName, string fName)
 		cout << "Unable to open shader file" << endl;
 	}
 	ifstream readFileF;
-	readFileF.open(fName);
+	readFileF.open(fName.c_str());
 	i = 0;
 
 	if (readFileF.is_open())
