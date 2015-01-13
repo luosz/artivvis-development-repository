@@ -27,6 +27,7 @@ find_package(DevIL REQUIRED)
 
 ## Additional include directories
 include_directories(${GLM_SRC})
+include_directories(${IL_INCLUDE_DIR})
 include_directories(${INCLUDE_DIR})
 include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/)
 include_directories(${VOLUME_RENDERER_SRC}GeneratedFiles/)
