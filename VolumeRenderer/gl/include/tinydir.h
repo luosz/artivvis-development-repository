@@ -29,7 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #ifdef _MSC_VER
 #pragma warning (disable : 4996)
@@ -141,7 +143,7 @@ int tinydir_open(tinydir_dir *dir, const char *path)
 	strcpy(dir->path, path);
 #ifdef _WIN32
 	strcat(dir->path, "\\*");
-	dir->_h = FindFirstFile(dir->path, &dir->_f);
+	dir->_h = FindFirstFile((LPCWSTR)dir->path, &dir->_f);
 	dir->path[strlen(dir->path) - 2] = '\0';
 	if (dir->_h == INVALID_HANDLE_VALUE)
 #else
@@ -322,7 +324,7 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 	if (strlen(dir->path) +
 		strlen(
 #ifdef _WIN32
-			dir->_f.cFileName
+			(const char*)dir->_f.cFileName
 #else
 			dir->_e->d_name
 #endif
@@ -335,7 +337,7 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 	}
 	if (strlen(
 #ifdef _WIN32
-			dir->_f.cFileName
+			(const char*)dir->_f.cFileName
 #else
 			dir->_e->d_name
 #endif
@@ -349,7 +351,7 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 	strcat(file->path, "/");
 	strcpy(file->name,
 #ifdef _WIN32
-		dir->_f.cFileName
+		(const char*)dir->_f.cFileName
 #else
 		dir->_e->d_name
 #endif
