@@ -9,7 +9,6 @@ set(CMAKE_AUTOMOC ON)
 set(VOLUME_RENDERER_SRC "VolumeRenderer/" CACHE STRING "Source code directory." FORCE)
 set(TRANSFER_FUNCTION_EDITOR_SRC "TransferFunctionEditor/" CACHE STRING "Source code directory." FORCE)
 set(GLM_SRC "gl/glm/" CACHE STRING "Source headers for the GLM." FORCE)
-set(DEVIL_SRC "gl/include/IL/" CACHE STRING "Source headers for the DevIL library.")
 set(INCLUDE_DIR "gl/include" CACHE STRING "Source headers for the additional includes." FORCE)
 set(QT_INSTALL_PREFIX "THIS MUST BE SET" CACHE PATH "Install directory for Qt")
 
@@ -17,7 +16,7 @@ set(QT_INSTALL_PREFIX "THIS MUST BE SET" CACHE PATH "Install directory for Qt")
 set(CMAKE_PREFIX_PATH ${QT_INSTALL_PREFIX})
 set(CUDA_LIB ${CUDA_TOOLKIT_ROOT_DIR}/lib64/libcudart.so)
 
-## Required libraries
+## Required libraries (Search handled by CMake)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -28,7 +27,6 @@ find_package(DevIL REQUIRED)
 
 ## Additional include directories
 include_directories(${GLM_SRC})
-include_directories(${DEVIL_SRC})
 include_directories(${INCLUDE_DIR})
 include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/)
 include_directories(${VOLUME_RENDERER_SRC}GeneratedFiles/)
@@ -41,7 +39,7 @@ add_definitions( -Wfatal-errors )
 add_definitions( -DGLM_FORCE_RADIANS )
 
 ## Create the TransferFunctionEditor as a library
-FILE(GLOB TF_EDITOR_SOURCES
+file(GLOB TF_EDITOR_SOURCES
 	"${TRANSFER_FUNCTION_EDITOR_SRC}*.cpp"
 	"${TRANSFER_FUNCTION_EDITOR_SRC}*.h"
 )
@@ -59,7 +57,7 @@ target_link_libraries(
 )
 
 ## Find standard C objects to build
-FILE(GLOB SOURCES 
+file(GLOB SOURCES 
 	"${INCLUDE_DIR}/tinyxml2.cpp"
 	"${VOLUME_RENDERER_SRC}*.cu"
 	"${VOLUME_RENDERER_SRC}*.cpp"
