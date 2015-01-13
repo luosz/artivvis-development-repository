@@ -65,15 +65,11 @@ FILE(GLOB SOURCES
 	"${VOLUME_RENDERER_SRC}*.cpp"
 	"${VOLUME_RENDERER_SRC}*.h"
 )
-add_executable(VolumeRenderer ${SOURCES})
+cuda_include_directories(${Qt5Widgets_INCLUDE_DIRS})
+cuda_add_executable(VolumeRenderer ${SOURCES})
 
 ## Build CUDA Objects
-FILE(GLOB CU_SOURCES 
-	"${VOLUME_RENDERER_SRC}*.cu"
-)
 SET(CUDA_NVCC_FLAGS "--compiler-options '-fPIC'" CACHE STRING "nvcc flags" FORCE)
-cuda_include_directories(${Qt5Widgets_INCLUDE_DIRS})
-cuda_compile(CUDA_OBJECTS ${CU_SOURCES})
 
 ## Build everything
 target_link_libraries(
