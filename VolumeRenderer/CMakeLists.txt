@@ -48,8 +48,7 @@ add_library(TransferFunctionEditor ${TF_EDITOR_SOURCES})
 target_link_libraries(
 	TransferFunctionEditor
 	Qt5::Core 
-	Qt5::Widgets 
-	${CUDA_LIB} 
+	Qt5::Widgets
 	${GLUT_LIBRARIES} 
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARIES}
@@ -65,23 +64,23 @@ file(GLOB SOURCES
 	"${VOLUME_RENDERER_SRC}*.h"
 )
 cuda_include_directories(${Qt5Widgets_INCLUDE_DIRS})
-cuda_add_executable(VolumeRenderer ${SOURCES})
 
 ## Build CUDA Objects
-SET(CUDA_NVCC_FLAGS "--compiler-options '-fPIC'" CACHE STRING "nvcc flags" FORCE)
+set(CUDA_NVCC_FLAGS "--compiler-options '-fPIC'" CACHE STRING "nvcc flags" FORCE)
 
 ## Build everything
+cuda_add_executable(VolumeRenderer ${SOURCES})
+
 target_link_libraries(
 	VolumeRenderer 
 	TransferFunctionEditor
 	Qt5::Core 
-	Qt5::Widgets 
-	${CUDA_LIB} 
+	Qt5::Widgets
+	${CUDA_CUDART_LIBRARY}
 	${GLUT_LIBRARIES} 
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARIES}
 	${IL_LIBRARIES}
-	${CUDA_OBJECTS}
 )
 
 ## Copy shader files to executable directory
