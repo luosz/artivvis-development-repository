@@ -31,7 +31,7 @@ public:
     void openTransferFunctionFromVoreenXML(const char *filename)
     {
 		tinyxml2::XMLDocument doc;
-		auto r = doc.LoadFile(filename);
+		tinyxml2::XMLError r = doc.LoadFile(filename);
 
 		if (r != tinyxml2::XML_NO_ERROR)
 		{
@@ -39,9 +39,9 @@ public:
 			return;
 		}
 
-        auto transFuncIntensity = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity");
+        tinyxml2::XMLElement* transFuncIntensity = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity");
 
-        auto key = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity")->FirstChildElement("Keys")->FirstChildElement("key");
+        tinyxml2::XMLElement* key = doc.FirstChildElement("VoreenData")->FirstChildElement("TransFuncIntensity")->FirstChildElement("Keys")->FirstChildElement("key");
 
         while (key)
         {
@@ -70,38 +70,38 @@ public:
 	{
 		tinyxml2::XMLDocument doc;
 
-		auto declaration = doc.NewDeclaration();
+		tinyxml2::XMLDeclaration* declaration = doc.NewDeclaration();
 		doc.InsertEndChild(declaration);
-		auto voreenData = doc.NewElement("VoreenData");
+		tinyxml2::XMLElement* voreenData = doc.NewElement("VoreenData");
 		voreenData->SetAttribute("version", 1);
-		auto transFuncIntensity = doc.NewElement("TransFuncIntensity");
+		tinyxml2::XMLElement* transFuncIntensity = doc.NewElement("TransFuncIntensity");
 		transFuncIntensity->SetAttribute("type", "TransFuncIntensity");
 
 		// add domain
-		auto domain = doc.NewElement("domain");
+		tinyxml2::XMLElement* domain = doc.NewElement("domain");
 		domain->SetAttribute("x", 0);
 		domain->SetAttribute("y", 1);
 		transFuncIntensity->InsertEndChild(domain);
 
 		// add threshold
-		auto threshold = doc.NewElement("threshold");
+		tinyxml2::XMLElement* threshold = doc.NewElement("threshold");
 		threshold->SetAttribute("x", 0);
 		threshold->SetAttribute("y", 1);
 		transFuncIntensity->InsertEndChild(threshold);
 
 		// add Keys
-		auto size = intensities.size();
-		auto keys = doc.NewElement("Keys");
+		int size = intensities.size();
+		tinyxml2::XMLElement* keys = doc.NewElement("Keys");
 		for (int i = 0; i < size; i++)
 		{
-			auto key = doc.NewElement("key");
+			tinyxml2::XMLElement* key = doc.NewElement("key");
 			key->SetAttribute("type", "TransFuncMappingKey");
-			auto intensity = doc.NewElement("intensity");
+			tinyxml2::XMLElement* intensity = doc.NewElement("intensity");
 			intensity->SetAttribute("value", intensities[i]);
-			auto split = doc.NewElement("split");
+			tinyxml2::XMLElement* split = doc.NewElement("split");
 			split->SetAttribute("value", "false");
-			auto colorL = doc.NewElement("colorL");
-			auto c = colors[i];
+			tinyxml2::XMLElement* colorL = doc.NewElement("colorL");
+			glm::vec4 c = colors[i];
 			colorL->SetAttribute("r", static_cast<int>(c.r * 255));
 			colorL->SetAttribute("g", static_cast<int>(c.g * 255));
 			colorL->SetAttribute("b", static_cast<int>(c.b * 255));
@@ -116,7 +116,7 @@ public:
 		voreenData->InsertEndChild(transFuncIntensity);
 		doc.InsertEndChild(voreenData);
 
-		auto r = doc.SaveFile(filename);
+		tinyxml2::XMLError r = doc.SaveFile(filename);
 		if (r != tinyxml2::XML_NO_ERROR)
 		{
 			std::cout << "failed to save file " << filename << std::endl;

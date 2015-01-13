@@ -22,13 +22,13 @@ protected:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent * event)
 	{
 		QGraphicsScene::mousePressEvent(event);
-		if (!event->isAccepted() && event->button() == Qt::MouseButton::LeftButton)
+		if (!event->isAccepted() && event->button() == Qt::LeftButton)
 		{
-			auto view = static_cast<AbstractGraphicsView*>(this->parent());
-			auto size = view->sceneRect();
-			auto pos = event->scenePos();
-			auto intensity = pos.x() / size.width();
-			auto opacity = 1 - pos.y() / size.height();
+			AbstractGraphicsView* view = static_cast<AbstractGraphicsView*>(this->parent());
+			QRectF size = view->sceneRect();
+			QPointF pos = event->scenePos();
+			qreal intensity = pos.x() / size.width();
+			qreal opacity = 1 - pos.y() / size.height();
 			view->addControlPoint(intensity, opacity);
 			event->accept();
 		}

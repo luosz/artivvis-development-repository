@@ -6,7 +6,7 @@ using namespace std;
 void Shader::Load(string vName, string fName)
 {
 	ifstream readFileV;
-	readFileV.open(vName);
+	readFileV.open(vName.c_str());
 	int i = 0;
 
 	if (readFileV.is_open())
@@ -23,10 +23,10 @@ void Shader::Load(string vName, string fName)
 		readFileV.close();
 	} else 
 	{
-		cout << "Unable to open shader file" << endl;
+		cout << "Unable to open vert shader file: " << vName.c_str() << endl;
 	}
 	ifstream readFileF;
-	readFileF.open(fName);
+	readFileF.open(fName.c_str());
 	i = 0;
 
 	if (readFileF.is_open())
@@ -43,7 +43,7 @@ void Shader::Load(string vName, string fName)
 		readFileF.close();
 	} else 
 	{
-		cout << "Unable to open shader file" << endl;
+		cout << "Unable to open frag shader file: " << fName.c_str() << endl;
 	}
 }
 

@@ -21,8 +21,8 @@ class TransferFunctionView : public AbstractGraphicsView
 public:
 	TransferFunctionView(QWidget *parent = 0) : AbstractGraphicsView(parent)
 	{
-		auto size = this->size();
-		auto tfScene = static_cast<QGraphicsScene*>(new TransferFunctionScene(this));
+		QSize size = this->size();
+		QGraphicsScene* tfScene = static_cast<QGraphicsScene*>(new TransferFunctionScene(this));
 		this->setScene(tfScene);
 		std::cout << "TransferFunctionView size " << size.width() << " " << size.height() << "\t";
 		scene()->setSceneRect(0, 0, size.width(), size.height());
@@ -65,13 +65,13 @@ public:
 
 	virtual void draw()
 	{
-		auto size = this->size();
+		QSize size = this->size();
 		scene()->clear();
 		ControlPoint *node0 = NULL;
 		for (int i=0; i<numIntensities; i++)
 		{
-			auto c = colors[i];
-			auto node1 = new ControlPoint(this, i, QColor(int(c.r * 255), int(c.g * 255), int(c.b * 255)));
+			glm::vec4 c = colors[i];
+			ControlPoint* node1 = new ControlPoint(this, i, QColor(int(c.r * 255), int(c.g * 255), int(c.b * 255)));
 			scene()->addItem(node1);
 			node1->setPos(intensities[i] * size.width(), (1 - c.a) * size.height());
 			if (i>=1)
@@ -120,7 +120,7 @@ public:
 		intensity = intensity > 1 ? 1 : intensity;
 		opacity = opacity < 0 ? 0 : opacity;
 		opacity = opacity > 1 ? 1 : opacity;
-		auto size = intensities.size();
+		int size = intensities.size();
 		int i = 0;
 		while (i < size && intensities[i] < intensity)
 		{
@@ -129,7 +129,7 @@ public:
 		if (i == 0)
 		{
 			intensities.insert(intensities.begin(), intensity);
-			auto c = glm::vec4(colors[0].r, colors[0].g, colors[0].b, opacity);
+			glm::vec4 c = glm::vec4(colors[0].r, colors[0].g, colors[0].b, opacity);
 			colors.insert(colors.begin(), c);
 		} 
 		else
@@ -141,20 +141,20 @@ public:
 					std::cout << "Error: index out of range. i=" << i << " size=" << size << std::endl;
 				}
 				intensities.push_back(intensity);
-				auto c = glm::vec4(colors[size - 1].r, colors[size - 1].g, colors[size - 1].b, opacity);
+				glm::vec4 c = glm::vec4(colors[size - 1].r, colors[size - 1].g, colors[size - 1].b, opacity);
 				colors.push_back(c);
 			}
 			else
 			{
-				auto c0 = colors[i - 1];
-				auto c1 = colors[i];
-				auto intensity0 = intensities[i - 1];
-				auto intensity1 = intensities[i];
-				auto fraction = (intensity - intensity0) / (intensity1 - intensity0);
-				auto r = c0.r + (c1.r - c0.r) * fraction;
-				auto g = c0.g + (c1.g - c0.g) * fraction;
-				auto b = c0.b + (c1.b - c0.b) * fraction;
-				auto c = glm::vec4(r, g, b, opacity);
+				glm::vec4 c0 = colors[i - 1];
+				glm::vec4 c1 = colors[i];
+				double intensity0 = intensities[i - 1];
+				double intensity1 = intensities[i];
+				double fraction = (intensity - intensity0) / (intensity1 - intensity0);
+				double r = c0.r + (c1.r - c0.r) * fraction;
+				double g = c0.g + (c1.g - c0.g) * fraction;
+				double b = c0.b + (c1.b - c0.b) * fraction;
+				glm::vec4 c = glm::vec4(r, g, b, opacity);
 				intensities.insert(intensities.begin() + i, intensity);
 				colors.insert(colors.begin() + i, c);
 			}
@@ -243,7 +243,7 @@ public:
 
 	void distributeVertically()
 	{
-		auto size = colors.size();
+		int size = colors.size();
 		double min = 1, max = 0;
 		for (int i = 0; i < size; i++)
 		{
@@ -267,7 +267,7 @@ public:
 
 	void distrubuteHorizontally()
 	{
-		auto size = intensities.size();
+		int size = intensities.size();
 		double range = intensities[size - 1] - intensities[0];
 		double interval = range / (size - 1);
 		for (int i = 0; i < size; i++)
@@ -279,7 +279,7 @@ public:
 
 	void makeDiagonal()
 	{
-		auto size = colors.size();
+		int size = colors.size();
 		for (int i = 0; i < size; i++)
 		{
 			colors[i].a = intensities[i];
@@ -289,7 +289,7 @@ public:
 
 	void makeFlat(double opacity = 0.1)
 	{
-		auto size = colors.size();
+		int size = colors.size();
 		for (int i = 0; i < size; i++)
 		{
 			colors[i].a = opacity;
@@ -299,7 +299,7 @@ public:
 
 	void makeRamp(double opacity = 0.1)
 	{
-		auto size = colors.size();
+		int size = colors.size();
 		for (int i = 0; i < size; i++)
 		{
 			if (i == 0 || i == size - 1)
@@ -317,7 +317,7 @@ public:
 protected:
 	virtual void resizeEvent(QResizeEvent * event)
 	{
-		auto size = event->size();
+		QSize size = event->size();
 		std::cout << "TransferFunctionView::resizeEvent size " << size.width() << " " << size.height() << "\t";
 		scene()->setSceneRect(0, 0, size.width(), size.height());
 		QRectF rect = this->sceneRect();

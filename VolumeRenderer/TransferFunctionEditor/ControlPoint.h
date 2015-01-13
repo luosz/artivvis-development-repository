@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ControlPoint_H
-#define ControlPoint_H
+#ifndef CONTROL_POINT_H
+#define CONTROL_POINT_H
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
@@ -19,7 +19,7 @@
 class ControlPoint : public Node
 {
 public:
-	ControlPoint(AbstractGraphicsView *graphWidget, int index, QColor &color = QColor(Qt::yellow)) : Node(static_cast<GraphWidget*>(graphWidget))
+	ControlPoint(AbstractGraphicsView *graphWidget, int index, QColor color = QColor(Qt::yellow)) : Node(static_cast<GraphWidget*>(graphWidget))
 	{
 		this->_color = color;
 		this->_index = index;
@@ -69,12 +69,12 @@ protected:
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 	{
 		Node::mouseReleaseEvent(event);
-		if (!event->isAccepted() && event->button() == Qt::MouseButton::LeftButton)
+		if (!event->isAccepted() && event->button() == Qt::LeftButton)
 		{
-			auto size = view->sceneRect();
-			auto pos = event->scenePos();
-			auto intensity = pos.x() / size.width();
-			auto opacity = 1 - pos.y() / size.height();
+			QRectF size = view->sceneRect();
+			QPointF pos = event->scenePos();
+			qreal intensity = pos.x() / size.width();
+			qreal opacity = 1 - pos.y() / size.height();
 			view->moveControlPoint(_index, intensity, opacity);
 			event->accept();
 		}
@@ -97,7 +97,7 @@ protected:
 			if (selectedAction == changeAction)
 			{
 				// change control point color
-				auto c = QColorDialog::getColor(_color, view);
+				QColor c = QColorDialog::getColor(_color, view);
 				if (c.isValid())
 				{
 					_color = c;

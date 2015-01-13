@@ -53,7 +53,7 @@ float IntensityTFOptimizerV2::GetVisibilityOpacityByID(float intensity, int inde
 	{
 		if (visibilityHistogram)
 		{
-			auto visibility = visibilityHistogram->visibilities[bin_index];
+			float visibility = visibilityHistogram->visibilities[bin_index];
 			float normalised = intensity / 255.0f;
 			return GetOpacityByInterp(normalised, index) * visibility * frequency;
 		}
@@ -200,7 +200,7 @@ void IntensityTFOptimizerV2::Optimize()
 
 		for (int i = 0; i < numIntensities - 1; i++)
 		{
-			auto area = GetWeightedAreaEntropy(i);
+			float area = GetWeightedAreaEntropy(i);
 			area_list.push_back(area);
 			mean_area += area;
 		}
@@ -214,7 +214,7 @@ void IntensityTFOptimizerV2::Optimize()
 				if (area_list[i] > mean_area)
 				{
 					// get the upper vertex of an edge
-					auto max_index = i;
+					int max_index = i;
 					int max_index_next = max_index + 1;
 					float weight_max_1 = GetWeightedEntropyOpacityByID(intensities[max_index] * 255.0f, max_index);
 					float weight_max_2 = GetWeightedEntropyOpacityByID(intensities[max_index_next] * 255.0f, max_index_next);
@@ -230,7 +230,7 @@ void IntensityTFOptimizerV2::Optimize()
 				}
 				if (area_list[i] < mean_area)
 				{
-					auto min_index = i;
+					int min_index = i;
 					// get the lower vertex of an edge
 					int min_index_next = min_index + 1;
 					float weight_min_1 = GetWeightedEntropyOpacityByID(intensities[min_index] * 255.0f, min_index);
@@ -262,7 +262,7 @@ void IntensityTFOptimizerV2::BalanceEdges()
 
 		for (int i = 0; i < numIntensities - 1; i++)
 		{
-			auto area = GetAreaEntropy(i);
+			float area = GetAreaEntropy(i);
 			area_list.push_back(area);
 			mean_area += area;
 		}
@@ -276,7 +276,7 @@ void IntensityTFOptimizerV2::BalanceEdges()
 				if (area_list[i] > mean_area)
 				{
 					// get the upper vertex of an edge
-					auto max_index = i;
+					int max_index = i;
 					int max_index_next = max_index + 1;
 					float weight_max_1 = GetEntropyOpacityByID(intensities[max_index] * 255.0f, max_index);
 					float weight_max_2 = GetEntropyOpacityByID(intensities[max_index_next] * 255.0f, max_index_next);
@@ -292,7 +292,7 @@ void IntensityTFOptimizerV2::BalanceEdges()
 				}
 				if (area_list[i] < mean_area)
 				{
-					auto min_index = i;
+					int min_index = i;
 					// get the lower vertex of an edge
 					int min_index_next = min_index + 1;
 					float weight_min_1 = GetEntropyOpacityByID(intensities[min_index] * 255.0f, min_index);
@@ -322,7 +322,7 @@ void IntensityTFOptimizerV2::BalanceVisibilityOnce()
 
 	for (int i = 0; i < numIntensities - 1; i++)
 	{
-		auto area = GetAreaVisibility(i);
+		float area = GetAreaVisibility(i);
 		area_list.push_back(area);
 		mean_area += area;
 	}
@@ -336,7 +336,7 @@ void IntensityTFOptimizerV2::BalanceVisibilityOnce()
 			if (area_list[i] > mean_area)
 			{
 				// get the upper vertex of an edge
-				auto max_index = i;
+				int max_index = i;
 				int max_index_next = max_index + 1;
 				float weight_max_1 = GetVisibilityOpacityByID(intensities[max_index] * 255.0f, max_index);
 				float weight_max_2 = GetVisibilityOpacityByID(intensities[max_index_next] * 255.0f, max_index_next);
@@ -352,7 +352,7 @@ void IntensityTFOptimizerV2::BalanceVisibilityOnce()
 			}
 			if (area_list[i] < mean_area)
 			{
-				auto min_index = i;
+				int min_index = i;
 				// get the lower vertex of an edge
 				int min_index_next = min_index + 1;
 				float weight_min_1 = GetVisibilityOpacityByID(intensities[min_index] * 255.0f, min_index);
@@ -383,7 +383,7 @@ void IntensityTFOptimizerV2::BalanceVisibility()
 
 		for (int i = 0; i < numIntensities - 1; i++)
 		{
-			auto area = GetAreaVisibility(i);
+			float area = GetAreaVisibility(i);
 			area_list.push_back(area);
 			mean_area += area;
 		}
@@ -397,7 +397,7 @@ void IntensityTFOptimizerV2::BalanceVisibility()
 				if (area_list[i] > mean_area)
 				{
 					// get the upper vertex of an edge
-					auto max_index = i;
+					int max_index = i;
 					int max_index_next = max_index + 1;
 					float weight_max_1 = GetVisibilityOpacityByID(intensities[max_index] * 255.0f, max_index);
 					float weight_max_2 = GetVisibilityOpacityByID(intensities[max_index_next] * 255.0f, max_index_next);
@@ -413,7 +413,7 @@ void IntensityTFOptimizerV2::BalanceVisibility()
 				}
 				if (area_list[i] < mean_area)
 				{
-					auto min_index = i;
+					int min_index = i;
 					// get the lower vertex of an edge
 					int min_index_next = min_index + 1;
 					float weight_min_1 = GetVisibilityOpacityByID(intensities[min_index] * 255.0f, min_index);

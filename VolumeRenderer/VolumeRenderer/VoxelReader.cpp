@@ -62,11 +62,11 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 // Reads a header of .mhd format and copies values to 'VolumeProperties'
 void VoxelReader::ReadMHD(std::string folderPath, std::string headerFile, VolumeProperties &properties)
 {
-	std::ifstream myFile(headerFile);
+	std::ifstream myFile(headerFile.c_str());
 
 	if (!myFile.is_open())
 	{
-		std::cout << "Failed to open File" << std::endl;
+		std::cout << "[VoxelReader] Failed to open file: " << headerFile.c_str() << std::endl;
 		return;
 	}
 
@@ -137,6 +137,11 @@ struct MyFileSort : public std::binary_function<std::string, std::string, bool>
 	}
 };
 
+bool NumericalFileSort(const std::string a, const std::string b)
+{
+	return (a.length() < b.length() || (a.length() == b.length() && (a < b)));
+};
+
 
 // Reads in the raw binary data using properties copied in from header
 void VoxelReader::ReadRaw(VolumeProperties &properties)
@@ -149,25 +154,23 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 	std::string directory = properties.rawFilePath;
 	directory.append("/*");
 
-	WIN32_FIND_DATAA findFileData;
-	HANDLE hFind;
 
-	hFind = FindFirstFileA(directory.c_str(), &findFileData);
-
-	if (hFind != INVALID_HANDLE_VALUE)
+	struct stat status;
+	stat(directory.c_str(), &status);
+	if (status.st_mode & S_IFDIR)
 	{
-		FindNextFileA(hFind, &findFileData);
+		tinydir_dir dir;
+		tinydir_open(&dir, directory.c_str());
 
-		while (FindNextFileA(hFind, &findFileData) != 0)
-			files.push_back(findFileData.cFileName);
+		while (dir.has_next)
+		{
+			tinydir_file file;
+			tinydir_readfile(&dir, &file);
+			files.push_back(std::string(file.name));
+			tinydir_next(&dir);
+		}
 		
-		sort(files.begin(), files.end(), MyFileSort());
-
-//		for (int i=0; i<files.size(); i++)
-//		{
-//			std::string currentFile(properties.rawFilePath + "/" + files[i]); 
-//			CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
-//		}
+		sort(files.begin(), files.end(), NumericalFileSort);
 
 		for (int i=0; i<files.size(); i++)
 			files[i] = std::string(properties.rawFilePath + "/" + files[i]);
@@ -187,7 +190,7 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 {
 	std::streampos size;
 
-	std::ifstream myFile (fileName, std::ios::in|std::ios::binary|std::ios::ate);
+	std::ifstream myFile (fileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
 
 	if (myFile.is_open())
 	{
@@ -212,7 +215,7 @@ void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
 
 	std::streampos size;
 
-	std::ifstream myFile (fileName, std::ios::in|std::ios::binary|std::ios::ate);
+	std::ifstream myFile (fileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
 
 	if (myFile.is_open())
 	{

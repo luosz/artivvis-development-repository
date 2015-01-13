@@ -77,9 +77,6 @@
     <ClCompile Include="ShaderManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tinyxml2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TransferFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -116,9 +113,6 @@
     <ClCompile Include="..\TransferFunctionEditor\node.cpp">
       <Filter>../TransferFunctionEditor</Filter>
     </ClCompile>
-    <ClCompile Include="..\TransferFunctionEditor\tinyxml2.cpp">
-      <Filter>../TransferFunctionEditor</Filter>
-    </ClCompile>
     <ClCompile Include="..\TransferFunctionEditor\transferfunctioneditor.cpp">
       <Filter>../TransferFunctionEditor</Filter>
     </ClCompile>
@@ -141,6 +135,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RegionGrabber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl\include\tinyxml2.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JoesOGLRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TomsOGLRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -234,9 +237,6 @@
       <Filter>../TransferFunctionEditor</Filter>
     </ClInclude>
     <ClInclude Include="..\TransferFunctionEditor\node.h">
-      <Filter>../TransferFunctionEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TransferFunctionEditor\tinyxml2.h">
       <Filter>../TransferFunctionEditor</Filter>
     </ClInclude>
     <ClInclude Include="..\TransferFunctionEditor\TransferFunctionScene.h">
