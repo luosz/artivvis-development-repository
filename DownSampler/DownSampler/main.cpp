@@ -19,12 +19,12 @@ struct MyFileSort : public std::binary_function<std::string, std::string, bool>
 
 int main(int argc, char** argv)
 {
-	string sourceFolder = "../../Samples/SmokeSim/SmokeSimSideways/";
-	string targetFileName = "../../Samples/SmokeSim/DSSmokeSideways/dsSmoke.";
+	string sourceFolder = "../../Samples/SmokeSim/SmokeSimRaw200200/";
+	string targetFileName = "../../Samples/SmokeSim/DSSmoke200200/dsSmoke.";
 
-	int xRes = 80;
-	int yRes = 80;
-	int zRes = 80;
+	int xRes = 200;
+	int yRes = 200;
+	int zRes = 200;
 	int numElements = xRes * yRes * zRes;
 	int bytesPerElement = 4;
 
@@ -61,8 +61,12 @@ int main(int argc, char** argv)
 		cout << "Invalid Directory" << endl;
 
 
+	cout << "Finding max float value" << endl;
+
 	for (int i=0; i<files.size(); i++)
 	{
+		cout << i << ", ";
+
 		int dataStartOffset;
 		string line;
 		streampos size;
@@ -91,10 +95,14 @@ int main(int argc, char** argv)
 	}
 
 
+	std::cout << "Copying floats to chars.." << endl;
+
 	// Very inefficient to do this all again but puts the least stress on memory and time constraints aren't really any issue
 
 	for (int i=0; i<files.size(); i++)
 	{
+		cout << i << ", ";
+
 		int dataStartOffset;
 		string line;
 		streampos size;

@@ -1,14 +1,13 @@
 #ifndef TRANSFER_FUNCTION_H
 #define TRANSFER_FUNCTION_H
 
-#include "../gl/include/tinyxml2.h"
+#include "tinyxml2.h"
 #include <vector>
 #include "GLM.h"
 #include <iostream>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "VolumeDataset.h"
-#include "../TransferFunctionEditor/AbstractGraphicsView.h"
 
 #define tfEPSILON glm::epsilon<float>()
 
@@ -21,11 +20,6 @@ public:
 	
 	int numIntensities;
 	GLuint tfTexture;
-	float targetIntensity;
-	bool optimizeIntensity;
-
-	AbstractGraphicsView *tfView;
-	AbstractGraphicsView *visibilityView;
 
 	std::vector<glm::vec4> origColorTable;
 	std::vector<glm::vec4> currentColorTable;

@@ -94,6 +94,10 @@ public:
 	int nonZeroFrequencies;
 	std::vector<int> frequencyHistogram;
 
+	float maxRatio, minRatio, meanRatio, stdDev;
+	std::vector<float> ratios;
+	int ratioTimeSteps;
+
 	void TemporalCoherence(VolumeDataset &volume);
 	void GPUPredict(VolumeDataset &volume);
 	void CPUPredict(VolumeDataset &volume);

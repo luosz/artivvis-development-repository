@@ -98,9 +98,6 @@
     <ClCompile Include="CPURaycaster.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tinyxml2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TransferFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,9 +114,6 @@
       <Filter>../TransferFunctionEditor</Filter>
     </ClCompile>
     <ClCompile Include="..\TransferFunctionEditor\node.cpp">
-      <Filter>../TransferFunctionEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TransferFunctionEditor\tinyxml2.cpp">
       <Filter>../TransferFunctionEditor</Filter>
     </ClCompile>
     <ClCompile Include="..\TransferFunctionEditor\transferfunctioneditor.cpp">
@@ -234,9 +228,6 @@
     <ClInclude Include="CPURaycaster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tinyxml2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TransferFunction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -271,9 +262,6 @@
       <Filter>../TransferFunctionEditor</Filter>
     </ClInclude>
     <ClInclude Include="..\TransferFunctionEditor\node.h">
-      <Filter>../TransferFunctionEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TransferFunctionEditor\tinyxml2.h">
       <Filter>../TransferFunctionEditor</Filter>
     </ClInclude>
     <ClInclude Include="..\TransferFunctionEditor\TransferFunctionScene.h">
