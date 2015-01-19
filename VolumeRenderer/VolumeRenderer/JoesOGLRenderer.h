@@ -6,6 +6,9 @@
 class JoesOGLRenderer     :     public OpenGLRenderer
 {
 public:
+	VisibilityTFOptimizer *visibilityTFOptimizer;
+	IntensityTFOptimizerV2 *intensityOptimizerV2;
+
 	JoesOGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
 	void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
 };
