@@ -4,11 +4,6 @@ JoesOGLRenderer::JoesOGLRenderer(int screenWidth, int screenHeight, VolumeDatase
 {
 	visibilityTFOptimizer = std::make_shared<VisibilityTFOptimizer>(&volume, &visibilityHistogram, &transferFunction);
 	intensityOptimizerV2 = std::make_shared<IntensityTFOptimizerV2>(&volume, &transferFunction, &visibilityHistogram);
-
-	//visibilityTFOptimizer = new VisibilityTFOptimizer(&volume, &visibilityHistogram, &transferFunction);
-	//optimizer = new RegionVisibilityOptimizer(&volume, &transferFunction, raycaster, &shaderManager, &camera);
-	//optimizer = new IntensityTFOptimizer(&volume, &transferFunction);
-	//intensityOptimizerV2 = new IntensityTFOptimizerV2(&volume, &transferFunction, &visibilityHistogram);
 }
 
 
@@ -20,7 +15,6 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 	{
 		visibilityTFOptimizer->Optimize();
 	}
-
 
 	// intensity and visibility optimization
 	if (transferFunction.tfView && transferFunction.tfView->isLuoOptimizerEnable())

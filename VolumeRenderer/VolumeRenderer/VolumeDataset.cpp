@@ -4,7 +4,6 @@
 void VolumeDataset::Init()
 {
 	VolumeProperties properties;
-	//voxelReader.LoadVolume(std::string(), std::string(), properties);
 	voxelReader.LoadVolume(folderPath, headerFile, properties);
 
 	memblock3D = properties.bufferAddress;

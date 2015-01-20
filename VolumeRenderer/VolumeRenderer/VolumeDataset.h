@@ -47,14 +47,13 @@ public:
 
 	void ParseArguments(int argc, char *argv[])
 	{
-		std::cout << "argc=" << argc << " argv[0]=" << argv[0] << std::endl;
 		// read filename from arguments if available
 		if (argc >= 2)
 		{
 			char volume_filename[MAX_PATH];
 			strcpy(volume_filename, argv[1]);
 			char *p = strrchr(volume_filename, '\\');
-			// try Windows and Linux directory separators ('\\' and '/')
+			// try both Windows and Linux directory separators ('\\' and '/')
 			if (!p)
 			{
 				p = strrchr(volume_filename, '/');
@@ -65,17 +64,15 @@ public:
 				std::cout << strlen(p) << std::endl;
 				if (strlen(p) >= 2)
 				{
-					// remove filename and keep folder path
+					// extract folder path from volume filename
 					p[1] = '\0';
 				}
 				folderPath = std::string(volume_filename);
-				std::cout << headerFile << std::endl << folderPath << std::endl;
+				std::cout << "headerFile=" << headerFile << std::endl << "folderPath=" << folderPath << std::endl;
 			}
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////
 };
-
-
 
 #endif
