@@ -9,6 +9,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	volume.Init();
 
 	renderer = new TomsOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
+	//renderer = new JoesOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
 
 	grabRegion = false;
 }

@@ -41,7 +41,6 @@ public:
 private:
 	void ReadMHD(std::string folderPath, std::string headerFile, VolumeProperties &properties);
 	void ReadRaw(VolumeProperties &properties);
-	
 };
 
 

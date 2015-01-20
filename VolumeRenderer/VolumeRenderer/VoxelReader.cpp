@@ -3,56 +3,59 @@
 // At the moment file is specified within function but in future will use parameter. 
 void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, VolumeProperties &properties)
 {
-//	folderPath = "../../Samples/TVvort/";
-//	headerFile = folderPath + "TVvort.mhd";
+	if (folderPath.length() <= 0 || headerFile.length() <= 0)
+	{
+		//	folderPath = "../../Samples/TVvort/";
+		//	headerFile = folderPath + "TVvort.mhd";
 
-//	folderPath = "../../Samples/Nucleon/";
-//	headerFile = folderPath + "nucleon.mhd";
+		//	folderPath = "../../Samples/Nucleon/";
+		//	headerFile = folderPath + "nucleon.mhd";
 
-//	folderPath = "../../Samples/CThead/";
-//	headerFile = folderPath + "CThead.mhd";
+		//	folderPath = "../../Samples/CThead/";
+		//	headerFile = folderPath + "CThead.mhd";
 
-//	folderPath = "../../Samples/MRbrain/";
-//	headerFile = folderPath + "MRbrain.mhd";
+		//	folderPath = "../../Samples/MRbrain/";
+		//	headerFile = folderPath + "MRbrain.mhd";
 
-//	folderPath = "../../Samples/TVlung/";
-//	headerFile = folderPath + "TVlung.mhd";
+		//	folderPath = "../../Samples/TVlung/";
+		//	headerFile = folderPath + "TVlung.mhd";
 
-//	folderPath = "../../Samples/FiveJets/";
-//	headerFile = folderPath + "FiveJetsDensity.mhd";
+		//	folderPath = "../../Samples/FiveJets/";
+		//	headerFile = folderPath + "FiveJetsDensity.mhd";
 
-//	folderPath = "../../Samples/Isabel/";
-//	headerFile = folderPath + "IsabelCloud.mhd";
+		//	folderPath = "../../Samples/Isabel/";
+		//	headerFile = folderPath + "IsabelCloud.mhd";
 
-//	folderPath = "../../Samples/TJet/";
-//	headerFile = folderPath + "TJet.mhd";
+		//	folderPath = "../../Samples/TJet/";
+		//	headerFile = folderPath + "TJet.mhd";
 
-//	folderPath = "../../Samples/Abdomen/";
-//	headerFile = folderPath + "Abdomen16.mhd";
+		//	folderPath = "../../Samples/Abdomen/";
+		//	headerFile = folderPath + "Abdomen16.mhd";
 
-//	folderPath = "../../Samples/Colon/";
-//	headerFile = folderPath + "colon.mhd";
+		//	folderPath = "../../Samples/Colon/";
+		//	headerFile = folderPath + "colon.mhd";
 
-//	folderPath = "../../Samples/MRThead/";
-//	headerFile = folderPath + "MRThead.mhd";
+		//	folderPath = "../../Samples/MRThead/";
+		//	headerFile = folderPath + "MRThead.mhd";
 
-//	folderPath = "../../Samples/MRIhead/";
-//	headerFile = folderPath + "MRIhead.mhd";
+		//	folderPath = "../../Samples/MRIhead/";
+		//	headerFile = folderPath + "MRIhead.mhd";
 
-//	folderPath = "../../Samples/Bonsai/";
-//	headerFile = folderPath + "bonsai.mhd";
+		//	folderPath = "../../Samples/Bonsai/";
+		//	headerFile = folderPath + "bonsai.mhd";
 
-	folderPath = "../../Samples/SmokeSim/";
-	headerFile = folderPath + "SmokeSim.mhd";
+		folderPath = "../../Samples/SmokeSim/";
+		headerFile = folderPath + "SmokeSim.mhd";
 
-//	folderPath = "../../Samples/SmokeSim/";
-//	headerFile = folderPath + "SmokeSimSideways.mhd";
+		//	folderPath = "../../Samples/SmokeSim/";
+		//	headerFile = folderPath + "SmokeSimSideways.mhd";
 
-//	folderPath = "../../Samples/CTknee/";
-//	headerFile = folderPath + "CTknee.mhd";
+		//	folderPath = "../../Samples/CTknee/";
+		//	headerFile = folderPath + "CTknee.mhd";
 
-//	folderPath = "../../Samples/downsampled vortex/";
-//	headerFile = folderPath + "dsVort.mhd";
+		//	folderPath = "../../Samples/downsampled vortex/";
+		//	headerFile = folderPath + "dsVort.mhd";
+	}
 
 	ReadMHD(folderPath, headerFile, properties);
 	ReadRaw(properties);
@@ -77,7 +80,7 @@ void VoxelReader::ReadMHD(std::string folderPath, std::string headerFile, Volume
 	while (getline(myFile, line))
 		fileLines.push_back(line);
 
-	for (int i=0; i<fileLines.size(); i++)
+	for (int i = 0; i < fileLines.size(); i++)
 	{
 		iss.str(fileLines[i]);
 		iss >> temp;
@@ -146,11 +149,11 @@ bool NumericalFileSort(const std::string a, const std::string b)
 // Reads in the raw binary data using properties copied in from header
 void VoxelReader::ReadRaw(VolumeProperties &properties)
 {
-//	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
+	//	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
 	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement;
-	properties.bufferAddress = new GLubyte [bufferSize];
+	properties.bufferAddress = new GLubyte[bufferSize];
 	int numBytesInBufferFilled = 0;
-	
+
 	std::string directory = properties.rawFilePath;
 	directory.append("/*");
 
@@ -169,13 +172,13 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 			files.push_back(std::string(file.name));
 			tinydir_next(&dir);
 		}
-		
+
 		sort(files.begin(), files.end(), NumericalFileSort);
 
-		for (int i=0; i<files.size(); i++)
+		for (int i = 0; i < files.size(); i++)
 			files[i] = std::string(properties.rawFilePath + "/" + files[i]);
 
-		std::string currentFile(properties.rawFilePath + "/" + files[0]); 
+		std::string currentFile(properties.rawFilePath + "/" + files[0]);
 		CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
 	}
 	else
@@ -190,22 +193,22 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 {
 	std::streampos size;
 
-	std::ifstream myFile (fileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
+	std::ifstream myFile(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 
 	if (myFile.is_open())
 	{
 		size = myFile.tellg();
-		
-		myFile.seekg (0, std::ios::beg);
-		myFile.read ((char*)properties.bufferAddress + numBytesInBufferFilled, size);
+
+		myFile.seekg(0, std::ios::beg);
+		myFile.read((char*)properties.bufferAddress + numBytesInBufferFilled, size);
 		myFile.close();
 
 		numBytesInBufferFilled += size;
 	}
-	else 
+	else
 		std::cout << "Unable to open file";
 
-	
+
 }
 
 
@@ -215,20 +218,20 @@ void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
 
 	std::streampos size;
 
-	std::ifstream myFile (fileName.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
+	std::ifstream myFile(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
 
 	if (myFile.is_open())
 	{
 		size = myFile.tellg();
-		
-		myFile.seekg (0, std::ios::beg);
-		myFile.read ((char*)bufferAddress, size);
+
+		myFile.seekg(0, std::ios::beg);
+		myFile.read((char*)bufferAddress, size);
 		myFile.close();
 	}
-	else 
+	else
 		std::cout << "Unable to open file";
 
-	
+
 }
 
 
