@@ -88,7 +88,6 @@
     <ClCompile Include="..\TransferFunctionEditor\edge.cpp" />
     <ClCompile Include="..\TransferFunctionEditor\graphwidget.cpp" />
     <ClCompile Include="..\TransferFunctionEditor\node.cpp" />
-    <ClCompile Include="..\TransferFunctionEditor\tinyxml2.cpp" />
     <ClCompile Include="..\TransferFunctionEditor\transferfunctioneditor.cpp" />
     <ClCompile Include="BurnsContours.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -137,7 +136,6 @@
     <ClCompile Include="RegionGrabber.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
-    <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TomsOGLRenderer.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
     <ClCompile Include="VisibilityTFOptimizer.cpp" />
@@ -189,7 +187,6 @@
     <ClInclude Include="..\TransferFunctionEditor\import_transfer_function_editor.h" />
     <ClInclude Include="..\TransferFunctionEditor\import_volume_renderer.h" />
     <ClInclude Include="..\TransferFunctionEditor\node.h" />
-    <ClInclude Include="..\TransferFunctionEditor\tinyxml2.h" />
     <CustomBuild Include="..\TransferFunctionEditor\transferfunctioneditor.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing transferfunctioneditor.h...</Message>
@@ -225,7 +222,6 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="TFOptimizer.h" />
-    <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TomsOGLRenderer.h" />
     <ClInclude Include="TransferFunction.h" />
     <ClInclude Include="VisibilityHistogram.h" />

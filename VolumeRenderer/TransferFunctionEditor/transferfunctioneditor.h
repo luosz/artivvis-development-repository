@@ -8,7 +8,7 @@
 #include "import_volume_renderer.h"
 
 #include "glm/glm.hpp"
-#include "tinyxml2.h"
+#include "../gl/include/tinyxml2.h"
 #include "graphwidget.h"
 #include "ControlEdge.h"
 #include "ControlPoint.h"

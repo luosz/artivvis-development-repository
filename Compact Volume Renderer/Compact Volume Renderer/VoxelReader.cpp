@@ -168,7 +168,7 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 		for (int i=0; i<files.size(); i++)
 			files[i] = std::string(properties.rawFilePath + "/" + files[i]);
 
-		for (int i=0; i<100; i++)
+		for (int i=0; i<files.size(); i++)
 		{
 			CopyFileToBuffer(files[i], numBytesInBufferFilled, properties);
 		}

@@ -55,6 +55,10 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 	blocksToBeCopied.resize(numBlocks);
 
 	frequencyHistogram.resize(256);
+
+	ratioTimeSteps = 200;
+	ratios.resize(ratioTimeSteps);
+	std::fill(ratios.begin(), ratios.end(), 0.0f);
 }
 
 __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface)
@@ -122,7 +126,7 @@ void BlockRaycaster::GPUPredict(VolumeDataset &volume)
 
 }
 
-/*
+
 bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
@@ -136,9 +140,9 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	float top, bottom;
 	top = bottom = 0.0f;
 
-	for (int k=0; k<blockRes; k++)
-		for (int j=0; j<blockRes; j++)
-			for (int i=0; i<blockRes; i++)
+	for (int k=0; k<blockRes; k+=2)
+		for (int j=0; j<blockRes; j+=2)
+			for (int i=0; i<blockRes; i+=2)
 			{
 				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
 					continue;
@@ -148,32 +152,34 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 				unsigned char p = nextTempVolume[ID];
 				unsigned char n = nextVolume[ID];
 
-				if (n > 10)
-					int a = 0;
+//				if (n <= alpha)
+//					beta = (((float)n / float(alpha)) / 2.0f) + 0.5f;
+//				else
+//					beta = ((((float)(255 - n)) / ((float)(255 - alpha))) / 2.0f) + 0.5f;
 
 				if (n <= alpha)
 					beta = (float)n / float(alpha);
 				else
 					beta = ((float)(255 - n)) / ((float)(255 - alpha));
 
-//				omega = beta * ((float)frequencyHistogram[n] / (float) maxFrequency);
+				omega = ((float)frequencyHistogram[n] / (float) maxFrequency);
 
-				omega = beta;
+//				omega = beta;
 
 				int diff =  n - p;
 				
-				top += omega * glm::pow(diff, 2);
+				top += glm::pow(diff, 2);
 
 				bottom += omega;
 			}
 
 //	bottom *= nonZeroFrequencies;
-	bottom *= blockRes * blockRes * blockRes;
+	bottom = blockRes * blockRes * blockRes;
 
 	float similar = glm::sqrt(top / bottom);
 //	similar = glm::sqrt(top);
 
-	if (similar < (float)epsilon)
+	if (similar < (float)0.05f || bottom == 0)
 		return true;
 
 
@@ -191,7 +197,7 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 	return false;
 }
-*/
+
 
 
 void BlockRaycaster::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
@@ -242,7 +248,8 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 {
 	std::fill(frequencyHistogram.begin(), frequencyHistogram.end(), 0);
 
-	for (int i=0; i<volume.numVoxels; i++)
+	// Beware of this, think it requires even stepsize
+	for (int i=0; i<volume.numVoxels; i+=2)
 	{
 		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
 		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
@@ -250,17 +257,18 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 		prevTempVolume[i] = currTempVolume[i];
 		currTempVolume[i] = nextTempVolume[i];
 
-//		int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
-//		frequencyHistogram[bucket]++;
+		int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
+		frequencyHistogram[bucket]++;
 	}
 
-//	maxFrequency = nonZeroFrequencies = 0;
-//	for (int i=0; i<256; i++)
-//	{
-//		int freq = frequencyHistogram[i];
-//		maxFrequency = glm::max(maxFrequency, freq);
-//		nonZeroFrequencies += freq;
-//	}
+	maxFrequency = nonZeroFrequencies = 0;
+	for (int i=1; i<256; i++)
+	{
+		int freq = frequencyHistogram[i];
+		maxFrequency = glm::max(maxFrequency, freq);
+		nonZeroFrequencies += freq;
+	}
+	frequencyHistogram[0] = maxFrequency;
 
 	for (int z=0; z<numZBlocks; z++)
 		for (int y =0; y<numYBlocks; y++)
@@ -364,6 +372,40 @@ void BlockRaycaster::TemporalCoherence(VolumeDataset &volume)
 			}
 			else
 			{
+				if (currentTimestep == ratioTimeSteps)
+				{
+					maxRatio = 0.0f;
+					minRatio = 100.0f;
+					meanRatio = 0.0f;
+					stdDev = 0.0f;
+
+					for (int i=2; i<ratioTimeSteps; i++)
+					{
+						maxRatio = glm::max(maxRatio, ratios[i]);
+						minRatio = glm::min(minRatio, ratios[i]);
+						meanRatio += ratios[i];
+
+//						if (ratios[i] == 0)
+//							int a =0;
+					}
+
+					meanRatio /= ratioTimeSteps;
+
+					for (int i=2; i<ratioTimeSteps; i++)
+					{
+						stdDev += glm::pow((ratios[i] - meanRatio), 2.0f);
+					}
+
+					stdDev /= ratioTimeSteps;
+					stdDev = glm::sqrt(stdDev);
+
+					std::cout << "Max: " << maxRatio << std::endl;
+					std::cout << "Min: " << minRatio << std::endl;
+					std::cout << "Mean: " << meanRatio << std::endl;
+					std::cout << "StdDev: " << stdDev << std::endl;
+					getchar();
+				}
+
 				GPUPredict(volume);
 				CPUPredict(volume);
 
@@ -375,6 +417,7 @@ void BlockRaycaster::TemporalCoherence(VolumeDataset &volume)
 //				glBindTexture(GL_TEXTURE_3D, 0);
 			}
 			std::cout << "Copied: " << numBlocksCopied << " - Extrapolated: " << numBlocksExtrapolated << std::endl;
+			ratios[currentTimestep] = (float)numBlocksExtrapolated / (float) numBlocks;
 		}
 	}	
 }
@@ -580,7 +623,7 @@ void BlockRaycaster::BlockRaycast(VolumeDataset &volume, TransferFunction &trans
 }
 
 
-
+/*
 bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
@@ -628,3 +671,4 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 	return false;
 }
+*/

@@ -4,11 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-//#include <Windows.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include "../gl/include/tinydir.h"
-
+#include <Windows.h>
 #include <algorithm>
 #include <string>
 #include <vector>
