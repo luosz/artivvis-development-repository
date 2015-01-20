@@ -39,6 +39,12 @@
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Raycaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BruteForce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -68,10 +74,16 @@
     <ClInclude Include="VoxelReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BlockRaycaster.h">
+    <ClInclude Include="tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tinyxml2.h">
+    <ClInclude Include="TempCoherence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Raycaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BruteForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -96,7 +108,7 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="BlockRaycaster.cu">
+    <CudaCompile Include="TempCoherence.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

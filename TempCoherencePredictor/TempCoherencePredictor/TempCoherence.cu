@@ -1,17 +1,11 @@
-#include "BlockRaycaster.h"
+#include "TempCoherence.h"
 
 texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> prevTexRef;
 texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> currTexRef;
 texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 
-BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset &volume)
+TempCoherence::TempCoherence(VolumeDataset &volume)
 {
-	maxRaySteps = 1000;
-	rayStepSize = 0.005f;
-	gradientStepSize = 0.005f;
-
-	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
-
 	epsilon = 3;
 	blockRes = 8;
 	alpha = 6;
@@ -25,17 +19,7 @@ BlockRaycaster::BlockRaycaster(int screenWidth, int screenHeight, VolumeDataset 
 	float yVoxelWidth = 2.0f / (float) volume.yRes;
 	float zVoxelWidth = 2.0f / (float) volume.zRes;
 
-	blocks.reserve(numBlocks);
-
-	for (int k=0; k<numZBlocks; k++)
-		for (int j=0; j<numYBlocks; j++)
-			for (int i=0; i<numXBlocks; i++)
-			{
-				blocks.push_back(Block(blockRes, i, j, k, xVoxelWidth, yVoxelWidth, zVoxelWidth));
-			}
-
 	currentTimestep = 0;
-	oldTime = clock();
 
 	textureSize = volume.xRes * volume.yRes * volume.zRes * volume.bytesPerElement;
 	prevTexture3D = GenerateTexture(volume);
@@ -86,7 +70,7 @@ __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSur
 	}
 }
 
-void BlockRaycaster::GPUPredict(VolumeDataset &volume)
+void TempCoherence::GPUPredict(VolumeDataset &volume)
 {
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], prevTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[1], currTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
@@ -127,7 +111,7 @@ void BlockRaycaster::GPUPredict(VolumeDataset &volume)
 }
 
 
-bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
+bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
 
@@ -151,11 +135,6 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 				unsigned char p = nextTempVolume[ID];
 				unsigned char n = nextVolume[ID];
-
-//				if (n <= alpha)
-//					beta = (((float)n / float(alpha)) / 2.0f) + 0.5f;
-//				else
-//					beta = ((((float)(255 - n)) / ((float)(255 - alpha))) / 2.0f) + 0.5f;
 
 				if (n <= alpha)
 					beta = (float)n / float(alpha);
@@ -200,7 +179,7 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 
 
-void BlockRaycaster::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
+void TempCoherence::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
 {
 	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
 	cudaPos offset = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
@@ -219,7 +198,7 @@ void BlockRaycaster::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, 
 	cudaMemcpy3D(&cudaCpyParams);
 }
 
-void BlockRaycaster::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z)
+void TempCoherence::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
 	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
@@ -244,7 +223,7 @@ void BlockRaycaster::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z
 	cudaMemcpy3D(&cudaCpyParams) ;
 }
 
-void BlockRaycaster::CPUPredict(VolumeDataset &volume)
+void TempCoherence::CPUPredict(VolumeDataset &volume)
 {
 	std::fill(frequencyHistogram.begin(), frequencyHistogram.end(), 0);
 
@@ -287,7 +266,7 @@ void BlockRaycaster::CPUPredict(VolumeDataset &volume)
 }
 
 
-void BlockRaycaster::CopyChunkToGPU(VolumeDataset &volume)
+void TempCoherence::CopyChunkToGPU(VolumeDataset &volume)
 {
 	cudaExtent extent = make_cudaExtent(numBlocksCopied * blockRes, blockRes, blockRes);
 
@@ -332,98 +311,82 @@ void BlockRaycaster::CopyChunkToGPU(VolumeDataset &volume)
 }
 
 
-void BlockRaycaster::TemporalCoherence(VolumeDataset &volume)
+GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimestep_)
 {
-	if (volume.timesteps > 1)
+	currentTimestep = currentTimestep_;
+	numBlocksCopied = numBlocksExtrapolated = 0;
+
+	GLuint temp = prevTexture3D;
+	prevTexture3D = currTexture3D;
+	currTexture3D = nextTexture3D;
+	nextTexture3D = temp;
+
+	if (currentTimestep < 2)
 	{
-		clock_t currentTime = clock();
-		float time = (currentTime - oldTime) / (float) CLOCKS_PER_SEC;
+		glBindTexture(GL_TEXTURE_3D, nextTexture3D);
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
+		glBindTexture(GL_TEXTURE_3D, 0);
 
-		if (time > volume.timePerFrame)
+		if (currentTimestep == 1)
 		{
-			numBlocksCopied = numBlocksExtrapolated = 0;
-
-			if (currentTimestep < volume.timesteps - 2)
-				currentTimestep++;
-			else
-				currentTimestep = 0;
-
-			oldTime = currentTime;
-
-			GLuint temp = prevTexture3D;
-			prevTexture3D = currTexture3D;
-			currTexture3D = nextTexture3D;
-			nextTexture3D = temp;
-
-			if (currentTimestep < 2)
+			for (int i=0; i<volume.numVoxels; i++)
 			{
-				glBindTexture(GL_TEXTURE_3D, nextTexture3D);
-				glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
-				glBindTexture(GL_TEXTURE_3D, 0);
-
-				if (currentTimestep == 1)
-				{
-					for (int i=0; i<volume.numVoxels; i++)
-					{
-						prevTempVolume[i] = volume.memblock3D[i];
-						currTempVolume[i] = volume.memblock3D[textureSize + i];
-					}						
-				}
-			}
-			else
-			{
-				if (currentTimestep == ratioTimeSteps)
-				{
-					maxRatio = 0.0f;
-					minRatio = 100.0f;
-					meanRatio = 0.0f;
-					stdDev = 0.0f;
-
-					for (int i=2; i<ratioTimeSteps; i++)
-					{
-						maxRatio = glm::max(maxRatio, ratios[i]);
-						minRatio = glm::min(minRatio, ratios[i]);
-						meanRatio += ratios[i];
-
-//						if (ratios[i] == 0)
-//							int a =0;
-					}
-
-					meanRatio /= ratioTimeSteps;
-
-					for (int i=2; i<ratioTimeSteps; i++)
-					{
-						stdDev += glm::pow((ratios[i] - meanRatio), 2.0f);
-					}
-
-					stdDev /= ratioTimeSteps;
-					stdDev = glm::sqrt(stdDev);
-
-					std::cout << "Max: " << maxRatio << std::endl;
-					std::cout << "Min: " << minRatio << std::endl;
-					std::cout << "Mean: " << meanRatio << std::endl;
-					std::cout << "StdDev: " << stdDev << std::endl;
-					getchar();
-				}
-
-				GPUPredict(volume);
-				CPUPredict(volume);
-
-				CopyChunkToGPU(volume);
-
-
-//				glBindTexture(GL_TEXTURE_3D, nextTexture3D);
-//				glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
-//				glBindTexture(GL_TEXTURE_3D, 0);
-			}
-			std::cout << "Copied: " << numBlocksCopied << " - Extrapolated: " << numBlocksExtrapolated << std::endl;
-			ratios[currentTimestep] = (float)numBlocksExtrapolated / (float) numBlocks;
+				prevTempVolume[i] = volume.memblock3D[i];
+				currTempVolume[i] = volume.memblock3D[textureSize + i];
+			}						
 		}
-	}	
+	}
+	else
+	{
+		if (currentTimestep == ratioTimeSteps)
+		{
+			maxRatio = 0.0f;
+			minRatio = 100.0f;
+			meanRatio = 0.0f;
+			stdDev = 0.0f;
+
+			for (int i=2; i<ratioTimeSteps; i++)
+			{
+				maxRatio = glm::max(maxRatio, ratios[i]);
+				minRatio = glm::min(minRatio, ratios[i]);
+				meanRatio += ratios[i];
+			}
+
+			meanRatio /= ratioTimeSteps;
+
+			for (int i=2; i<ratioTimeSteps; i++)
+			{
+				stdDev += glm::pow((ratios[i] - meanRatio), 2.0f);
+			}
+
+			stdDev /= ratioTimeSteps;
+			stdDev = glm::sqrt(stdDev);
+
+			std::cout << "Max: " << maxRatio << std::endl;
+			std::cout << "Min: " << minRatio << std::endl;
+			std::cout << "Mean: " << meanRatio << std::endl;
+			std::cout << "StdDev: " << stdDev << std::endl;
+			getchar();
+		}
+
+		GPUPredict(volume);
+		CPUPredict(volume);
+
+		CopyChunkToGPU(volume);
+
+
+//		glBindTexture(GL_TEXTURE_3D, nextTexture3D);
+//		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
+//		glBindTexture(GL_TEXTURE_3D, 0);
+	}
+	std::cout << "Copied: " << numBlocksCopied << " - Extrapolated: " << numBlocksExtrapolated << std::endl;
+	ratios[currentTimestep] = (float)numBlocksExtrapolated / (float) numBlocks;
+	
+	return nextTexture3D;
 }
 
 
-GLuint BlockRaycaster::GenerateTexture(VolumeDataset &volume)
+GLuint TempCoherence::GenerateTexture(VolumeDataset &volume)
 {
 	GLuint tex;
 
@@ -444,183 +407,6 @@ GLuint BlockRaycaster::GenerateTexture(VolumeDataset &volume)
 }
 
 
-
-
-void BlockRaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
-{
-	int uniformLoc;
-
-	glm::mat4 model_mat = glm::mat4(1.0f);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
-
-	glActiveTexture (GL_TEXTURE0);
-	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
-	glUniform1i(uniformLoc,0);
-	glBindTexture (GL_TEXTURE_3D, currTexture3D);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
-	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"maxRaySteps");
-	glUniform1i(uniformLoc, maxRaySteps);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"rayStepSize");
-	glUniform1f(uniformLoc, rayStepSize);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"gradientStepSize");
-	glUniform1f(uniformLoc, gradientStepSize);
-
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"lightPosition");
-	glUniform3f(uniformLoc, lightPosition.x, lightPosition.y, lightPosition.z);
-
-	glActiveTexture (GL_TEXTURE1);
-	uniformLoc = glGetUniformLocation(shaderProgramID,"transferFunc");
-	glUniform1i(uniformLoc,1);
-	glBindTexture (GL_TEXTURE_1D, transferFunction.tfTexture);
-
-
-	// Final render is the front faces of a cube rendered
-	glBegin(GL_QUADS);
-
-	// Front Face
-	glVertex3f(-1.0f, -1.0f,  1.0f);
-	glVertex3f( 1.0f, -1.0f,  1.0f);
-	glVertex3f( 1.0f,  1.0f,  1.0f);
-	glVertex3f(-1.0f,  1.0f,  1.0f);
- 
-	// Back Face
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f,  1.0f, -1.0f);
-	glVertex3f( 1.0f,  1.0f, -1.0f);
-	glVertex3f( 1.0f, -1.0f, -1.0f);
- 
-	// Top Face
-	glVertex3f(-1.0f,  1.0f, -1.0f);
-	glVertex3f(-1.0f,  1.0f,  1.0f);
-	glVertex3f( 1.0f,  1.0f,  1.0f);
-	glVertex3f( 1.0f,  1.0f, -1.0f);
-	
-	// Bottom Face
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f( 1.0f, -1.0f, -1.0f);
-	glVertex3f( 1.0f, -1.0f,  1.0f);
-	glVertex3f(-1.0f, -1.0f,  1.0f);
- 
-	// Right face
-	glVertex3f( 1.0f, -1.0f, -1.0f);
-	glVertex3f( 1.0f,  1.0f, -1.0f);
-	glVertex3f( 1.0f,  1.0f,  1.0f);
-	glVertex3f( 1.0f, -1.0f,  1.0f);
- 
-	// Left Face
-	glVertex3f(-1.0f, -1.0f, -1.0f);
-	glVertex3f(-1.0f, -1.0f,  1.0f);
-	glVertex3f(-1.0f,  1.0f,  1.0f);
-	glVertex3f(-1.0f,  1.0f, -1.0f);
-
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_3D, 0);
-}
-
-// Messy but just inputs all data to shader
-void BlockRaycaster::BlockRaycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
-{
-	int uniformLoc;
-
-	glm::mat4 model_mat = glm::mat4(1.0f);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
-
-	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
-	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
-
-	glActiveTexture (GL_TEXTURE0);
-	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
-	glUniform1i(uniformLoc,0);
-	glBindTexture (GL_TEXTURE_3D, currTexture3D);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
-	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"maxRaySteps");
-	glUniform1i(uniformLoc, maxRaySteps);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"rayStepSize");
-	glUniform1f(uniformLoc, rayStepSize);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"gradientStepSize");
-	glUniform1f(uniformLoc, gradientStepSize);
-
-	uniformLoc = glGetUniformLocation(shaderProgramID,"lightPosition");
-	glUniform3f(uniformLoc, lightPosition.x, lightPosition.y, lightPosition.z);
-
-	glActiveTexture (GL_TEXTURE2);
-	uniformLoc = glGetUniformLocation(shaderProgramID,"transferFunc");
-	glUniform1i(uniformLoc,2);
-	glBindTexture (GL_TEXTURE_1D, transferFunction.tfTexture);
-
-//	glEnable(GL_DEPTH_TEST);
-//	glBlendFunc(GL_ONE, GL_ONE);
-//	glEnable(GL_BLEND);
-
-	// Final render is the front faces of a cube rendered
-	
-
-	for (int i=0; i<numBlocks; i++)
-	{
-		glBegin(GL_POLYGON);
-		glVertex3f(blocks[i].vertices[0].x, blocks[i].vertices[0].y, blocks[i].vertices[0].z);
-		glVertex3f(blocks[i].vertices[1].x, blocks[i].vertices[1].y, blocks[i].vertices[1].z);
-		glVertex3f(blocks[i].vertices[3].x, blocks[i].vertices[3].y, blocks[i].vertices[3].z);
-		glVertex3f(blocks[i].vertices[2].x, blocks[i].vertices[2].y, blocks[i].vertices[2].z);
-	
-		glVertex3f(blocks[i].vertices[4].x, blocks[i].vertices[4].y, blocks[i].vertices[4].z);
-		glVertex3f(blocks[i].vertices[5].x, blocks[i].vertices[5].y, blocks[i].vertices[5].z);
-		glVertex3f(blocks[i].vertices[7].x, blocks[i].vertices[7].y, blocks[i].vertices[7].z);
-		glVertex3f(blocks[i].vertices[6].x, blocks[i].vertices[6].y, blocks[i].vertices[6].z);
-	
-	
-		glVertex3f(blocks[i].vertices[0].x, blocks[i].vertices[0].y, blocks[i].vertices[0].z);
-		glVertex3f(blocks[i].vertices[1].x, blocks[i].vertices[1].y, blocks[i].vertices[1].z);
-		glVertex3f(blocks[i].vertices[5].x, blocks[i].vertices[5].y, blocks[i].vertices[5].z);
-		glVertex3f(blocks[i].vertices[4].x, blocks[i].vertices[4].y, blocks[i].vertices[4].z);
-	
-		glVertex3f(blocks[i].vertices[2].x, blocks[i].vertices[2].y, blocks[i].vertices[2].z);
-		glVertex3f(blocks[i].vertices[3].x, blocks[i].vertices[3].y, blocks[i].vertices[3].z);
-		glVertex3f(blocks[i].vertices[7].x, blocks[i].vertices[7].y, blocks[i].vertices[7].z);
-		glVertex3f(blocks[i].vertices[6].x, blocks[i].vertices[6].y, blocks[i].vertices[6].z);
-	
-	
-		glVertex3f(blocks[i].vertices[0].x, blocks[i].vertices[0].y, blocks[i].vertices[0].z);
-		glVertex3f(blocks[i].vertices[2].x, blocks[i].vertices[2].y, blocks[i].vertices[2].z);
-		glVertex3f(blocks[i].vertices[6].x, blocks[i].vertices[6].y, blocks[i].vertices[6].z);
-		glVertex3f(blocks[i].vertices[4].x, blocks[i].vertices[4].y, blocks[i].vertices[4].z);
-
-		glVertex3f(blocks[i].vertices[1].x, blocks[i].vertices[1].y, blocks[i].vertices[1].z);
-		glVertex3f(blocks[i].vertices[3].x, blocks[i].vertices[3].y, blocks[i].vertices[3].z);
-		glVertex3f(blocks[i].vertices[7].x, blocks[i].vertices[7].y, blocks[i].vertices[7].z);
-		glVertex3f(blocks[i].vertices[5].x, blocks[i].vertices[5].y, blocks[i].vertices[5].z);
-		glEnd();
-	}
-
-	
-
-	glBindTexture(GL_TEXTURE_3D, 0);
-}
 
 
 /*

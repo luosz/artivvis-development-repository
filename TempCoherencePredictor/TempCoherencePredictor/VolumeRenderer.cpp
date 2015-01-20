@@ -9,9 +9,14 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	volume.Init();
 
 
-	raycaster = new BlockRaycaster(screenWidth, screenHeight, volume);
+	tempCoherence = new TempCoherence(volume);
+	bruteForce = new BruteForce(volume);
+
+	raycaster = new Raycaster(screenWidth, screenHeight, volume);
 
 	transferFunction.Init(" ", volume);
+
+	oldTime = clock();
 }
 
 
@@ -23,11 +28,27 @@ void VolumeRenderer::Update()
 
 	camera.Update();
 	
+	if (volume.timesteps > 1)
+	{
+		clock_t currentTime = clock();
+		float time = (currentTime - oldTime) / (float) CLOCKS_PER_SEC;
 
-	raycaster->TemporalCoherence(volume);
+		if (time > volume.timePerFrame)
+		{
+			if (currentTimestep < volume.timesteps - 2)
+				currentTimestep++;
+			else
+				currentTimestep = 0;
+
+			oldTime = currentTime;
+
+//			tex3D = tempCoherence->TemporalCoherence(volume, currentTimestep);
+			tex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
+		}
+	}
 
 	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
-	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera);
+	raycaster->Raycast(volume, transferFunction, shaderProgramID, camera, tex3D);
 
 	glutSwapBuffers();
 }

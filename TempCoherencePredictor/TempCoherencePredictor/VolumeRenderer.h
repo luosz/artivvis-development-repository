@@ -4,8 +4,10 @@
 #include "Camera.h"
 #include "VolumeDataset.h"
 #include "ShaderManager.h"
-#include "BlockRaycaster.h"
+#include "TempCoherence.h"
 #include "TransferFunction.h"
+#include "Raycaster.h"
+#include "BruteForce.h"
 
 class VolumeRenderer
 {
@@ -14,8 +16,14 @@ public:
 	GLuint shaderProgramID;
 	ShaderManager shaderManager;
 	VolumeDataset volume;
-	BlockRaycaster *raycaster;
+	TempCoherence *tempCoherence;
 	TransferFunction transferFunction;
+	Raycaster *raycaster;
+	BruteForce *bruteForce;
+
+	int currentTimestep;
+	GLuint tex3D;
+	clock_t oldTime;
 
 	void Init(int screenWidth, int screenHeight);
 	void Update();

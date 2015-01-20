@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BruteForce.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <CudaCompile Include="BlockRaycaster.cu" />
+    <CudaCompile Include="TempCoherence.cu" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -31,10 +33,12 @@
     <ClCompile Include="VoxelReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BruteForce.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CudaHeaders.h" />
     <ClInclude Include="GLM.h" />
-    <ClInclude Include="BlockRaycaster.h" />
+    <ClInclude Include="Raycaster.h" />
+    <ClInclude Include="TempCoherence.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="tinyxml2.h" />
