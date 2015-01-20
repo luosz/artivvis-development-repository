@@ -308,6 +308,8 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\gl\include\tinydir.h" />
+    <ClInclude Include="..\gl\include\tinyxml2.h" />
     <ClInclude Include="..\TransferFunctionEditor\AbstractGraphicsView.h" />
     <ClInclude Include="..\TransferFunctionEditor\ControlEdge.h" />
     <ClInclude Include="..\TransferFunctionEditor\ControlPoint.h" />
@@ -402,7 +404,6 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="TFOptimizer.h" />
-    <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TomsOGLRenderer.h" />
     <ClInclude Include="TransferFunction.h" />
     <ClInclude Include="VisibilityHistogram.h" />

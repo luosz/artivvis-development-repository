@@ -161,6 +161,9 @@ int main(int argc, char *argv[])
 	QtWidget w;
 	w.show();
 		
+	// Pass command-line arguments to VolumeDataset
+	volumeRenderer.volume.ParseArguments(argc, argv);
+
 	// Initialize Renderer and Qt
 	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);	
 	w.Init(volumeRenderer);
