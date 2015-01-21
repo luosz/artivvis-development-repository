@@ -6,7 +6,7 @@ texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 
 TempCoherence::TempCoherence(VolumeDataset &volume)
 {
-	epsilon = 3;
+	epsilon = 10;
 	blockRes = 8;
 	alpha = 6;
 
@@ -110,7 +110,7 @@ void TempCoherence::GPUPredict(VolumeDataset &volume)
 
 }
 
-
+/*
 bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
@@ -124,9 +124,9 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	float top, bottom;
 	top = bottom = 0.0f;
 
-	for (int k=0; k<blockRes; k+=2)
-		for (int j=0; j<blockRes; j+=2)
-			for (int i=0; i<blockRes; i+=2)
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
 			{
 				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
 					continue;
@@ -147,9 +147,9 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 				int diff =  n - p;
 				
-				top += glm::pow(diff, 2);
+				top += omega * glm::pow(diff, 2);
 
-				bottom += omega;
+//				bottom += omega;
 			}
 
 //	bottom *= nonZeroFrequencies;
@@ -158,7 +158,7 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	float similar = glm::sqrt(top / bottom);
 //	similar = glm::sqrt(top);
 
-	if (similar < (float)0.05f || bottom == 0)
+	if (similar < (float)epsilon)
 		return true;
 
 
@@ -176,7 +176,7 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 	return false;
 }
-
+*/
 
 
 void TempCoherence::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
@@ -228,14 +228,17 @@ void TempCoherence::CPUPredict(VolumeDataset &volume)
 	std::fill(frequencyHistogram.begin(), frequencyHistogram.end(), 0);
 
 	// Beware of this, think it requires even stepsize
-	for (int i=0; i<volume.numVoxels; i+=2)
+	for (int i=0; i<volume.numVoxels; i++)
 	{
 		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
 		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
 
 		prevTempVolume[i] = currTempVolume[i];
-		currTempVolume[i] = nextTempVolume[i];
+		currTempVolume[i] = nextTempVolume[i];	
+	}
 
+	for (int i=0; i<volume.numVoxels; i++)
+	{
 		int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
 		frequencyHistogram[bucket]++;
 	}
@@ -338,36 +341,36 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 	}
 	else
 	{
-		if (currentTimestep == ratioTimeSteps)
-		{
-			maxRatio = 0.0f;
-			minRatio = 100.0f;
-			meanRatio = 0.0f;
-			stdDev = 0.0f;
-
-			for (int i=2; i<ratioTimeSteps; i++)
-			{
-				maxRatio = glm::max(maxRatio, ratios[i]);
-				minRatio = glm::min(minRatio, ratios[i]);
-				meanRatio += ratios[i];
-			}
-
-			meanRatio /= ratioTimeSteps;
-
-			for (int i=2; i<ratioTimeSteps; i++)
-			{
-				stdDev += glm::pow((ratios[i] - meanRatio), 2.0f);
-			}
-
-			stdDev /= ratioTimeSteps;
-			stdDev = glm::sqrt(stdDev);
-
-			std::cout << "Max: " << maxRatio << std::endl;
-			std::cout << "Min: " << minRatio << std::endl;
-			std::cout << "Mean: " << meanRatio << std::endl;
-			std::cout << "StdDev: " << stdDev << std::endl;
-			getchar();
-		}
+//		if (currentTimestep == ratioTimeSteps)
+//		{
+//			maxRatio = 0.0f;
+//			minRatio = 100.0f;
+//			meanRatio = 0.0f;
+//			stdDev = 0.0f;
+//
+//			for (int i=2; i<ratioTimeSteps; i++)
+//			{
+//				maxRatio = glm::max(maxRatio, ratios[i]);
+//				minRatio = glm::min(minRatio, ratios[i]);
+//				meanRatio += ratios[i];
+//			}
+//
+//			meanRatio /= ratioTimeSteps;
+//
+//			for (int i=2; i<ratioTimeSteps; i++)
+//			{
+//				stdDev += glm::pow((ratios[i] - meanRatio), 2.0f);
+//			}
+//
+//			stdDev /= ratioTimeSteps;
+//			stdDev = glm::sqrt(stdDev);
+//
+//			std::cout << "Max: " << maxRatio << std::endl;
+//			std::cout << "Min: " << minRatio << std::endl;
+//			std::cout << "Mean: " << meanRatio << std::endl;
+//			std::cout << "StdDev: " << stdDev << std::endl;
+////			getchar();
+//		}
 
 		GPUPredict(volume);
 		CPUPredict(volume);
@@ -378,9 +381,11 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 //		glBindTexture(GL_TEXTURE_3D, nextTexture3D);
 //		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
 //		glBindTexture(GL_TEXTURE_3D, 0);
+
 	}
+
 	std::cout << "Copied: " << numBlocksCopied << " - Extrapolated: " << numBlocksExtrapolated << std::endl;
-	ratios[currentTimestep] = (float)numBlocksExtrapolated / (float) numBlocks;
+//	ratios[currentTimestep] = (float)numBlocksExtrapolated / (float) numBlocks;
 	
 	return nextTexture3D;
 }
@@ -409,8 +414,8 @@ GLuint TempCoherence::GenerateTexture(VolumeDataset &volume)
 
 
 
-/*
-bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
+
+bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
 
@@ -457,4 +462,3 @@ bool BlockRaycaster::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 	return false;
 }
-*/

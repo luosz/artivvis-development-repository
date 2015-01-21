@@ -11,7 +11,7 @@ Raycaster::Raycaster(int screenWidth, int screenHeight, VolumeDataset &volume)
 
 
 
-void Raycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera, GLuint tex3D)
+void Raycaster::Raycast(TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera, GLuint tex3D)
 {
 	int uniformLoc;
 

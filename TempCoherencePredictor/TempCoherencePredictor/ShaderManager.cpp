@@ -23,6 +23,9 @@ void ShaderManager::LoadShaders()
 	shader.Load("BlockVertShader.txt", "BlockFragShader.txt");
 	shaders.push_back(shader);
 
+	shader.Load("GreyScaleVertShader.txt", "GreyScaleFragShader.txt");
+	shaders.push_back(shader);
+
 	CompileShaders();
 }
 
