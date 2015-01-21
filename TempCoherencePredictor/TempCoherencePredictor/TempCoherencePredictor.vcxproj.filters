@@ -45,6 +45,12 @@
     <ClCompile Include="BruteForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SignalToNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -86,6 +92,15 @@
     <ClInclude Include="BruteForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SignalToNoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="SimpleFragShader.txt">
@@ -104,6 +119,12 @@
       <Filter>Shaders</Filter>
     </Text>
     <Text Include="BlockVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="GreyScaleFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="GreyScaleVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>

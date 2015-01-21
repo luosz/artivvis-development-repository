@@ -22,10 +22,12 @@
     <ClCompile Include="BruteForce.cpp" />
     <ClCompile Include="Camera.cpp" />
     <CudaCompile Include="TempCoherence.cu" />
+    <ClCompile Include="ErrorEvaluator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
+    <CudaCompile Include="SignalToNoise.cu" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
@@ -36,8 +38,11 @@
     <ClInclude Include="BruteForce.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CudaHeaders.h" />
+    <ClInclude Include="ErrorEvaluator.h" />
+    <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GLM.h" />
     <ClInclude Include="Raycaster.h" />
+    <ClInclude Include="SignalToNoise.h" />
     <ClInclude Include="TempCoherence.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
@@ -50,6 +55,8 @@
   <ItemGroup>
     <Text Include="BlockFragShader.txt" />
     <Text Include="BlockVertShader.txt" />
+    <Text Include="GreyScaleFragShader.txt" />
+    <Text Include="GreyScaleVertShader.txt" />
     <Text Include="SimpleFragShader.txt" />
     <Text Include="SimpleVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />

@@ -18,7 +18,7 @@ class Raycaster
 	glm::vec3 lightPosition;
 
 	Raycaster(int screenWidth, int screenHeight, VolumeDataset &volume);
-	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera, GLuint tex3D);
+	void Raycast(TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera, GLuint tex3D);
 };
 
 

@@ -1,0 +1,60 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform sampler1D transferFunc;
+uniform vec3 camPos;
+
+uniform int maxRaySteps;
+uniform float rayStepSize;
+uniform float gradientStepSize;
+
+uniform vec3 lightPosition;
+
+
+
+
+void main()
+{
+	vec4 finalColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	vec3 position = facePos;
+	vec3 texCoord;
+	vec4 color;
+	vec3 normal;
+
+	vec3 direction = position - camPos;
+	direction = normalize(direction);
+
+	float absorption = 0.0f;
+	float opacity;
+	
+	for(int i=0; i<maxRaySteps; i++)
+	{
+		color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		texCoord = (position + 1.0f) / 2.0f; 
+
+		float index = texture(volume, texCoord).x;
+		
+		color = vec4(texture(transferFunc, index));
+		opacity = color.w;
+		color = vec4(index, index, index, color.w);
+
+		if ((absorption + opacity) > 1.0f)
+			finalColor += color*(1.0f - absorption);
+		else
+			finalColor += color*opacity;
+
+		absorption += opacity;
+
+		position = position + (direction * rayStepSize);
+
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f)
+			break;
+	}
+
+	FragColor = finalColor;
+}

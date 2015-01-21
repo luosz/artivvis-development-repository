@@ -1,0 +1,39 @@
+#ifndef SIGNAL_TO_NOISE_H
+#define SIGNAL_TO_NOISE_H
+
+#include "ShaderManager.h"
+#include "CudaHeaders.h"
+#include "Raycaster.h"
+#include "VolumeDataset.h"
+#include "Camera.h"
+#include "TransferFunction.h"
+#include "Framebuffer.h"
+#include "thrust\reduce.h"
+#include "thrust\device_ptr.h"
+#include <thrust/device_vector.h>
+#include <math.h>
+#include <iostream>
+#include <string>
+
+class SignalToNoise
+{
+	
+public:
+	int xPixels, yPixels, numPixels;
+	GLuint interpImage, bruteImage;
+	Framebuffer framebuffer;
+
+	float meanSqrError, meanAvgErr, peakSigToNoise, maxDifference;
+	thrust::device_vector<float> cudaMSE, cudaMAE;
+	std::vector<cudaGraphicsResource_t> cudaResources;
+
+	void Init(int screenWidth, int screenHeight);
+	GLuint GenerateImageTexture();
+	void Test(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex);
+	void RenderImages(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex);
+	void CompareImages();
+	void GetErrorMetrics();
+	
+};
+
+#endif
