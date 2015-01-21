@@ -1,5 +1,7 @@
 #include "VolumeRenderer.h"
 
+#include "use_JoesOGLRenderer.h"
+
 void VolumeRenderer::Init(int screenWidth, int screenHeight)
 {
 	glEnable(GL_DEPTH_TEST);
@@ -8,8 +10,11 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	shaderManager.Init();
 	volume.Init();
 
+#ifndef USE_JoesOGLRenderer
 	renderer = new TomsOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
-	//renderer = new JoesOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
+#else
+	renderer = new JoesOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
+#endif
 
 	grabRegion = false;
 }

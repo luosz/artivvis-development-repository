@@ -41,33 +41,32 @@ public:
 	void UpdateTexture();
 
 	//////////////////////////////////////////////////////////////////////////
-	// parse command-line arguments to get volume filename
 	std::string folderPath;
 	std::string headerFile;
 
+	/// Read mhd filename from command-line argument in argv[1] and extract folder path from mhd filename
 	void ParseArguments(int argc, char *argv[])
 	{
-		// read filename from arguments if available
+		// Read filename from command-line argument argv[1] if available
 		if (argc >= 2)
 		{
-			char volume_filename[MAX_PATH];
-			strcpy(volume_filename, argv[1]);
-			char *p = strrchr(volume_filename, '\\');
-			// try both Windows and Linux directory separators ('\\' and '/')
+			char filename[MAX_PATH];
+			strcpy(filename, argv[1]);
+			// Try both Windows and Linux directory separators ('\\' and '/')
+			char *p = strrchr(filename, '\\');
 			if (!p)
 			{
-				p = strrchr(volume_filename, '/');
+				p = strrchr(filename, '/');
 			}
 			if (p)
 			{
-				headerFile = std::string(volume_filename);
-				std::cout << strlen(p) << std::endl;
+				headerFile = std::string(filename);
 				if (strlen(p) >= 2)
 				{
-					// extract folder path from volume filename
+					// Extract folder path from volume filename
 					p[1] = '\0';
 				}
-				folderPath = std::string(volume_filename);
+				folderPath = std::string(filename);
 				std::cout << "headerFile=" << headerFile << std::endl << "folderPath=" << folderPath << std::endl;
 			}
 		}

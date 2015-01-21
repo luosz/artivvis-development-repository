@@ -216,7 +216,7 @@ public:
         horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
         checkBox = new QCheckBox(dockWidgetContents);
         checkBox->setObjectName(QStringLiteral("checkBox"));
-        checkBox->setChecked(true);
+        checkBox->setChecked(false);
 
         horizontalLayout_4->addWidget(checkBox);
 
