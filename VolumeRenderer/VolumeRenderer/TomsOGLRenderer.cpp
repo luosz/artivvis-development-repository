@@ -10,6 +10,5 @@ void TomsOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 {
 //	visibilityHistogram.CalculateHistogram(volume, transferFunction.tfTexture, shaderManager, camera);
 //	optimizer->Optimize();
-
 	OpenGLRenderer::Draw(volume, shaderManager, camera);
 }

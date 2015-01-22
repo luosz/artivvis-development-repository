@@ -1,7 +1,5 @@
 #include "VolumeRenderer.h"
 
-#include "use_JoesOGLRenderer.h"
-
 void VolumeRenderer::Init(int screenWidth, int screenHeight)
 {
 	glEnable(GL_DEPTH_TEST);
@@ -11,8 +9,10 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	volume.Init();
 
 #ifndef USE_JoesOGLRenderer
+	std::cout << "Tom's OpenGL renderer is used." << std::endl;
 	renderer = new TomsOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
 #else
+	std::cout << "Joe's OpenGL renderer is used." << std::endl;
 	renderer = new JoesOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
 #endif
 
