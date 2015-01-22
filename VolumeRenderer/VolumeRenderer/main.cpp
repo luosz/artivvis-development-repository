@@ -169,11 +169,11 @@ int main(int argc, char *argv[])
 	w.Init(volumeRenderer);
 
 	// Initialize Transfer Function Editor
-	TransferFunctionEditor tf;
-	tf.init(volumeRenderer);
-	tf.show();
-	volumeRenderer.renderer->transferFunction.tfView = &tf.tf;
-	volumeRenderer.renderer->transferFunction.visibilityView = &tf.visibility_histogram;
+	TransferFunctionEditor tfEditor;
+	tfEditor.init(volumeRenderer);
+	tfEditor.show();
+	volumeRenderer.renderer->transferFunction.tfView = &tfEditor.tfView;
+	volumeRenderer.renderer->transferFunction.visibilityView = &tfEditor.visibility_histogram;
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);

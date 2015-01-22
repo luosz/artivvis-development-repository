@@ -207,7 +207,7 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 		numBytesInBufferFilled += size;
 	}
 	else
-		std::cout << "Unable to open file";
+		std::cout << "Unable to open file" << std::endl;
 
 
 }
@@ -230,7 +230,7 @@ void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
 		myFile.close();
 	}
 	else
-		std::cout << "Unable to open file";
+		std::cout << "Unable to open file" << std::endl;
 
 
 }
