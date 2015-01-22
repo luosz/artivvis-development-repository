@@ -169,13 +169,25 @@ float IntensityTFOptimizerV2::GetAreaVisibility(int index)
 	return sum;
 }
 
-
 void IntensityTFOptimizerV2::Optimize()
 {
+	memcpy(&transferFunction->colors[0], &transferFunction->origColors[0], transferFunction->numIntensities * sizeof(glm::vec4));
 	numIntensities = transferFunction->numIntensities;
 	colors = &transferFunction->colors[0];
 	intensities = &transferFunction->intensities[0];
 	targetIntensity = transferFunction->targetIntensity;
+
+	OptimizeForIntensity();
+
+	transferFunction->LoadLookup(transferFunction->currentColorTable);
+}
+
+void IntensityTFOptimizerV2::OptimizeForIntensity()
+{
+	//numIntensities = transferFunction->numIntensities;
+	//colors = &transferFunction->colors[0];
+	//intensities = &transferFunction->intensities[0];
+	//targetIntensity = transferFunction->targetIntensity;
 
 	float sum = 0.0f;
 

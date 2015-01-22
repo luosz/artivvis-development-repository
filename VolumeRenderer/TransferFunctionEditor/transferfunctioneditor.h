@@ -129,16 +129,18 @@ public:
 		return tfView.transfer_function;
 	}
 
-	IntensityTFOptimizerV2 *intensityTFOptimizerV2()
+	IntensityTFOptimizerV2 *optimizer()
 	{
-		return tfView.intensityTFOptimizerV2();
+		//return tfView.optimizer();
+		return tfView.intensityTFOptimizerV2;
 	}
 
 	void init(VolumeRenderer &volumeRenderer)
 	{
 		std::cout << "TransferFunctionEditor::init" << std::endl;
 		tfView.transfer_function = &volumeRenderer.renderer->transferFunction;
-		tfView.renderer = volumeRenderer.renderer;
+		//tfView.renderer = volumeRenderer.renderer;
+		tfView.volumeRenderer = &volumeRenderer;
 		//if (transferFunction())
 		//{
 		//	std::cout << "tfView.transfer_function is not NULL" << std::endl;
@@ -147,12 +149,14 @@ public:
 		//{
 		//	std::cout << "tfView.transfer_function is NULL" << std::endl;
 		//}
+		
+		tfView.intensityTFOptimizerV2 = new IntensityTFOptimizerV2(&volumeRenderer.volume, &volumeRenderer.renderer->transferFunction, &volumeRenderer.renderer->visibilityHistogram);
 
 		if (transferFunction())
 		{
 			//auto &frequencies = tfView.transfer_function->intensityOptimizerV2->frequencies;
-			auto &frequencies = intensityTFOptimizerV2()->frequencies;
-			//std::cout << "frequencies size " << frequencies.size() << std::endl;
+			auto &frequencies = optimizer()->frequencies;
+			std::cout << "frequencies size " << frequencies.size() << std::endl;
 			auto size = frequencies.size();
 			float max = 0;
 			for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
@@ -170,8 +174,9 @@ public:
 			intensity_histogram.draw();
 			//auto &visibilities = tfView.transfer_function->intensityOptimizerV2->visibilityHistogram->visibilities;
 			//auto &numVis = tfView.transfer_function->intensityOptimizerV2->visibilityHistogram->numVis;
-			auto &visibilities = intensityTFOptimizerV2()->visibilityHistogram->visibilities;
-			auto &numVis = intensityTFOptimizerV2()->visibilityHistogram->numVis;
+			auto &visibilities = optimizer()->visibilityHistogram->visibilities;
+			auto &numVis = optimizer()->visibilityHistogram->numVis;
+			std::cout << "visibilities size " << visibilities.size() << std::endl;
 			visibility_histogram.intensities.clear();
 			visibility_histogram.frequencies.clear();
 			for (int i = 0; i < visibilities.size();i++)

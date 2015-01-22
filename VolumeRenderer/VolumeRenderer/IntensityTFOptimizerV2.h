@@ -24,6 +24,7 @@ public:
 	float targetIntensity;
 	int numIntensities;
 	
+	void OptimizeForIntensity();
 
 	float GetEntropyOpacityByID(float intensity, int index);
 	float GetVisibilityOpacityByID(float intensity, int index);
@@ -31,7 +32,6 @@ public:
 	float GetAreaVisibility(int index);
 	void BalanceEdges();
 	
-
 	void BalanceVisibilityOnce();
 	void BalanceVisibility();
 

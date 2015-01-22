@@ -1,9 +1,10 @@
 #include "JoesOGLRenderer.h"
+#include "../TransferFunctionEditor/import_transfer_function_editor.h"
 
 JoesOGLRenderer::JoesOGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera) : OpenGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera)
 {
 	//visibilityTFOptimizer = std::make_shared<VisibilityTFOptimizer>(&volume, &visibilityHistogram, &transferFunction);
-	intensityOptimizerV2 = std::make_shared<IntensityTFOptimizerV2>(&volume, &transferFunction, &visibilityHistogram);
+	//intensityOptimizerV2 = std::make_shared<IntensityTFOptimizerV2>(&volume, &transferFunction, &visibilityHistogram);
 }
 
 
@@ -24,7 +25,11 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 		if (transferFunction.tfView->isLuoOptimizerEnable())
 		{
 			transferFunction.tfView->updateTransferFunctionFromView();
-			intensityOptimizerV2->BalanceVisibilityOnce();
+			auto p = dynamic_cast<TransferFunctionView *>(transferFunction.tfView);
+			if (p)
+			{
+				p->intensityTFOptimizerV2->BalanceVisibilityOnce();
+			}
 			transferFunction.LoadLookup(transferFunction.currentColorTable);
 			transferFunction.tfView->updateViewFromTransferFunction();
 		}

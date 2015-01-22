@@ -103,12 +103,14 @@ void TransferFunctionEditor::on_entropyButton_clicked()
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 	if (transferFunction())
 	{
+		std::cout<<"on_entropyButton_clicked\n";
+
 		tfView.updateTransferFunctionFromView();
 
 		//tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
 		//tfView.transfer_function->intensityOptimizerV2->BalanceEdges();
-		intensityTFOptimizerV2()->numIterations = ui->spinBox->value();
-		intensityTFOptimizerV2()->BalanceEdges();
+		optimizer()->numIterations = ui->spinBox->value();
+		optimizer()->BalanceEdges();
 		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
 
 		tfView.updateViewFromTransferFunction();
@@ -121,12 +123,14 @@ void TransferFunctionEditor::on_visibilityButton_clicked()
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 	if (transferFunction())
 	{
+		std::cout<<"on_visibilityButton_clicked\n";
+
 		tfView.updateTransferFunctionFromView();
 
 //		tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
 //		tfView.transfer_function->intensityOptimizerV2->BalanceVisibility();
-		intensityTFOptimizerV2()->numIterations = ui->spinBox->value();
-		intensityTFOptimizerV2()->BalanceVisibility();
+		optimizer()->numIterations = ui->spinBox->value();
+		optimizer()->BalanceVisibility();
 		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
 
 		tfView.updateViewFromTransferFunction();

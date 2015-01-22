@@ -33,7 +33,9 @@ public:
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 		transfer_function = NULL;
-		renderer = NULL;
+		//renderer = NULL;
+		volumeRenderer = NULL;
+		intensityTFOptimizerV2 = NULL;
 #endif // NOT_USED_BY_VOLUME_RENDERER
 
 		is_ma_optimizer_enable = false;
@@ -211,8 +213,8 @@ public:
 			updateTransferFunctionFromView();
 			transfer_function->targetIntensity = intensities[index];
 			//transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
-			intensityTFOptimizerV2()->transferFunction = transfer_function;
-			intensityTFOptimizerV2()->Optimize();
+			//intensityTFOptimizerV2()->transferFunction = transfer_function;
+			optimizer()->Optimize();
 			transfer_function->LoadLookup(transfer_function->currentColorTable);
 			updateViewFromTransferFunction();
 		}
@@ -348,19 +350,31 @@ public:
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 public:
 	TransferFunction *transfer_function;
-	Renderer *renderer;
+	//Renderer *renderer;
+	VolumeRenderer *volumeRenderer;
+	IntensityTFOptimizerV2 *intensityTFOptimizerV2;
 
-	IntensityTFOptimizerV2 *intensityTFOptimizerV2()
+	IntensityTFOptimizerV2 *optimizer()
 	{
-		if (renderer)
-		{
-			auto p = dynamic_cast<JoesOGLRenderer*>(renderer);
-			if (p)
-			{
-				return p->intensityOptimizerV2.get();
-			}
-		}
-		return NULL;
+		//if (renderer)
+		//{
+		//	auto p = dynamic_cast<JoesOGLRenderer*>(renderer);
+		//	if (p)
+		//	{
+		//		return p->intensityOptimizerV2.get();
+		//	}
+		//	else
+		//	{
+		//		auto p2 = dynamic_cast<OpenGLRenderer*>(renderer);
+		//		if (p2)
+		//		{
+		//			return p2->optimizer;
+		//		}
+		//	}
+		//}
+		//return NULL;
+
+		return intensityTFOptimizerV2;
 	}
 
 #endif // NOT_USED_BY_VOLUME_RENDERER

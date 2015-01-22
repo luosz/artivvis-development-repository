@@ -11,10 +11,8 @@
 #include "TomsOGLRenderer.h"
 #include "JoesOGLRenderer.h"
 
-//////////////////////////////////////////////////////////////////////////
 // Include use_JoesOGLRenderer.h to enable Joe's OpenGL Renderer, otherwise Tom's OpenGL renderer is used.
 #include "use_JoesOGLRenderer.h"
-//////////////////////////////////////////////////////////////////////////
 
 class VolumeRenderer
 {

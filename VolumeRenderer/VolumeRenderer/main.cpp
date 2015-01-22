@@ -1,6 +1,8 @@
 #include"VolumeRenderer.h"
 #include "QtWidget.h"
 #include <QtWidgets/QApplication>
+
+// Import transfer function editor
 #include "../TransferFunctionEditor/import_transfer_function_editor.h"
 
 #define SCREEN_WIDTH 800
