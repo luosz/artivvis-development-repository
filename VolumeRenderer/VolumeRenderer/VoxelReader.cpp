@@ -3,6 +3,7 @@
 // At the moment file is specified within function but in future will use parameter. 
 void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, VolumeProperties &properties)
 {
+	// If folderPath or headerFile is empty, use predefined mhd header filename and folder path
 	if (folderPath.length() <= 0 || headerFile.length() <= 0)
 	{
 		//	folderPath = "../../Samples/TVvort/";
@@ -206,7 +207,7 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 		numBytesInBufferFilled += size;
 	}
 	else
-		std::cout << "Unable to open file";
+		std::cout << "Unable to open file" << std::endl;
 
 
 }
@@ -229,7 +230,7 @@ void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
 		myFile.close();
 	}
 	else
-		std::cout << "Unable to open file";
+		std::cout << "Unable to open file" << std::endl;
 
 
 }

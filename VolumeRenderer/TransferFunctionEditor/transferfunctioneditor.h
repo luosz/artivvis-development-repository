@@ -124,48 +124,62 @@ public:
 	}
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
+	TransferFunction *transferFunction()
+	{
+		return tfView.transfer_function;
+	}
+
+	IntensityTFOptimizerV2 *intensityTFOptimizerV2()
+	{
+		return tfView.intensityTFOptimizerV2();
+	}
+
 	void init(VolumeRenderer &volumeRenderer)
 	{
 		std::cout << "TransferFunctionEditor::init" << std::endl;
-		tf.transfer_function = &volumeRenderer.renderer->transferFunction;
-		if (tf.transfer_function)
-		{
-			std::cout << "tf.transfer_function is not NULL" << std::endl;
-		} 
-		else
-		{
-			std::cout << "tf.transfer_function is NULL" << std::endl;
-		}
+		tfView.transfer_function = &volumeRenderer.renderer->transferFunction;
+		tfView.renderer = volumeRenderer.renderer;
+		//if (transferFunction())
+		//{
+		//	std::cout << "tfView.transfer_function is not NULL" << std::endl;
+		//} 
+		//else
+		//{
+		//	std::cout << "tfView.transfer_function is NULL" << std::endl;
+		//}
 
-		if (tf.transfer_function)
+		if (transferFunction())
 		{
-//			auto &frequencies = tf.transfer_function->intensityOptimizerV2->frequencies;
-//			//std::cout << "frequencies size " << frequencies.size() << std::endl;
-//			auto size = frequencies.size();
-//			float max = 0;
-//			for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
-//			{
-//				max = std::max((float)*i, max);
-//			}
-//			intensity_histogram.intensities.clear();
-//			intensity_histogram.frequencies.clear();
-//			for (int i = 0; i < size; i++)
-//			{
-//				intensity_histogram.intensities.push_back(i / (float)size);
-//				intensity_histogram.frequencies.push_back(frequencies[i]/max);
-//				//std::cout<<"frequencies "<<i<<" "<<frequencies[i]<<std::endl;
-//			}
-//			//intensity_histogram.draw();
-//			auto &visibilities = tf.transfer_function->intensityOptimizerV2->visibilityHistogram->visibilities;
-//			auto &numVis = tf.transfer_function->intensityOptimizerV2->visibilityHistogram->numVis;
-//			visibility_histogram.intensities.clear();
-//			visibility_histogram.frequencies.clear();
-//			for (int i = 0; i < visibilities.size();i++)
-//			{
-//				visibility_histogram.intensities.push_back(i / (float)size);
-//				visibility_histogram.frequencies.push_back(visibilities[i]);
-//			}
-			//visibility_histogram.draw();
+			//auto &frequencies = tfView.transfer_function->intensityOptimizerV2->frequencies;
+			auto &frequencies = intensityTFOptimizerV2()->frequencies;
+			//std::cout << "frequencies size " << frequencies.size() << std::endl;
+			auto size = frequencies.size();
+			float max = 0;
+			for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
+			{
+				max = std::max((float)*i, max);
+			}
+			intensity_histogram.intensities.clear();
+			intensity_histogram.frequencies.clear();
+			for (int i = 0; i < size; i++)
+			{
+				intensity_histogram.intensities.push_back(i / (float)size);
+				intensity_histogram.frequencies.push_back(frequencies[i]/max);
+				//std::cout<<"frequencies "<<i<<" "<<frequencies[i]<<std::endl;
+			}
+			intensity_histogram.draw();
+			//auto &visibilities = tfView.transfer_function->intensityOptimizerV2->visibilityHistogram->visibilities;
+			//auto &numVis = tfView.transfer_function->intensityOptimizerV2->visibilityHistogram->numVis;
+			auto &visibilities = intensityTFOptimizerV2()->visibilityHistogram->visibilities;
+			auto &numVis = intensityTFOptimizerV2()->visibilityHistogram->numVis;
+			visibility_histogram.intensities.clear();
+			visibility_histogram.frequencies.clear();
+			for (int i = 0; i < visibilities.size();i++)
+			{
+				visibility_histogram.intensities.push_back(i / (float)size);
+				visibility_histogram.frequencies.push_back(visibilities[i]);
+			}
+			visibility_histogram.draw();
 		}
 	}
 #endif // NOT_USED_BY_VOLUME_RENDERER
@@ -198,7 +212,7 @@ private:
     Ui::TransferFunctionEditor *ui;
 
 public:
-    TransferFunctionView tf;
+    TransferFunctionView tfView;
     int numIntensities;
     std::vector<glm::vec4> colors;
     std::vector<float> intensities;

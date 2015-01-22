@@ -10,7 +10,7 @@ visibility_histogram("Visibility Histogram")
 	ui->setupUi(this);
 
 	// add transfer function widget
-	ui->verticalLayout->addWidget(&tf);
+	ui->verticalLayout->addWidget(&tfView);
 
 	// add histogram widget
 	ui->verticalLayout_2->addWidget(&intensity_histogram);
@@ -24,7 +24,7 @@ visibility_histogram("Visibility Histogram")
 	QByteArray array = filename.toLocal8Bit();
 	char* buffer = array.data();
 	openTransferFunctionFromVoreenXML(buffer);
-	tf.setTransferFunction(numIntensities, colors, intensities);
+	tfView.setTransferFunction(numIntensities, colors, intensities);
 
 	// set up histogram
 	int n = 16;
@@ -55,13 +55,13 @@ void TransferFunctionEditor::on_action_Open_Transfer_Function_triggered()
 		intensities.clear();
 		colors.clear();
 		openTransferFunctionFromVoreenXML(buffer);
-		tf.setTransferFunction(numIntensities, colors, intensities);
+		tfView.setTransferFunction(numIntensities, colors, intensities);
 	}
 }
 
 void TransferFunctionEditor::on_action_Save_Transfer_Function_triggered()
 {
-	tf.getTransferFunction(numIntensities, colors, intensities);
+	tfView.getTransferFunction(numIntensities, colors, intensities);
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save File"), "../../transferfuncs/save_as.tfi", tr("Voreen Transfer Function (*.tfi) ;; All (*.*)"));
 	std::cout << "size" << filename.size() << std::endl;
 	if (filename.size() > 0)
@@ -75,17 +75,17 @@ void TransferFunctionEditor::on_action_Save_Transfer_Function_triggered()
 
 void TransferFunctionEditor::on_distributeHorizontallyButton_clicked()
 {
-	tf.distrubuteHorizontally();
+	tfView.distrubuteHorizontally();
 }
 
 void TransferFunctionEditor::on_distributeVerticallyButton_clicked()
 {
-	tf.distributeVertically();
+	tfView.distributeVertically();
 }
 
 void TransferFunctionEditor::on_diagonalButton_clicked()
 {
-	tf.makeDiagonal();
+	tfView.makeDiagonal();
 }
 
 void TransferFunctionEditor::on_peaksButton_clicked()
@@ -95,21 +95,23 @@ void TransferFunctionEditor::on_peaksButton_clicked()
 
 void TransferFunctionEditor::on_rampButton_clicked()
 {
-	tf.makeRamp(ui->doubleSpinBox->value());
+	tfView.makeRamp(ui->doubleSpinBox->value());
 }
 
 void TransferFunctionEditor::on_entropyButton_clicked()
 {
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	if (tf.transfer_function)
+	if (transferFunction())
 	{
-		tf.updateTransferFunctionFromView();
+		tfView.updateTransferFunctionFromView();
 
-//		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-//		tf.transfer_function->intensityOptimizerV2->BalanceEdges();
-//		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
+		//tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+		//tfView.transfer_function->intensityOptimizerV2->BalanceEdges();
+		intensityTFOptimizerV2()->numIterations = ui->spinBox->value();
+		intensityTFOptimizerV2()->BalanceEdges();
+		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
 
-		tf.updateViewFromTransferFunction();
+		tfView.updateViewFromTransferFunction();
 	}
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }
@@ -117,15 +119,17 @@ void TransferFunctionEditor::on_entropyButton_clicked()
 void TransferFunctionEditor::on_visibilityButton_clicked()
 {
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	if (tf.transfer_function)
+	if (transferFunction())
 	{
-		tf.updateTransferFunctionFromView();
+		tfView.updateTransferFunctionFromView();
 
-//		tf.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-//		tf.transfer_function->intensityOptimizerV2->BalanceVisibility();
-//		tf.transfer_function->LoadLookup(tf.transfer_function->currentColorTable);
+//		tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+//		tfView.transfer_function->intensityOptimizerV2->BalanceVisibility();
+		intensityTFOptimizerV2()->numIterations = ui->spinBox->value();
+		intensityTFOptimizerV2()->BalanceVisibility();
+		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
 
-		tf.updateViewFromTransferFunction();
+		tfView.updateViewFromTransferFunction();
 	}
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }
@@ -133,20 +137,20 @@ void TransferFunctionEditor::on_visibilityButton_clicked()
 void TransferFunctionEditor::on_checkBox_clicked()
 {
 	ui->checkBox_2->setChecked(false);
-	tf.is_ma_optimizer_enable = ui->checkBox->isChecked();
-	tf.is_luo_optimizer_enable = false;
-	std::cout << "Ma's optimizer " << (tf.isMaOptimizerEnable() ? "enabled" : "disabled") << std::endl;
+	tfView.is_ma_optimizer_enable = ui->checkBox->isChecked();
+	tfView.is_luo_optimizer_enable = false;
+	std::cout << "Ma's optimizer " << (tfView.isMaOptimizerEnable() ? "enabled" : "disabled") << std::endl;
 }
 
 void TransferFunctionEditor::on_checkBox_2_clicked()
 {
 	ui->checkBox->setChecked(false);
-	tf.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
-	tf.is_ma_optimizer_enable = false;
-	std::cout << "Luo's optimizer " << (tf.isLuoOptimizerEnable() ? "enabled" : "disabled") << std::endl;
+	tfView.is_luo_optimizer_enable = ui->checkBox_2->isChecked();
+	tfView.is_ma_optimizer_enable = false;
+	std::cout << "Luo's optimizer " << (tfView.isLuoOptimizerEnable() ? "enabled" : "disabled") << std::endl;
 }
 
 void TransferFunctionEditor::on_flatButton_clicked()
 {
-	tf.makeFlat(ui->doubleSpinBox->value());
+	tfView.makeFlat(ui->doubleSpinBox->value());
 }
