@@ -1,10 +1,9 @@
-#ifndef SIGNAL_TO_NOISE_H
-#define SIGNAL_TO_NOISE_H
+#ifndef ERROR_METRICS_H
+#define ERROR_METRICS_H
 
 #include "ShaderManager.h"
 #include "CudaHeaders.h"
 #include "Raycaster.h"
-#include "VolumeDataset.h"
 #include "Camera.h"
 #include "TransferFunction.h"
 #include "Framebuffer.h"
@@ -12,12 +11,9 @@
 #include "thrust\device_ptr.h"
 #include <thrust/device_vector.h>
 #include <math.h>
-#include <iostream>
-#include <string>
 
-class SignalToNoise
+class ErrorMetrics
 {
-	
 public:
 	int xPixels, yPixels, numPixels;
 	GLuint interpImage, bruteImage;
@@ -28,12 +24,11 @@ public:
 	std::vector<cudaGraphicsResource_t> cudaResources;
 
 	void Init(int screenWidth, int screenHeight);
-	GLuint GenerateImageTexture();
-	void Test(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex);
+	GLuint Generate2DTexture();
+	void FindError(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex);
 	void RenderImages(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex);
 	void CompareImages();
 	void GetErrorMetrics();
-	
 };
 
 #endif

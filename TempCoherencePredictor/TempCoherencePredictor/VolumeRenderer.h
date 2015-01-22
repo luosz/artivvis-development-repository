@@ -8,9 +8,8 @@
 #include "TransferFunction.h"
 #include "Raycaster.h"
 #include "BruteForce.h"
-#include "SignalToNoise.h"
-#include "ErrorEvaluator.h"
-#include <iomanip>
+#include "TestSuite.h"
+#include "WriteToFile.h"
 
 class VolumeRenderer
 {
@@ -23,9 +22,11 @@ public:
 	TransferFunction transferFunction;
 	Raycaster *raycaster;
 	BruteForce *bruteForce;
-	SignalToNoise tester;
-	ErrorEvaluator errorEvaluator;
-	std::string targetFileName;
+	TestSuite tester;
+	WriteToFile fileWriter;
+
+	bool writeToFile;
+	
 
 	int currentTimestep;
 	GLuint bruteTex3D, interpTex3D;
@@ -33,9 +34,6 @@ public:
 
 	void Init(int screenWidth, int screenHeight);
 	void Update();
-
-	void WriteToFile();
-
 };
 
 

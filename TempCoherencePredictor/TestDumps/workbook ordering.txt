@@ -1,0 +1,3 @@
+Case 1: Epsilon = 1, Camera = front, Histogram = frequency
+Case 2: Epsilon = 2, Camera = front, Histogram = frequency
+Case 3: Epsilon = 3, Camera = front, Histogram = frequency

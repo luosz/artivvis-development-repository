@@ -1,14 +1,14 @@
-#include "SignalToNoise.h"
+#include "ErrorMetrics.h"
 
-void SignalToNoise::Init(int screenWidth, int screenHeight)
+void ErrorMetrics::Init(int screenWidth, int screenHeight)
 {
 	xPixels = screenWidth;
 	yPixels = screenHeight;
 	numPixels = xPixels * yPixels;
 
 	// Generate two textures for alternating read and write on framebuffer
-	bruteImage = GenerateImageTexture();
-	interpImage = GenerateImageTexture();
+	bruteImage = Generate2DTexture();
+	interpImage = Generate2DTexture();
 
 	framebuffer.Generate(screenWidth, screenHeight, bruteImage);
 
@@ -19,7 +19,7 @@ void SignalToNoise::Init(int screenWidth, int screenHeight)
 	cudaMAE.resize(numPixels);
 }
 
-GLuint SignalToNoise::GenerateImageTexture()
+GLuint ErrorMetrics::Generate2DTexture()
 {
 	GLuint tex;
 	glGenTextures(1, &tex);
@@ -34,38 +34,14 @@ GLuint SignalToNoise::GenerateImageTexture()
 	return tex;
 }
 
-void SignalToNoise::Test(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex3D, GLuint interpTex3D)
+
+void ErrorMetrics::FindError(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex3D, GLuint interpTex3D)
 {
 	RenderImages(transferFunction, shaderManager, camera, raycaster, bruteTex3D, interpTex3D);
 	CompareImages();
 	GetErrorMetrics();
 }
 
-struct Max_Functor 
-{ 
-	__host__ __device__ float operator()(const float& x, const float& y) const 
-	{ 
-		return glm::max(glm::abs(x), glm::abs(y)); 
-	} 
-};
-
-void SignalToNoise::GetErrorMetrics()
-{
-	meanSqrError = thrust::reduce(cudaMSE.begin(), cudaMSE.end(), 0.0f, thrust::plus<float>());
-	meanSqrError /= numPixels;
-
-	meanAvgErr = thrust::reduce(cudaMAE.begin(), cudaMAE.end(), 0.0f, thrust::plus<float>());
-	meanAvgErr /= numPixels;
-
-	peakSigToNoise = 10.0f * log10f((255.0f * 255.0f) / meanSqrError);
-
-	maxDifference = thrust::reduce(cudaMAE.begin(), cudaMAE.end(), 0.0f, Max_Functor());
-
-//	std::cout << "Mean Square Error: " << meanSqrError << std::endl;
-//	std::cout << "Mean Average Error: " << meanAvgErr << std::endl;
-//	std::cout << "Peak Signal To Noise: " << peakSigToNoise << std::endl;
-//	std::cout << "Max Difference: " << maxDifference << std::endl;
-}
 
 texture <uchar1, cudaTextureType2D, cudaReadModeElementType> bruteTexRef;
 texture <uchar1, cudaTextureType2D, cudaReadModeElementType> interpTexRef;
@@ -94,7 +70,7 @@ __global__ void CudaCompare(int numPixels, int xPixels, int yPixels, thrust::dev
 }
 
 
-void SignalToNoise::CompareImages()
+void ErrorMetrics::CompareImages()
 {
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], bruteImage, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[1], interpImage, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
@@ -122,7 +98,7 @@ void SignalToNoise::CompareImages()
 }
 
 
-void SignalToNoise::RenderImages(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex3D, GLuint interpTex3D)
+void ErrorMetrics::RenderImages(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex3D, GLuint interpTex3D)
 {
 	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
 
@@ -139,4 +115,31 @@ void SignalToNoise::RenderImages(TransferFunction &transferFunction, ShaderManag
 	raycaster.Raycast(transferFunction, shaderProgramID, camera, interpTex3D);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+struct Max_Functor 
+{ 
+	__host__ __device__ float operator()(const float& x, const float& y) const 
+	{ 
+		return glm::max(glm::abs(x), glm::abs(y)); 
+	} 
+};
+
+void ErrorMetrics::GetErrorMetrics()
+{
+	meanSqrError = thrust::reduce(cudaMSE.begin(), cudaMSE.end(), 0.0f, thrust::plus<float>());
+	meanSqrError /= numPixels;
+
+	meanAvgErr = thrust::reduce(cudaMAE.begin(), cudaMAE.end(), 0.0f, thrust::plus<float>());
+	meanAvgErr /= numPixels;
+
+	peakSigToNoise = 10.0f * log10f((255.0f * 255.0f) / meanSqrError);
+
+	maxDifference = thrust::reduce(cudaMAE.begin(), cudaMAE.end(), 0.0f, Max_Functor());
+
+//	std::cout << "Mean Square Error: " << meanSqrError << std::endl;
+//	std::cout << "Mean Average Error: " << meanAvgErr << std::endl;
+//	std::cout << "Peak Signal To Noise: " << peakSigToNoise << std::endl;
+//	std::cout << "Max Difference: " << maxDifference << std::endl;
 }

@@ -16,18 +16,12 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 
 	transferFunction.Init(" ", volume);
 
-	tester.Init(screenWidth, screenHeight);
-	errorEvaluator.Init(screenWidth, screenHeight);
+	tester.Init(screenWidth, screenHeight, volume);
 
-	targetFileName = "Error Metrics - SimilarFunc = maxDiff, Epsilon = 10, Camera = front.txt";
-	std::remove(targetFileName.c_str());
 
-	ofstream outStream(targetFileName);
-	if (outStream.is_open())
-	{
-		outStream << "Time \t\tCopy \tExtrap \tMSE \t\t\tMAE \t\t\tPSN" << std::endl;
-		outStream.close();
-	}
+	writeToFile = false;
+	if (writeToFile)
+		fileWriter.Init();
 
 
 	oldTime = clock();
@@ -59,8 +53,10 @@ void VolumeRenderer::Update()
 			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep);
 			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
 
-			tester.Test(transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D);
-			WriteToFile();
+			tester.Test(volume, transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D, currentTimestep);
+			
+			if (writeToFile)
+				fileWriter.Write(currentTimestep, *tempCoherence, tester);
 		}
 
 		
@@ -75,15 +71,3 @@ void VolumeRenderer::Update()
 }
 
 
-void VolumeRenderer::WriteToFile()
-{
-	ofstream outStream(targetFileName, std::ios::app);
-
-	if (outStream.is_open())
-	{
-		outStream << currentTimestep << "\t\t" << tempCoherence->numBlocksCopied << "\t" << tempCoherence->numBlocksExtrapolated << std::fixed << std::setprecision(6) << "\t\t" << tester.meanSqrError << "\t\t" << tester.meanAvgErr << "\t\t" << tester.peakSigToNoise << std::endl;
-		outStream.close();
-	}
-	if (currentTimestep == 598)
-		getchar();
-}

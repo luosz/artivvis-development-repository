@@ -45,12 +45,6 @@
     <ClCompile Include="BruteForce.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SignalToNoise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ErrorEvaluator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -92,13 +86,19 @@
     <ClInclude Include="BruteForce.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SignalToNoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Framebuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ErrorEvaluator.h">
+    <ClInclude Include="TestSuite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorMetrics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeBetweenFrames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteToFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -130,6 +130,13 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="TempCoherence.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="TestSuite.cu" />
+    <CudaCompile Include="ChangeBetweenFrames.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="ErrorMetrics.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

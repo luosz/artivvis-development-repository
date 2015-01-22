@@ -21,13 +21,14 @@
   <ItemGroup>
     <ClCompile Include="BruteForce.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <CudaCompile Include="ChangeBetweenFrames.cu" />
     <CudaCompile Include="TempCoherence.cu" />
-    <ClCompile Include="ErrorEvaluator.cpp" />
+    <CudaCompile Include="ErrorMetrics.cu" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
-    <CudaCompile Include="SignalToNoise.cu" />
+    <CudaCompile Include="TestSuite.cu" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
@@ -37,12 +38,13 @@
   <ItemGroup>
     <ClInclude Include="BruteForce.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ChangeBetweenFrames.h" />
     <ClInclude Include="CudaHeaders.h" />
-    <ClInclude Include="ErrorEvaluator.h" />
+    <ClInclude Include="ErrorMetrics.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="GLM.h" />
     <ClInclude Include="Raycaster.h" />
-    <ClInclude Include="SignalToNoise.h" />
+    <ClInclude Include="TestSuite.h" />
     <ClInclude Include="TempCoherence.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
@@ -51,6 +53,7 @@
     <ClInclude Include="VolumeDataset.h" />
     <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="VoxelReader.h" />
+    <ClInclude Include="WriteToFile.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="BlockFragShader.txt" />

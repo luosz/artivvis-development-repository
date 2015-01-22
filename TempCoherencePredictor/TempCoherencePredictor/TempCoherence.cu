@@ -384,7 +384,7 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 
 	}
 
-	std::cout << "Copied: " << numBlocksCopied << " - Extrapolated: " << numBlocksExtrapolated << std::endl;
+//	std::cout << "Copied: " << numBlocksCopied << " - Extrapolated: " << numBlocksExtrapolated << std::endl;
 //	ratios[currentTimestep] = (float)numBlocksExtrapolated / (float) numBlocks;
 	
 	return nextTexture3D;
