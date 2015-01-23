@@ -9,7 +9,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	volume.Init();
 
 
-	tempCoherence = new TempCoherence(volume);
+	tempCoherence = new TempCoherence(screenWidth, screenHeight, volume);
 	bruteForce = new BruteForce(volume);
 
 	raycaster = new Raycaster(screenWidth, screenHeight, volume);
@@ -50,7 +50,7 @@ void VolumeRenderer::Update()
 
 			oldTime = currentTime;
 
-			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep);
+			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep, transferFunction, shaderManager, camera);
 			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
 
 			tester.Test(volume, transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D, currentTimestep);
@@ -64,8 +64,6 @@ void VolumeRenderer::Update()
 
 	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
 	raycaster->Raycast(transferFunction, shaderProgramID, camera, interpTex3D);
-
-	
 
 	glutSwapBuffers();
 }

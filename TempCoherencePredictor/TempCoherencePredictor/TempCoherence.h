@@ -9,6 +9,8 @@
 #include "VolumeDataset.h"
 #include "TransferFunction.h"
 #include "CudaHeaders.h"
+#include "FrequencyHistogram.h"
+#include "VisibilityHistogram.h"
 
 #define EXTRAP_CONST 2
 
@@ -40,10 +42,8 @@ public:
 	unsigned char *prevTempVolume;
 	unsigned char *currTempVolume;
 	unsigned char *nextTempVolume;
-	int epsilon;
-	float extrapConst;
+	
 	int numBlocksCopied, numBlocksExtrapolated;
-
 	int currentTimestep;
 
 	std::vector<cudaGraphicsResource_t> cudaResources;
@@ -52,19 +52,14 @@ public:
 	unsigned char *chunkToBeCopied;
 	unsigned char *cudaCopiedChunk;
 
+	int epsilon;
 	int alpha;
-	int maxFrequency;
-	int nonZeroFrequencies;
-	std::vector<int> frequencyHistogram;
+	Histogram *histogram;
 
-	float maxRatio, minRatio, meanRatio, stdDev;
-	std::vector<float> ratios;
-	int ratioTimeSteps;
-
-	TempCoherence(VolumeDataset &volume);
+	TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume);
 	GLuint GenerateTexture(VolumeDataset &volume);
 
-	GLuint TemporalCoherence(VolumeDataset &volume, int currentTimestep_);
+	GLuint TemporalCoherence(VolumeDataset &volume, int currentTimestep_, TransferFunction &tf, ShaderManager &shaderManager, Camera &camera);
 	void GPUPredict(VolumeDataset &volume);
 	void CPUPredict(VolumeDataset &volume);
 	bool BlockCompare(VolumeDataset &volume, int x, int y, int z);

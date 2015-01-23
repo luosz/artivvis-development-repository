@@ -29,6 +29,8 @@ public:
 	void RenderImages(TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex);
 	void CompareImages();
 	void GetErrorMetrics();
+
+	~ErrorMetrics();
 };
 
 #endif

@@ -34,6 +34,7 @@
     <ClCompile Include="VolumeDataset.cpp" />
     <ClCompile Include="VolumeRenderer.cpp" />
     <ClCompile Include="VoxelReader.cpp" />
+    <CudaCompile Include="VisibilityHistogram.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BruteForce.h" />
@@ -42,7 +43,9 @@
     <ClInclude Include="CudaHeaders.h" />
     <ClInclude Include="ErrorMetrics.h" />
     <ClInclude Include="Framebuffer.h" />
+    <ClInclude Include="FrequencyHistogram.h" />
     <ClInclude Include="GLM.h" />
+    <ClInclude Include="Histogram.h" />
     <ClInclude Include="Raycaster.h" />
     <ClInclude Include="TestSuite.h" />
     <ClInclude Include="TempCoherence.h" />
@@ -50,6 +53,7 @@
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransferFunction.h" />
+    <ClInclude Include="VisibilityHistogram.h" />
     <ClInclude Include="VolumeDataset.h" />
     <ClInclude Include="VolumeRenderer.h" />
     <ClInclude Include="VoxelReader.h" />
@@ -64,6 +68,8 @@
     <Text Include="SimpleVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />
     <Text Include="TransFuncVertShader.txt" />
+    <Text Include="VisibilityFragShader.txt" />
+    <Text Include="VisibilityVertShader.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{11900334-A9D0-4F18-8DFF-1305F0B9831E}</ProjectGuid>

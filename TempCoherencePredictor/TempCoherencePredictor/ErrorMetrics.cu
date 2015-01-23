@@ -143,3 +143,14 @@ void ErrorMetrics::GetErrorMetrics()
 //	std::cout << "Peak Signal To Noise: " << peakSigToNoise << std::endl;
 //	std::cout << "Max Difference: " << maxDifference << std::endl;
 }
+
+
+ErrorMetrics::~ErrorMetrics()
+{
+	cudaMSE.clear();
+//	thrust::device_vector<float>().swap(cudaMSE);
+//	thrust::device_free(&cudaMSE[0]);
+//	thrust::device_free(&cudaMAE[0]);
+	cudaMAE.clear();
+//	thrust::device_vector<float>().swap(cudaMSE);
+}

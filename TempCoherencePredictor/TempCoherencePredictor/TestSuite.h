@@ -19,6 +19,8 @@ public:
 
 	void Init(int screenWidth, int screenHeight, VolumeDataset &volume);	
 	void Test(VolumeDataset &volume, TransferFunction &transferFunction, ShaderManager &shaderManager, Camera &camera, Raycaster &raycaster, GLuint bruteTex, GLuint interpTex, int currentTimestep);
+
+	~TestSuite();
 	
 };
 

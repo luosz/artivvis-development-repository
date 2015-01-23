@@ -26,7 +26,8 @@ void ShaderManager::LoadShaders()
 	shader.Load("GreyScaleVertShader.txt", "GreyScaleFragShader.txt");
 	shaders.push_back(shader);
 
-	CompileShaders();
+	shader.Load("VisibilityVertShader.txt", "VisibilityFragShader.txt");
+	shaders.push_back(shader);
 }
 
 

@@ -1,5 +1,6 @@
 #include"VolumeRenderer.h"
 #include "CudaHeaders.h"
+#include <stdlib.h>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
@@ -25,6 +26,7 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 	{
 
 		case 27:
+			volumeRenderer.tester.errorMetrics.~ErrorMetrics();
 			cudaDeviceReset();
 			exit(0);
 			break;
@@ -103,11 +105,8 @@ void MouseWheel(int wheel, int direction, int x, int y)
 	volumeRenderer.camera.Zoom(-direction * 0.2f);	
 }
 
-
-
 int main(int argc, char *argv[])
 {
-	
 	// Set up the window
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);

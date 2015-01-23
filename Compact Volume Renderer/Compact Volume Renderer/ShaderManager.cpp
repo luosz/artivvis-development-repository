@@ -16,9 +16,6 @@ void ShaderManager::LoadShaders()
 
 	shader.Load("TransFuncVertShader.txt", "TransFuncFragShader.txt");
 	shaders.push_back(shader);
-
-
-	CompileShaders();
 }
 
 

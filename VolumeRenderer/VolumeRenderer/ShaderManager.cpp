@@ -70,8 +70,6 @@ void ShaderManager::LoadShaders()
 
 	shader.Load("RegionVisibilityVertShader.txt", "RegionVisibilityFragShader.txt");
 	shaders.push_back(shader);
-
-	CompileShaders();
 }
 
 

@@ -1,0 +1,65 @@
+#version 330
+
+in vec2 imageCoords;
+in vec3 facePos;
+
+uniform sampler3D volume;
+uniform sampler1D transferFunc;
+uniform sampler2D opacityTex;
+
+out vec4 FragColor;
+
+vec3 CalculateNormal(vec3 texCoord)
+{
+	vec3 sample1, sample2;
+
+	sample1.x = texture(volume, texCoord - vec3(0.05f, 0.0f, 0.0f)).x;
+	sample2.x = texture(volume, texCoord + vec3(0.05f, 0.0f, 0.0f)).x;
+	sample1.y = texture(volume, texCoord - vec3(0.0f, 0.05f, 0.0f)).x;
+	sample2.y = texture(volume, texCoord + vec3(0.0f, 0.05f, 0.0f)).x;
+	sample1.z = texture(volume, texCoord - vec3(0.0f, 0.0f, 0.05f)).x;
+	sample2.z = texture(volume, texCoord + vec3(0.0f, 0.0f, 0.05f)).x;
+
+	return (sample2 - sample1);
+}
+
+
+void main()
+{
+
+	if (abs(facePos.x) > 1.0f || abs(facePos.y) > 1.0f || abs(facePos.z) > 1.0f)
+	{	
+//		FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		return;
+	}
+
+	float prevOpacity = texture(opacityTex, imageCoords).y;
+
+	vec3 texCoord = (facePos + 1.0f) / 2.0f; 
+	float scalar = texture(volume, texCoord).x;
+
+	float alpha = texture(transferFunc, scalar).w;
+
+//	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
+//	float visibility = (1.0f - prevOpacity) * alpha;
+
+	float gradient = length(CalculateNormal(texCoord));
+
+
+	float opacity = prevOpacity + alpha;
+
+	float visibility; 
+
+	if (opacity > 1.0f)
+	{
+		opacity = 1.0f;
+		visibility = (1.0f - prevOpacity);
+	}
+	else
+		visibility = alpha;
+
+
+	vec4 final = vec4(visibility, opacity, scalar, gradient);
+
+	FragColor = final;
+}

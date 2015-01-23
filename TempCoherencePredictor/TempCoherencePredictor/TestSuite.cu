@@ -22,5 +22,13 @@ void TestSuite::Test(VolumeDataset &volume, TransferFunction &transferFunction, 
 
 
 
+TestSuite::~TestSuite()
+{
+//	errorMetrics.cudaMSE.clear();
+//	errorMetrics.cudaMAE.clear();
+}
+
+
+
 
 
