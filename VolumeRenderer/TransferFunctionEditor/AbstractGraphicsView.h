@@ -17,14 +17,15 @@ public:
 	}
 
 	// interface for use in TransferFunctionView
+	virtual void optimizeForIntensity(int index){}
+	virtual void optimize(){}
 	virtual void removeControlPoint(int index){}
 	virtual void moveControlPoint(int index, double intensity, double opacity){}
 	virtual void addControlPoint(double intensity, double opacity){}
 	virtual void setSelectedIndex(int index){}
-	virtual void optimizeForIntensity(int index){}
 	virtual void changeControlPointColor(int index, QColor color){}
 	virtual void draw(){}
-	virtual void updateTransferFunctionFromView(){}
+	virtual void updateTransferFunctionFromView(bool upate_origColors = false){}
 	virtual void updateViewFromTransferFunction(){}
 	virtual bool isMaOptimizerEnable(){ return false; }
 	virtual bool isLuoOptimizerEnable(){ return false; }

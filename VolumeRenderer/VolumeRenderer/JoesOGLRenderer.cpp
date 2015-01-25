@@ -28,9 +28,9 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 			auto p = dynamic_cast<TransferFunctionView *>(transferFunction.tfView);
 			if (p)
 			{
-				p->intensityTFOptimizerV2->BalanceVisibilityOnce();
+				auto optimizer2 = p->optimizer();
+				optimizer2->BalanceVisibilityOnce();
 			}
-			transferFunction.LoadLookup(transferFunction.currentColorTable);
 			transferFunction.tfView->updateViewFromTransferFunction();
 		}
 	}

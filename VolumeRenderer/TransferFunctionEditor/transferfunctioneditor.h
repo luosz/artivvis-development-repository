@@ -138,19 +138,12 @@ public:
 	void init(VolumeRenderer &volumeRenderer)
 	{
 		std::cout << "TransferFunctionEditor::init" << std::endl;
-		tfView.transfer_function = &volumeRenderer.renderer->transferFunction;
-		//tfView.renderer = volumeRenderer.renderer;
-		tfView.volumeRenderer = &volumeRenderer;
-		//if (transferFunction())
-		//{
-		//	std::cout << "tfView.transfer_function is not NULL" << std::endl;
-		//} 
-		//else
-		//{
-		//	std::cout << "tfView.transfer_function is NULL" << std::endl;
-		//}
-		
-		tfView.intensityTFOptimizerV2 = new IntensityTFOptimizerV2(&volumeRenderer.volume, &volumeRenderer.renderer->transferFunction, &volumeRenderer.renderer->visibilityHistogram);
+
+		//tfView.transfer_function = &volumeRenderer.renderer->transferFunction;
+		//tfView.volumeRenderer = &volumeRenderer;
+		//tfView.intensityTFOptimizerV2 = new IntensityTFOptimizerV2(&volumeRenderer.volume, &volumeRenderer.renderer->transferFunction, &volumeRenderer.renderer->visibilityHistogram);
+
+		tfView.init(volumeRenderer);
 
 		if (transferFunction())
 		{

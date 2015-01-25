@@ -41,6 +41,28 @@ public:
 	float GetWeightByInterp(float intensity, int index);
 	float GetWeight(int index);
 	float GetWeightedAreaEntropy(int index);
+
+	void BeginOfOptimization()
+	{
+		memcpy(&transferFunction->colors[0], &transferFunction->origColors[0], transferFunction->numIntensities * sizeof(glm::vec4));
+		numIntensities = transferFunction->numIntensities;
+		colors = &transferFunction->colors[0];
+		intensities = &transferFunction->intensities[0];
+		targetIntensity = transferFunction->targetIntensity;
+	}
+
+	void BeginOfOptimizationNoCopy()
+	{
+		numIntensities = transferFunction->numIntensities;
+		colors = &transferFunction->colors[0];
+		intensities = &transferFunction->intensities[0];
+		targetIntensity = transferFunction->targetIntensity;
+	}
+
+	void EndOfOptimization()
+	{
+		transferFunction->LoadLookup(transferFunction->currentColorTable);
+	}
 };
 
 #endif // IntensityTFOptimizerV2_h

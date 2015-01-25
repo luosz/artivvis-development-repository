@@ -21,7 +21,7 @@ http://openil.sourceforge.net/
 NVIDIA Widgets 1.0.0 (August 24, 2008)
 https://code.google.com/p/nvidia-widgets/
 
-NVIDIA GameWorks OpenGL Samples 1.2 (Jul 08 2014)
+NVIDIA GameWorks OpenGL Graphics and Compute Samples 2.0 (2014/09/18)
 https://developer.nvidia.com/gameworks-opengl-samples
 
 OpenGL Mathematics (GLM)

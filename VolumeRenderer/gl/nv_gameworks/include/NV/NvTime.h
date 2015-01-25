@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------------
-// File:        NV/NvLogs.h
+// File:        NV/NvTime.h
 // SDK Version: v2.0 
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
@@ -32,53 +32,42 @@
 //
 //----------------------------------------------------------------------------------
 
-#ifndef NV_LOGS_H
-#define NV_LOGS_H
+#ifndef _NV_TIME_H
+#define _NV_TIME_H
 
-#include <NvFoundation.h>
+#include <time.h>
 
-/// \file
-/// Cross-platform application logging to file and console.
-/// - LOGI(...) printf-style "info" logging
-/// - LOGE(...) printf-style "error" logging
-/// - CHECK_GL_ERROR() check the current GL error status and log any error
+/** Generalize a 64-bit integer time value in nanoseconds. */
+typedef uint64_t               NvUST; // U64 unadjusted system time value
+/** Convert 64-bit nsecs value to floating-point seconds. */
+#define UST2SECS(t)     ((double)(((double)(t)) / 1.0e9))
+/** Convert floating-point seconds to a 64-bit nsecs value. */
+#define SECS2UST(t)     ((NvUST)(((double)(t)) * 1.0e9))
 
-#define  LOG_TAG    "NVSDK"
+/** Convert nsecs value to ms value. */
+#define UST2MS(t)     ((t) / (NvUST)(1000000))
+/** Convert ms to 64-bit nsecs value. */
+#define MS2UST(t)     ((t) * (NvUST)(1000000))
 
+inline NvUST NvTimeGetTime()
+{
+    NvUST nowu;
 #ifdef _WIN32
-
-#include <stdio.h>
-
-extern void NVWindowsLog(const char* fmt, ...);
-
-#define LOGI(...) { NVWindowsLog(__VA_ARGS__); }
-#define LOGE(...) { NVWindowsLog(__VA_ARGS__); }
-
-#elif ANDROID
-
-#include <stdlib.h> // for exit()
-#include <android/log.h>
-
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
-#define  LOGE(...)  { __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__); }
-
-#elif defined(LINUX) || defined(MACOSX)
-
-#include <stdlib.h> // for exit()
-#include <stdio.h>
-
-#define LOGI(...) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); }
-#define LOGE(...) { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); }
-
+    clock_t now = clock(); // clocks are really ms...
+    nowu = MS2UST(now);
 #else
-
-#error "No supported platform specified for NvLogs.h"
-
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    nowu = SECS2UST(now.tv_sec) + now.tv_nsec;
 #endif
+    return nowu;
+}
 
-void checkGLError(const char* file, int32_t line);
+inline float NvTimeDiffInSecs(NvUST newTime, NvUST oldTime)
+{
+    if (oldTime<newTime)
+        return (float)UST2SECS(newTime-oldTime);
+    return 0; // !!!!!TBD should this return 1 just to 'tick' a bit?
+}
 
-#ifndef CHECK_GL_ERROR
-#define CHECK_GL_ERROR() checkGLError(__FILE__, __LINE__)
-#endif
-#endif
+#endif //_NV_TIME_H

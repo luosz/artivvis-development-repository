@@ -33,7 +33,6 @@ public:
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 		transfer_function = NULL;
-		//renderer = NULL;
 		volumeRenderer = NULL;
 		intensityTFOptimizerV2 = NULL;
 #endif // NOT_USED_BY_VOLUME_RENDERER
@@ -172,59 +171,6 @@ public:
 		this->selectedIndex = index;
 	}
 
-	virtual void updateTransferFunctionFromView(bool upate_origColors = false)
-	{
-#ifndef NOT_USED_BY_VOLUME_RENDERER
-		if (transfer_function)
-		{
-			//transfer_function->optimizeIntensity = true;
-			transfer_function->numIntensities = numIntensities;
-			transfer_function->intensities = intensities;
-			transfer_function->colors = colors;
-			if (upate_origColors)
-			{
-				transfer_function->origColors = colors;
-			}
-			transfer_function->LoadLookup(transfer_function->currentColorTable);
-		}
-#endif // NOT_USED_BY_VOLUME_RENDERER
-	}
-
-	virtual void updateViewFromTransferFunction()
-	{
-#ifndef NOT_USED_BY_VOLUME_RENDERER
-		if (transfer_function)
-		{
-			//transfer_function->optimizeIntensity = false;
-			numIntensities = transfer_function->numIntensities;
-			intensities = transfer_function->intensities;
-			colors = transfer_function->colors;
-			draw();
-		}
-#endif // NOT_USED_BY_VOLUME_RENDERER
-	}
-
-	virtual void optimizeForIntensity(int index)
-	{
-#ifndef NOT_USED_BY_VOLUME_RENDERER
-		// optimize for selected intensity
-		if (transfer_function)
-		{
-			updateTransferFunctionFromView();
-			transfer_function->targetIntensity = intensities[index];
-			//transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
-			//intensityTFOptimizerV2()->transferFunction = transfer_function;
-			optimizer()->Optimize();
-			transfer_function->LoadLookup(transfer_function->currentColorTable);
-			updateViewFromTransferFunction();
-		}
-		else
-		{
-			std::cout << "Error in optimizeForIntensity: transfer_function is NULL." << std::endl;
-		}
-#endif // NOT_USED_BY_VOLUME_RENDERER
-	}
-
 	virtual bool isMaOptimizerEnable()
 	{
 		return is_ma_optimizer_enable;
@@ -348,11 +294,75 @@ public:
 	bool is_luo_optimizer_enable;
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
+
 public:
-	TransferFunction *transfer_function;
-	//Renderer *renderer;
-	VolumeRenderer *volumeRenderer;
-	IntensityTFOptimizerV2 *intensityTFOptimizerV2;
+	virtual void updateTransferFunctionFromView(bool upate_origColors = false)
+	{
+		if (transfer_function)
+		{
+			//transfer_function->optimizeIntensity = true;
+			transfer_function->numIntensities = numIntensities;
+			transfer_function->intensities = intensities;
+			transfer_function->colors = colors;
+			if (upate_origColors)
+			{
+				transfer_function->origColors = colors;
+			}
+			transfer_function->LoadLookup(transfer_function->currentColorTable);
+		}
+	}
+
+	virtual void updateViewFromTransferFunction()
+	{
+		if (transfer_function)
+		{
+			//transfer_function->optimizeIntensity = false;
+			numIntensities = transfer_function->numIntensities;
+			intensities = transfer_function->intensities;
+			colors = transfer_function->colors;
+			draw();
+		}
+	}
+
+	virtual void optimizeForIntensity(int index)
+	{
+		// optimize for selected intensity
+		if (transfer_function)
+		{
+			updateTransferFunctionFromView();
+			transfer_function->targetIntensity = intensities[index];
+			//transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
+			//intensityTFOptimizerV2()->transferFunction = transfer_function;
+			optimizer()->Optimize();
+			transfer_function->LoadLookup(transfer_function->currentColorTable);
+			updateViewFromTransferFunction();
+		}
+		else
+		{
+			std::cout << "Error in optimizeForIntensity: transfer_function is NULL." << std::endl;
+		}
+	}
+
+	virtual void optimize()
+	{
+		updateTransferFunctionFromView();
+
+		//tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
+		//tfView.transfer_function->intensityOptimizerV2->BalanceEdges();
+		optimizer()->numIterations = 1000;
+		optimizer()->BalanceEdges();
+		transfer_function->LoadLookup(transfer_function->currentColorTable);
+
+		updateViewFromTransferFunction();
+	}
+
+	void init(VolumeRenderer &volumeRenderer)
+	{
+		std::cout << "TransferFunctionView::init" << std::endl;
+		transfer_function = &volumeRenderer.renderer->transferFunction;
+		this->volumeRenderer = &volumeRenderer;
+		intensityTFOptimizerV2 = new IntensityTFOptimizerV2(&volumeRenderer.volume, &volumeRenderer.renderer->transferFunction, &volumeRenderer.renderer->visibilityHistogram);
+	}
 
 	IntensityTFOptimizerV2 *optimizer()
 	{
@@ -376,6 +386,11 @@ public:
 
 		return intensityTFOptimizerV2;
 	}
+
+public:
+	TransferFunction *transfer_function;
+	VolumeRenderer *volumeRenderer;
+	IntensityTFOptimizerV2 *intensityTFOptimizerV2;
 
 #endif // NOT_USED_BY_VOLUME_RENDERER
 };

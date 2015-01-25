@@ -90,7 +90,7 @@ void TransferFunctionEditor::on_diagonalButton_clicked()
 
 void TransferFunctionEditor::on_peaksButton_clicked()
 {
-
+	std::cout << "on_peaksButton_clicked\n";
 }
 
 void TransferFunctionEditor::on_rampButton_clicked()
@@ -106,9 +106,6 @@ void TransferFunctionEditor::on_entropyButton_clicked()
 		std::cout<<"on_entropyButton_clicked\n";
 
 		tfView.updateTransferFunctionFromView();
-
-		//tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-		//tfView.transfer_function->intensityOptimizerV2->BalanceEdges();
 		optimizer()->numIterations = ui->spinBox->value();
 		optimizer()->BalanceEdges();
 		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
@@ -126,9 +123,6 @@ void TransferFunctionEditor::on_visibilityButton_clicked()
 		std::cout<<"on_visibilityButton_clicked\n";
 
 		tfView.updateTransferFunctionFromView();
-
-//		tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-//		tfView.transfer_function->intensityOptimizerV2->BalanceVisibility();
 		optimizer()->numIterations = ui->spinBox->value();
 		optimizer()->BalanceVisibility();
 		transferFunction()->LoadLookup(transferFunction()->currentColorTable);

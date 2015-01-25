@@ -171,23 +171,13 @@ float IntensityTFOptimizerV2::GetAreaVisibility(int index)
 
 void IntensityTFOptimizerV2::Optimize()
 {
-	memcpy(&transferFunction->colors[0], &transferFunction->origColors[0], transferFunction->numIntensities * sizeof(glm::vec4));
-	numIntensities = transferFunction->numIntensities;
-	colors = &transferFunction->colors[0];
-	intensities = &transferFunction->intensities[0];
-	targetIntensity = transferFunction->targetIntensity;
-
 	OptimizeForIntensity();
-
-	transferFunction->LoadLookup(transferFunction->currentColorTable);
 }
 
 void IntensityTFOptimizerV2::OptimizeForIntensity()
 {
-	//numIntensities = transferFunction->numIntensities;
-	//colors = &transferFunction->colors[0];
-	//intensities = &transferFunction->intensities[0];
-	//targetIntensity = transferFunction->targetIntensity;
+	BeginOfOptimization();
+	//////////////////////////////////////////////////////////////////////////
 
 	float sum = 0.0f;
 
@@ -260,12 +250,16 @@ void IntensityTFOptimizerV2::OptimizeForIntensity()
 			}
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	EndOfOptimization();
 }
-
-
 
 void IntensityTFOptimizerV2::BalanceEdges()
 {
+	BeginOfOptimization();
+	//////////////////////////////////////////////////////////////////////////
+
 	for (int i = 0; i < numIterations; i++)
 	{
 		const float step_size = 1.0f / 255.0f;
@@ -322,12 +316,16 @@ void IntensityTFOptimizerV2::BalanceEdges()
 			}
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	EndOfOptimization();
 }
-
-
 
 void IntensityTFOptimizerV2::BalanceVisibilityOnce()
 {
+	BeginOfOptimizationNoCopy();
+	//////////////////////////////////////////////////////////////////////////
+
 	const float step_size = 1.0f / 255.0f;
 	std::vector<double> area_list;
 	double mean_area = 0;
@@ -381,12 +379,16 @@ void IntensityTFOptimizerV2::BalanceVisibilityOnce()
 			}
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	EndOfOptimization();
 }
-
-
 
 void IntensityTFOptimizerV2::BalanceVisibility()
 {
+	BeginOfOptimization();
+	//////////////////////////////////////////////////////////////////////////
+
 	for (int i = 0; i < numIterations; i++)
 	{
 		const float step_size = 1.0f / 255.0f;
@@ -443,10 +445,10 @@ void IntensityTFOptimizerV2::BalanceVisibility()
 			}
 		}
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	EndOfOptimization();
 }
-
-
-
 
 float IntensityTFOptimizerV2::GetWeightedEntropyOpacityByID(float intensity, int index)
 {
@@ -464,7 +466,6 @@ float IntensityTFOptimizerV2::GetWeightedEntropyOpacityByID(float intensity, int
 		return 0;
 	}
 }
-
 
 float IntensityTFOptimizerV2::GetOpacityByInterp(float intensity, int index)
 {
@@ -501,7 +502,6 @@ float IntensityTFOptimizerV2::GetOpacityByInterp(float intensity, int index)
 		}
 	}
 }
-
 
 float IntensityTFOptimizerV2::GetWeightByInterp(float intensity, int index)
 {
@@ -551,7 +551,6 @@ float IntensityTFOptimizerV2::GetWeight(int index)
 		return 1;
 	}
 }
-
 
 float IntensityTFOptimizerV2::GetWeightedAreaEntropy(int index)
 {

@@ -86,7 +86,8 @@ protected:
 		QMenu menu;
 		QAction *removeAction = menu.addAction("Remove");
 		QAction *changeAction = menu.addAction("Change color...");
-		QAction *optimizeAction = menu.addAction("Optimize for intensity");
+		QAction *optimizeForIntensityAction = menu.addAction("Optimize for intensity");
+		QAction *optimizeAction = menu.addAction("Optimize transfer function");
 		QAction *selectedAction = menu.exec(event->screenPos());
 		if (selectedAction == removeAction)
 		{
@@ -106,10 +107,18 @@ protected:
 			}
 			else
 			{
-				if (selectedAction == optimizeAction)
+				if (selectedAction == optimizeForIntensityAction)
 				{
 					// optimize for intensity
 					view->optimizeForIntensity(_index);
+				}
+				else
+				{
+					if (selectedAction == optimizeAction)
+					{
+						// optimize the transfer function
+						view->optimize();
+					}
 				}
 			}
 		}
