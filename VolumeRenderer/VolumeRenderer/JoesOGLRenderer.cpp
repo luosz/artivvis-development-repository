@@ -18,19 +18,20 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 		// Ma's optimization
 		if (transferFunction.tfView->isMaOptimizerEnable())
 		{
-			optimizer->Optimize();
+			optimizer()->Optimize();
 		}
 
 		// Joe's intensity and visibility optimization
 		if (transferFunction.tfView->isLuoOptimizerEnable())
 		{
 			transferFunction.tfView->updateTransferFunctionFromView();
-			auto p = dynamic_cast<TransferFunctionView *>(transferFunction.tfView);
-			if (p)
-			{
-				auto optimizer2 = p->optimizer();
-				optimizer2->BalanceVisibilityOnce();
-			}
+			//auto p = dynamic_cast<TransferFunctionView *>(transferFunction.tfView);
+			//if (p)
+			//{
+			//	auto optimizer2 = p->optimizer();
+			//	optimizer2->BalanceVisibilityOnce();
+			//}
+			intensityTFOptimizerV2()->BalanceVisibilityOnce();
 			transferFunction.tfView->updateViewFromTransferFunction();
 		}
 	}
