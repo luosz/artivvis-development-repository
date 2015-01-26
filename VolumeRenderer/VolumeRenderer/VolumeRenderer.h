@@ -30,6 +30,16 @@ public:
 	void Update();
 
 	void OptimizeForSelectedRegion(int mouseX, int mouseY, int screenWidth, int screenHeight);
+
+	void OptimizeForSelectedRegionWithVisibility(int mouseX, int mouseY, int screenWidth, int screenHeight)
+	{
+		float avgIntensity = regionGrabber.Grab(mouseX, mouseY, screenWidth, screenHeight, camera, renderer->raycaster->clipPlaneNormal, renderer->raycaster->clipPlaneDistance, volume);
+
+		if (avgIntensity == -1.0f)
+			return;
+
+		renderer->transferFunction.targetIntensity = avgIntensity;
+	}
 };
 
 
