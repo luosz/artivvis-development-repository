@@ -17,6 +17,8 @@ void ErrorMetrics::Init(int screenWidth, int screenHeight)
 
 	cudaMSE.resize(numPixels);
 	cudaMAE.resize(numPixels);
+	cudaLMSE.resize(numPixels);
+	HANDLE_ERROR( cudaMalloc((void**)&cudaNumZeroLaplacians, sizeof(int)) );
 }
 
 GLuint ErrorMetrics::Generate2DTexture()
@@ -44,10 +46,10 @@ void ErrorMetrics::FindError(TransferFunction &transferFunction, ShaderManager &
 
 
 texture <uchar1, cudaTextureType2D, cudaReadModeElementType> bruteTexRef;
-texture <uchar1, cudaTextureType2D, cudaReadModeElementType> interpTexRef;
+texture <uchar1, cudaTextureType2D, cudaReadModeElementType> extrapTexRef;
 
 
-__global__ void CudaCompare(int numPixels, int xPixels, int yPixels, thrust::device_ptr<float> cudaMSE, thrust::device_ptr<float> cudaMAE)
+__global__ void CudaCompare(int numPixels, int xPixels, int yPixels, thrust::device_ptr<float> cudaMSE, thrust::device_ptr<float> cudaMAE, thrust::device_ptr<float> cudaLMSE, int *numZeroLaplacians)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
 
@@ -57,21 +59,42 @@ __global__ void CudaCompare(int numPixels, int xPixels, int yPixels, thrust::dev
 		int u = tid % yPixels;
 
 		uchar1 bruteColor = tex2D(bruteTexRef, u, v);
-		uchar1 interpColor = tex2D(interpTexRef, u, v);
+		uchar1 extrapColor = tex2D(extrapTexRef, u, v);
 
-		float diff = bruteColor.x - interpColor.x;
+		float diff = bruteColor.x - extrapColor.x;
 
 		cudaMSE[tid] = diff * diff;
 		cudaMAE[tid] = glm::abs(diff);
 
-//		if (diff > 0.0f)
-//			printf("%d\n", diff);
+		if (u == 0 || u == xPixels-1 || v == 0 || v == yPixels-1)
+		{
+			cudaLMSE[tid] = 0.0f;
+			return;
+		}
+
+		float bruteLaplace = tex2D(bruteTexRef, u+1, v).x + tex2D(bruteTexRef, u-1, v).x + tex2D(bruteTexRef, u, v+1).x + tex2D(bruteTexRef, u, v-1).x - (4 * bruteColor.x);
+		float extrapLaplace = tex2D(extrapTexRef, u+1, v).x + tex2D(extrapTexRef, u-1, v).x + tex2D(extrapTexRef, u, v+1).x + tex2D(extrapTexRef, u, v-1).x - (4 * extrapColor.x);
+
+		float result = glm::pow(bruteLaplace - extrapLaplace, 2.0f) / glm::pow(bruteLaplace, 2.0f);
+
+		if (bruteLaplace != 0.0f)
+			cudaLMSE[tid] = result;
+		else
+		{
+			cudaLMSE[tid] = 0.0f;
+			atomicAdd(numZeroLaplacians, (int)1);
+		}
+
+//		if (bruteLaplace != 0.0f && result != 0.0f)
+//			printf("%f, %f, %f\n", bruteLaplace, extrapLaplace, result);
 	}
 }
 
 
 void ErrorMetrics::CompareImages()
 {
+	HANDLE_ERROR( cudaMemset(cudaNumZeroLaplacians, 0, sizeof(int)) );
+
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], bruteImage, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[1], interpImage, GL_TEXTURE_2D, cudaGraphicsRegisterFlagsNone) );
 	HANDLE_ERROR( cudaGraphicsMapResources(2, &cudaResources[0]) );
@@ -80,17 +103,17 @@ void ErrorMetrics::CompareImages()
 	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&bruteArray, cudaResources[0], 0, 0) ); 
 	HANDLE_ERROR( cudaBindTextureToArray(bruteTexRef, bruteArray) );
 
-	cudaArray *interpArray = 0;	
-	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&interpArray, cudaResources[1], 0, 0) ); 
-	HANDLE_ERROR( cudaBindTextureToArray(interpTexRef, interpArray) );
+	cudaArray *extrapArray = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&extrapArray, cudaResources[1], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(extrapTexRef, extrapArray) );
 
 
 
-	CudaCompare<<<(numPixels + 255) / 256, 256>>>(numPixels, xPixels, yPixels, &cudaMSE[0], &cudaMAE[0]);
+	CudaCompare<<<(numPixels + 255) / 256, 256>>>(numPixels, xPixels, yPixels, &cudaMSE[0], &cudaMAE[0], &cudaLMSE[0], cudaNumZeroLaplacians);
 
 
 	HANDLE_ERROR( cudaUnbindTexture(bruteTexRef) );
-	HANDLE_ERROR( cudaUnbindTexture(interpTexRef) );
+	HANDLE_ERROR( cudaUnbindTexture(extrapTexRef) );
 
 	HANDLE_ERROR( cudaGraphicsUnmapResources(2, &cudaResources[0]) );
 	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );
@@ -126,13 +149,27 @@ struct Max_Functor
 	} 
 };
 
+struct Is_Non_Negative 
+{ 
+	__host__ __device__ bool operator()(const float& x) const 
+	{ 
+		return x >= 0.0f; 
+	} 
+};
+
 void ErrorMetrics::GetErrorMetrics()
 {
 	meanSqrError = thrust::reduce(cudaMSE.begin(), cudaMSE.end(), 0.0f, thrust::plus<float>());
-	meanSqrError /= numPixels;
+	meanSqrError /= (float)numPixels;
 
 	meanAvgErr = thrust::reduce(cudaMAE.begin(), cudaMAE.end(), 0.0f, thrust::plus<float>());
-	meanAvgErr /= numPixels;
+	meanAvgErr /= (float)numPixels;
+
+	int numZeroLaplacians;
+	HANDLE_ERROR( cudaMemcpy(&numZeroLaplacians, cudaNumZeroLaplacians, sizeof(int), cudaMemcpyDeviceToHost) );
+	int numValid = ((xPixels - 2) * (yPixels - 2)) - numZeroLaplacians;
+	laplaceMSE = thrust::reduce(cudaLMSE.begin(), cudaLMSE.end(), 0.0f, thrust::plus<float>());
+	laplaceMSE /= (float)numValid;
 
 	peakSigToNoise = 10.0f * log10f((255.0f * 255.0f) / meanSqrError);
 
@@ -148,9 +185,6 @@ void ErrorMetrics::GetErrorMetrics()
 ErrorMetrics::~ErrorMetrics()
 {
 	cudaMSE.clear();
-//	thrust::device_vector<float>().swap(cudaMSE);
-//	thrust::device_free(&cudaMSE[0]);
-//	thrust::device_free(&cudaMAE[0]);
 	cudaMAE.clear();
-//	thrust::device_vector<float>().swap(cudaMSE);
+	cudaLMSE.clear();
 }

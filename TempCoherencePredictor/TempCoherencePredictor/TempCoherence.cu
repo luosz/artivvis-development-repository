@@ -6,12 +6,13 @@ texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 
 TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
-	epsilon = 0.2;
+//	epsilon = 0.2f;
+	epsilon = 1;
 	blockRes = 8;
 	alpha = 6;
 
-//	histogram = new FrequencyHistogram();
-	histogram = new VisibilityHistogram(screenWidth, screenHeight);
+	histogram = new FrequencyHistogram();
+//	histogram = new VisibilityHistogram(screenWidth, screenHeight);
 
 	numXBlocks = glm::ceil((float)volume.xRes / (float)blockRes);
 	numYBlocks = glm::ceil((float)volume.yRes / (float)blockRes);
