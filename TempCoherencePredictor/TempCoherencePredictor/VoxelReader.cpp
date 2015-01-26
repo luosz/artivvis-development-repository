@@ -3,47 +3,15 @@
 // At the moment file is specified within function but in future will use parameter. 
 void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, VolumeProperties &properties)
 {
-//	folderPath = "../../Samples/TVvort/";
-//	headerFile = folderPath + "TVvort.mhd";
-
-//	folderPath = "../../Samples/Nucleon/";
-//	headerFile = folderPath + "nucleon.mhd";
-
-//	folderPath = "../../Samples/CThead/";
-//	headerFile = folderPath + "CThead.mhd";
-
-//	folderPath = "../../Samples/MRbrain/";
-//	headerFile = folderPath + "MRbrain.mhd";
-
-//	folderPath = "../../Samples/TVlung/";
-//	headerFile = folderPath + "TVlung.mhd";
-
 //	folderPath = "../../Samples/FiveJets/";
 //	headerFile = folderPath + "FiveJetsDensity.mhd";
 
-//	folderPath = "../../Samples/Isabel/";
-//	headerFile = folderPath + "IsabelCloud.mhd";
+	folderPath = "../../Samples/TJet/";
+	headerFile = folderPath + "DSTJet.mhd";
 
-//	folderPath = "../../Samples/TJet/";
-//	headerFile = folderPath + "TJet.mhd";
 
-//	folderPath = "../../Samples/Abdomen/";
-//	headerFile = folderPath + "Abdomen16.mhd";
-
-//	folderPath = "../../Samples/Colon/";
-//	headerFile = folderPath + "colon.mhd";
-
-//	folderPath = "../../Samples/MRThead/";
-//	headerFile = folderPath + "MRThead.mhd";
-
-//	folderPath = "../../Samples/MRIhead/";
-//	headerFile = folderPath + "MRIhead.mhd";
-
-//	folderPath = "../../Samples/Bonsai/";
-//	headerFile = folderPath + "bonsai.mhd";
-
-	folderPath = "../../Samples/SmokeSim/";
-	headerFile = folderPath + "SmokeSim.mhd";
+//	folderPath = "../../Samples/SmokeSim/";
+//	headerFile = folderPath + "SmokeSim.mhd";
 
 //	folderPath = "../../Samples/SmokeSim/";
 //	headerFile = folderPath + "SmokeSimSideways.mhd";

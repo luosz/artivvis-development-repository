@@ -10,6 +10,7 @@
 #include "thrust\reduce.h"
 #include "thrust\device_ptr.h"
 #include <thrust/device_vector.h>
+#include <thrust\count.h>
 #include <math.h>
 
 class ErrorMetrics
@@ -19,8 +20,9 @@ public:
 	GLuint interpImage, bruteImage;
 	Framebuffer framebuffer;
 
-	float meanSqrError, meanAvgErr, peakSigToNoise, maxDifference;
-	thrust::device_vector<float> cudaMSE, cudaMAE;
+	float meanSqrError, meanAvgErr, laplaceMSE, peakSigToNoise, maxDifference;
+	int *cudaNumZeroLaplacians;
+	thrust::device_vector<float> cudaMSE, cudaMAE, cudaLMSE;
 	std::vector<cudaGraphicsResource_t> cudaResources;
 
 	void Init(int screenWidth, int screenHeight);

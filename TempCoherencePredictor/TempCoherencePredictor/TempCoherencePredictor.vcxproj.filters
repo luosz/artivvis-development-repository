@@ -147,7 +147,6 @@
     <CudaCompile Include="TempCoherence.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="TestSuite.cu" />
     <CudaCompile Include="ChangeBetweenFrames.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
@@ -155,6 +154,9 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="VisibilityHistogram.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="TestSuite.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>
