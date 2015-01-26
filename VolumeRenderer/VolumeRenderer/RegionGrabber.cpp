@@ -72,7 +72,17 @@ float RegionGrabber::Grab(int mouseX, int mouseY, int screenWidth, int screenHei
 	}
 
 	// Average intensity over adjacent voxels
-	return getAverageIntensity(xVoxel, yVoxel, zVoxel, volume);
+	float avgIntensity = 0.0f;
+	for (int i = -cubeWidth; i <= cubeWidth; i++)
+		for (int j = -cubeWidth; j <= cubeWidth; j++)
+			for (int k = -cubeWidth; k <= cubeWidth; k++)
+			{
+				auto index = (xVoxel + i) + ((yVoxel + j) * volume.xRes) + ((zVoxel + k) * volume.xRes * volume.yRes);
+				avgIntensity += (volume.memblock3D[index] / 255.0f);
+			}
+	avgIntensity /= (glm::pow((2.0f*cubeWidth + 1.0f), 3.0f));
+	std::cout << avgIntensity << std::endl;
+	return avgIntensity;
 }
 
 std::vector<float> RegionGrabber::GrabVisibility(int mouseX, int mouseY, int screenWidth, int screenHeight, Camera &camera, glm::vec3 clipPlaneNormal, float clipPlaneDistance, VolumeDataset &volume, const VisibilityHistogram &visibilityHistogram)
@@ -146,24 +156,22 @@ std::vector<float> RegionGrabber::GrabVisibility(int mouseX, int mouseY, int scr
 		return result;
 	}
 
-	//// Average intensity over adjacent voxels
-	//float avgIntensity = 0.0f;
+	result.resize(256);
+	std::fill(result.begin(), result.end(), 0);
+	std::cout << "result.size=" << result.size() << std::endl;
 
-	//for (int i=-cubeWidth; i<=cubeWidth; i++)
-	//	for (int j=-cubeWidth; j<=cubeWidth; j++)
-	//		for (int k=-cubeWidth; k<=cubeWidth; k++)
-	//		{
-	//			index = (xVoxel + i) + ((yVoxel + j) * volume.xRes) + ((zVoxel + k) * volume.xRes * volume.yRes);
-	//			avgIntensity += (volume.memblock3D[index] / 255.0f);
-	//		}
+	// Average intensity over adjacent voxels
+	float avgIntensity = 0.0f;
+	for (int i = -cubeWidth; i <= cubeWidth; i++)
+		for (int j = -cubeWidth; j <= cubeWidth; j++)
+			for (int k = -cubeWidth; k <= cubeWidth; k++)
+			{
+				auto index = (xVoxel + i) + ((yVoxel + j) * volume.xRes) + ((zVoxel + k) * volume.xRes * volume.yRes);
+				auto intensity = volume.memblock3D[index];
+				auto visibility = visibilityHistogram.visibilities[intensity];
+				result[intensity] += 1;
+				result[intensity] += visibility;
+			}
 
-	//avgIntensity /= (glm::pow( (2.0f*cubeWidth + 1.0f), 3.0f));
-
-	//std::cout << avgIntensity << std::endl;
-
-	//return avgIntensity;
-
-	//return getAverageIntensity(xVoxel, yVoxel, zVoxel, volume);
-	//return averageIntensityWithVisibility(xVoxel, yVoxel, zVoxel, volume, visibilityHistogram);
 	return result;
 }

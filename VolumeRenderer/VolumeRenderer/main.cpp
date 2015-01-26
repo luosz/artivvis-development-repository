@@ -25,23 +25,49 @@ void MainLoop()
 
 
 // General Keyboard Input
-void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
+void KeyboardFunc(unsigned char key, int xmouse, int ymouse)
 {
-	switch(key)
+	AbstractGraphicsView *tfView = NULL;
+	switch (key)
 	{
+	case 'a':
+		// global optimization
+		std::cout << key << " " << xmouse << " " << ymouse << " " << std::endl;
+		volumeRenderer.OptimizeForSelectedRegion(xmouse, ymouse, SCREEN_WIDTH, SCREEN_HEIGHT);
+		tfView = volumeRenderer.renderer->transferFunction.tfView;
+		if (tfView)
+		{
+			tfView->updateTransferFunctionFromView();
+			volumeRenderer.renderer->intensityTFOptimizerV2()->BalanceEdges();
+			tfView->updateViewFromTransferFunction();
+		}
+		break;
 
-		case 27:
-			cudaDeviceReset();
-			exit(0);
-			break;
+	case 's':
+		// optimize for intensity
+		std::cout << key << " " << xmouse << " " << ymouse << " " << std::endl;
+		volumeRenderer.OptimizeForSelectedRegion(xmouse, ymouse, SCREEN_WIDTH, SCREEN_HEIGHT);
+		tfView = volumeRenderer.renderer->transferFunction.tfView;
+		if (tfView)
+		{
+			tfView->updateTransferFunctionFromView();
+			volumeRenderer.renderer->intensityTFOptimizerV2()->Optimize();
+			tfView->updateViewFromTransferFunction();
+		}
+		break;
+
+	case 27:
+		cudaDeviceReset();
+		exit(0);
+		break;
 	}
 }
 
 
 // Keyboad Special Keys Input
 void SpecialFunc(int key, int x, int y)
- {
-	switch(key)
+{
+	switch (key)
 	{
 	case GLUT_KEY_UP:
 		volumeRenderer.camera.position.z -= 0.5f;
@@ -63,18 +89,18 @@ void SpecialFunc(int key, int x, int y)
 		break;
 	}
 	glutPostRedisplay();
- }
+}
 
 
 // Mouse drags to control camera
-void MouseMove(int x, int y) 
-{ 	
+void MouseMove(int x, int y)
+{
 	if (xclickedAt >= 0)
 	{
 		volumeRenderer.camera.Rotate((float)(xclickedAt - x));
 		xclickedAt = x;
 	}
-		
+
 
 	if (yclickedAt >= 0)
 	{
@@ -85,9 +111,9 @@ void MouseMove(int x, int y)
 
 
 // Mouse clicks to initialize drags
-void MouseButton(int button, int state, int x, int y) 
+void MouseButton(int button, int state, int x, int y)
 {
-	if (button == GLUT_RIGHT_BUTTON) 
+	if (button == GLUT_RIGHT_BUTTON)
 	{
 		if (state == GLUT_UP)
 		{
@@ -126,48 +152,48 @@ void MouseButton(int button, int state, int x, int y)
 
 
 // Mouse wheel to zoom camera
-void MouseWheel(int wheel, int direction, int x, int y) 
+void MouseWheel(int wheel, int direction, int x, int y)
 {
 	if (volumeRenderer.grabRegion)
 		volumeRenderer.renderer->raycaster->clipPlaneDistance += (direction * 0.02f);
 	else
-		volumeRenderer.camera.Zoom(-direction * 0.2f);	
+		volumeRenderer.camera.Zoom(-direction * 0.2f);
 }
 
 
 
 int main(int argc, char *argv[])
 {
-	
+
 	// Set up the window
 	glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    glutCreateWindow("Volume Renderer");
+	glutCreateWindow("Volume Renderer");
 
 	// Tell glut where the display function is
 	glutDisplayFunc(MainLoop);
 	glutIdleFunc(MainLoop);
 
 	// A call to glewInit() must be done after glut is initialized!
-    GLenum res = glewInit();
+	GLenum res = glewInit();
 	// Check for any errors
-    if (res != GLEW_OK) 
+	if (res != GLEW_OK)
 	{
 		fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
 		return 1;
-    }
+	}
 
 	// Initialize Qt Widget, QApplication must be called before any Qt operations are performed
 	QApplication a(argc, argv);
 	QtWidget w;
 	w.show();
-		
+
 	// Pass command-line arguments to VolumeDataset
 	volumeRenderer.volume.ParseArguments(argc, argv);
 
 	// Initialize Renderer and Qt
-	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);	
+	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 	w.Init(volumeRenderer);
 
 	// Initialize Transfer Function Editor
@@ -186,7 +212,7 @@ int main(int argc, char *argv[])
 
 	// Begin infinite event loop
 	glutMainLoop();
-	
-    return 0;
+
+	return 0;
 
 }

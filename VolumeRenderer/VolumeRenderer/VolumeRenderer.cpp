@@ -40,6 +40,8 @@ void VolumeRenderer::OptimizeForSelectedRegion(int mouseX, int mouseY, int scree
 {
 	float avgIntensity = regionGrabber.Grab(mouseX, mouseY, screenWidth, screenHeight, camera, renderer->raycaster->clipPlaneNormal, renderer->raycaster->clipPlaneDistance, volume);
 
+	std::cout << "avgIntensity=" << avgIntensity << std::endl;
+
 	if (avgIntensity == -1.0f)
 		return;
 

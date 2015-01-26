@@ -25,7 +25,7 @@ public:
 	virtual void setSelectedIndex(int index){}
 	virtual void changeControlPointColor(int index, QColor color){}
 	virtual void draw(){}
-	virtual void updateTransferFunctionFromView(bool upate_origColors = false){}
+	virtual void updateTransferFunctionFromView(bool upate_origColors = true){}
 	virtual void updateViewFromTransferFunction(){}
 	virtual bool isMaOptimizerEnable(){ return false; }
 	virtual bool isLuoOptimizerEnable(){ return false; }

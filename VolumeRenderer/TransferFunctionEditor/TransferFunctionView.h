@@ -296,7 +296,7 @@ public:
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 
 public:
-	virtual void updateTransferFunctionFromView(bool upate_origColors = false)
+	virtual void updateTransferFunctionFromView(bool upate_origColors = true)
 	{
 		if (transfer_function)
 		{
@@ -331,10 +331,7 @@ public:
 		{
 			updateTransferFunctionFromView();
 			transfer_function->targetIntensity = intensities[index];
-			//transfer_function->intensityOptimizerV2->Optimize(transfer_function->targetIntensity);
-			//intensityTFOptimizerV2()->transferFunction = transfer_function;
 			optimizer()->Optimize();
-			transfer_function->LoadLookup(transfer_function->currentColorTable);
 			updateViewFromTransferFunction();
 		}
 		else
@@ -346,13 +343,8 @@ public:
 	virtual void optimize()
 	{
 		updateTransferFunctionFromView();
-
-		//tfView.transfer_function->intensityOptimizerV2->numIterations = ui->spinBox->value();
-		//tfView.transfer_function->intensityOptimizerV2->BalanceEdges();
 		optimizer()->numIterations = 1000;
 		optimizer()->BalanceEdges();
-		transfer_function->LoadLookup(transfer_function->currentColorTable);
-
 		updateViewFromTransferFunction();
 	}
 
@@ -361,29 +353,11 @@ public:
 		std::cout << "TransferFunctionView::init" << std::endl;
 		transfer_function = &volumeRenderer.renderer->transferFunction;
 		this->volumeRenderer = &volumeRenderer;
-		intensityTFOptimizerV2 = new IntensityTFOptimizerV2(&volumeRenderer.volume, &volumeRenderer.renderer->transferFunction, &volumeRenderer.renderer->visibilityHistogram);
+		intensityTFOptimizerV2 = volumeRenderer.renderer->intensityTFOptimizerV2();
 	}
 
 	IntensityTFOptimizerV2 *optimizer()
 	{
-		//if (renderer)
-		//{
-		//	auto p = dynamic_cast<JoesOGLRenderer*>(renderer);
-		//	if (p)
-		//	{
-		//		return p->intensityOptimizerV2.get();
-		//	}
-		//	else
-		//	{
-		//		auto p2 = dynamic_cast<OpenGLRenderer*>(renderer);
-		//		if (p2)
-		//		{
-		//			return p2->optimizer;
-		//		}
-		//	}
-		//}
-		//return NULL;
-
 		return intensityTFOptimizerV2;
 	}
 
