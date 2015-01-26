@@ -28,8 +28,8 @@ OpenGL Mathematics (GLM)
 
 There are two versions
 A newer version is in directory glm:
-GLM 0.9.5.4 (21/06/2014)
-http://glm.g-truc.net/0.9.5/index.html
+GLM 0.9.6.1 (2014-12-10)
+http://glm.g-truc.net/
 
 An older version that works with GLI is in directory glm_gli:
 GLM 0.9.4.3 (20/03/2013)
