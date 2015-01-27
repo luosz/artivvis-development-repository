@@ -19,7 +19,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	tester.Init(screenWidth, screenHeight, volume);
 
 
-	writeToFile = false;
+	writeToFile = true;
 	if (writeToFile)
 		fileWriter.Init();
 
@@ -53,7 +53,7 @@ void VolumeRenderer::Update()
 			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep, transferFunction, shaderManager, camera);
 			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
 
-//			tester.Test(volume, transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D, currentTimestep);
+			tester.Test(volume, transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D, currentTimestep);
 			
 			if (writeToFile)
 				fileWriter.Write(currentTimestep, *tempCoherence, tester);

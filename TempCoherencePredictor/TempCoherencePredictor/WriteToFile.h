@@ -13,7 +13,7 @@ public:
 
 	void Init()
 	{
-		targetFileName = "../TestDumps/blah.txt";
+		targetFileName = "../TestDumps/Epsilon_3_0.txt";
 		std::remove(targetFileName.c_str());
 
 		ofstream outStream(targetFileName);
@@ -29,8 +29,8 @@ public:
 
 		if (outStream.is_open())
 		{
-//			outStream << currentTimestep << "\t\t" << tC.numBlocksCopied << "\t" << tC.numBlocksExtrapolated << std::fixed << std::setprecision(6) << "\t\t" << test.errorMetrics.meanSqrError << "\t\t" << test.errorMetrics.meanAvgErr << "\t\t" << test.errorMetrics.peakSigToNoise << std::endl;
-			outStream << currentTimestep << std::fixed << std::setprecision(6) << "\t\t" << test.changeBetweenFrames.la1 << "\t\t" << test.changeBetweenFrames.la2 << "\t\t" << test.changeBetweenFrames.la3 << "\t\t" << test.changeBetweenFrames.la4 << "\t\t" << test.changeBetweenFrames.la5 << std::endl;
+			outStream << currentTimestep << "\t\t" << tC.numBlocksCopied << "\t" << tC.numBlocksExtrapolated << std::fixed << std::setprecision(6) << "\t\t" << test.errorMetrics.meanSqrError << "\t\t" << test.errorMetrics.meanAvgErr << "\t\t" << test.errorMetrics.peakSigToNoise << "\t\t" << test.errorMetrics.laplaceMSE << std::endl;
+//			outStream << currentTimestep << std::fixed << std::setprecision(6) << "\t\t" << test.changeBetweenFrames.la1 << "\t\t" << test.changeBetweenFrames.la2 << "\t\t" << test.changeBetweenFrames.la3 << "\t\t" << test.changeBetweenFrames.la4 << "\t\t" << test.changeBetweenFrames.la5 << std::endl;
 			outStream.close();
 		}
 		if (currentTimestep == 598)

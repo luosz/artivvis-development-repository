@@ -7,7 +7,7 @@ texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
 //	epsilon = 0.2f;
-	epsilon = 1;
+	epsilon = 3;
 	blockRes = 8;
 	alpha = 6;
 
@@ -151,7 +151,7 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 	float similar = glm::sqrt(top / bottom);
 
-	if (similar < (float)epsilon)
+	if (similar < (float)3.0f)
 		return true;
 
 
