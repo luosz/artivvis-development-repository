@@ -10,8 +10,6 @@ enum ShaderType {	TFShader  };
 class ShaderManager
 {
 public:
-	ShaderType currentShader;
-
 	void Init();
 	GLuint UseShader(ShaderType shaderType);
 

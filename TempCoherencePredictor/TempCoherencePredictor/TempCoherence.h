@@ -11,8 +11,14 @@
 #include "CudaHeaders.h"
 #include "FrequencyHistogram.h"
 #include "VisibilityHistogram.h"
+#include <thread>
+#include <atomic>
 
 #define EXTRAP_CONST 2
+#define EPSILON 1.0f
+#define CHECK_STRIDE 1
+#define NUM_THREADS 4
+
 
 struct BlockID
 {
@@ -43,6 +49,7 @@ public:
 	unsigned char *currTempVolume;
 	unsigned char *nextTempVolume;
 	
+	std::atomic<int> atomicNumBlocksCopied;
 	int numBlocksCopied, numBlocksExtrapolated;
 	int currentTimestep;
 
@@ -52,7 +59,6 @@ public:
 	unsigned char *chunkToBeCopied;
 	unsigned char *cudaCopiedChunk;
 
-	int epsilon;
 	int alpha;
 	Histogram *histogram;
 
@@ -63,9 +69,12 @@ public:
 	void GPUPredict(VolumeDataset &volume);
 	void CPUPredict(VolumeDataset &volume);
 	bool BlockCompare(VolumeDataset &volume, int x, int y, int z);
+	void CPUExtrap(int begin, int end);
+	void CPUCompare(int begin, int end, VolumeDataset &volume);
 
 	void CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z);
 	void CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z);
+	void CopyBlockToChunk(VolumeDataset &volume, int posInChunk, int x, int y, int z);
 	void CopyChunkToGPU(VolumeDataset &volume);
 };
 

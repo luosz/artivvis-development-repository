@@ -9,6 +9,8 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	volume.Init();
 
 	renderer = new OpenGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
+
+	currentTimestep = 0;
 }
 
 
@@ -19,7 +21,25 @@ void VolumeRenderer::Update()
 	
 
 	camera.Update();
-	volume.Update();
+	
+	// If dataset is time variant advance time and update GPU's texture
+	if (volume.timesteps > 1)
+	{
+		clock_t currentTime = clock();
+		float time = (currentTime - oldTime) / (float) CLOCKS_PER_SEC;
+
+		if (time > volume.timePerFrame)
+		{
+			if (currentTimestep < volume.timesteps - 2)
+				currentTimestep++;
+			else
+				currentTimestep = 0;
+
+			oldTime = currentTime;
+
+			renderer->UpdateTexture(currentTimestep, volume);
+		}	
+	}
 
 	renderer->Draw(volume, shaderManager, camera);
 

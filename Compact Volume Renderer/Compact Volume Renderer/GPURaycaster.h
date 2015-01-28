@@ -19,7 +19,7 @@ public:
 
 
 	GPURaycaster(int screenWidth, int screenHeight, VolumeDataset &volume);
-	void Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
+	void Raycast(GLuint currTexture3D, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera);
 };
 
 #endif

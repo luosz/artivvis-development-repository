@@ -5,7 +5,6 @@ void ShaderManager::Init()
 {
 	LoadShaders();
 	CompileShaders();
-	currentShader = TFShader;
 }
 
 

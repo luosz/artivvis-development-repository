@@ -32,7 +32,6 @@ public:
 
 	void LoadVolume(std::string folderPath, std::string headerFile, VolumeProperties &properties);
 	void CopyFileToBuffer(std::string fileName, int &numBytesInBufferFilled, VolumeProperties &properties);
-	void CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex);
 
 private:
 	void ReadMHD(std::string folderPath, std::string headerFile, VolumeProperties &properties);

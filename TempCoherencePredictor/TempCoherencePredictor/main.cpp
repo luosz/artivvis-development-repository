@@ -2,6 +2,8 @@
 #include "CudaHeaders.h"
 #include <stdlib.h>
 
+#define _VARIADIC_MAX 10
+
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 800
 
