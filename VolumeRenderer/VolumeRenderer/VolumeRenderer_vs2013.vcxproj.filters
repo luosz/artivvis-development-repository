@@ -312,72 +312,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="XToonVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="NormalsFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="NormalsVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="OpacityFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="OpacityVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="RaycastFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="RaycastVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="ShadowFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="ShadowVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="SimpleFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="SimpleVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="SmokeFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="SmokeVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="TextureFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="TextureVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="TransFuncFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="TransFuncVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="VisibilityHistFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="VisibilityHistVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="VolumeFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="VolumeVertShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
-    <Text Include="XToonFragShader.txt">
-      <Filter>Shaders</Filter>
-    </Text>
+    <CudaCompile Include="RegionVisibilityOptimizer.cu" />
+    <CudaCompile Include="VisibilityHistogram.cu" />
+  </ItemGroup>
+  <ItemGroup>
     <Text Include="ComparisonFragShader.txt">
       <Filter>Shaders</Filter>
     </Text>
@@ -420,9 +358,77 @@
     <Text Include="MarchingSurfaceVertShader.txt">
       <Filter>Shaders</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="RegionVisibilityOptimizer.cu" />
-    <CudaCompile Include="VisibilityHistogram.cu" />
+    <Text Include="NormalsFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="NormalsVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="OpacityFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="OpacityVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="RaycastFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="RaycastVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="RegionVisibilityFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="RegionVisibilityVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="ShadowFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="ShadowVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="SimpleFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="SimpleVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="SmokeFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="SmokeVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="TextureFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="TextureVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="TransFuncFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="TransFuncVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="VisibilityFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="VisibilityVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="VolumeFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="VolumeVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="XToonFragShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="XToonVertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

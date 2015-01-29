@@ -280,6 +280,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="RegionVisibilityOptimizer.cu" />
+    <CudaCompile Include="VisibilityHistogram.cu" />
+  </ItemGroup>
+  <ItemGroup>
     <Text Include="ComparisonFragShader.txt" />
     <Text Include="ComparisonVertShader.txt" />
     <Text Include="ContourFragShader.txt" />
@@ -300,6 +304,8 @@
     <Text Include="OpacityVertShader.txt" />
     <Text Include="RaycastFragShader.txt" />
     <Text Include="RaycastVertShader.txt" />
+    <Text Include="RegionVisibilityFragShader.txt" />
+    <Text Include="RegionVisibilityVertShader.txt" />
     <Text Include="ShadowFragShader.txt" />
     <Text Include="ShadowVertShader.txt" />
     <Text Include="SimpleFragShader.txt" />
@@ -310,16 +316,12 @@
     <Text Include="TextureVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />
     <Text Include="TransFuncVertShader.txt" />
-    <Text Include="VisibilityHistFragShader.txt" />
-    <Text Include="VisibilityHistVertShader.txt" />
+    <Text Include="VisibilityFragShader.txt" />
+    <Text Include="VisibilityVertShader.txt" />
     <Text Include="VolumeFragShader.txt" />
     <Text Include="VolumeVertShader.txt" />
     <Text Include="XToonFragShader.txt" />
     <Text Include="XToonVertShader.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="RegionVisibilityOptimizer.cu" />
-    <CudaCompile Include="VisibilityHistogram.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
