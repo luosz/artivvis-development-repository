@@ -16,8 +16,8 @@
 
 #define EXTRAP_CONST 2
 #define EPSILON 1.0f
-#define CHECK_STRIDE 1
-#define NUM_THREADS 4
+#define CHECK_STRIDE 2
+#define NUM_THREADS 7
 
 
 struct BlockID
@@ -61,6 +61,8 @@ public:
 
 	int alpha;
 	Histogram *histogram;
+
+	std::vector<std::thread> threads;
 
 	TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume);
 	GLuint GenerateTexture(VolumeDataset &volume);
