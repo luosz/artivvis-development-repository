@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     }
 
 		
-	// Initialize Renderer and Qt
+	// Initialize Renderer
 	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);	
 
 

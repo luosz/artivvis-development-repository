@@ -2,6 +2,7 @@
 
 GPURaycaster::GPURaycaster(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
+	// Variables which will be used in shader
 	maxRaySteps = 1000;
 	rayStepSize = 0.005f;
 	gradientStepSize = 0.005f;
@@ -10,10 +11,8 @@ GPURaycaster::GPURaycaster(int screenWidth, int screenHeight, VolumeDataset &vol
 
 
 
-
-
-// Messy but just inputs all data to shader
-void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
+// Messy but just inputs all uniforms to shader and raycasts using the passed in 3D texture and transfer function
+void GPURaycaster::Raycast(GLuint currTexture3D, TransferFunction &transferFunction, GLuint shaderProgramID, Camera &camera)
 {
 	int uniformLoc;
 
@@ -31,7 +30,7 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 	glActiveTexture (GL_TEXTURE0);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
 	glUniform1i(uniformLoc,0);
-	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
+	glBindTexture (GL_TEXTURE_3D, currTexture3D);
 
 	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
 	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
@@ -56,7 +55,7 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 
 
 
-	// Final render is the front faces of a cube rendered
+	// Final render is the front faces of a cube which can then be raycasted into
 	glBegin(GL_QUADS);
 
 	// Front Face

@@ -51,7 +51,7 @@ void VolumeRenderer::Update()
 			oldTime = currentTime;
 
 			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep, transferFunction, shaderManager, camera);
-			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
+//			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
 
 //			tester.Test(volume, transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D, currentTimestep);
 			

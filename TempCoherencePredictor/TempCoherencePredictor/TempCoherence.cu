@@ -6,8 +6,6 @@ texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 
 TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
-//	epsilon = 0.2f;
-	epsilon = 1;
 	blockRes = 8;
 	alpha = 6;
 
@@ -122,9 +120,9 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	float top, bottom;
 	top = bottom = 0.0f;
 
-	for (int k=0; k<blockRes; k++)
-		for (int j=0; j<blockRes; j++)
-			for (int i=0; i<blockRes; i++)
+	for (int k=0; k<blockRes; k+=CHECK_STRIDE)
+		for (int j=0; j<blockRes; j+=CHECK_STRIDE)
+			for (int i=0; i<blockRes; i+=CHECK_STRIDE)
 			{
 				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
 					continue;
@@ -147,11 +145,12 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 				top += omega * glm::pow(diff, 2);
 			}
 
-	bottom = blockRes * blockRes * blockRes;
+	int numPerAxis = blockRes / CHECK_STRIDE;
+	bottom = numPerAxis * numPerAxis * numPerAxis;
 
 	float similar = glm::sqrt(top / bottom);
 
-	if (similar < (float)epsilon)
+	if (similar < EPSILON)
 		return true;
 
 
@@ -216,10 +215,130 @@ void TempCoherence::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z)
 	cudaMemcpy3D(&cudaCpyParams) ;
 }
 
+
+void TempCoherence::CopyBlockToChunk(VolumeDataset &volume, int posInChunk, int x, int y, int z)
+{
+	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
+	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToHost;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.srcPos = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
+
+	cudaCpyParams.dstPos = make_cudaPos((posInChunk * blockRes), 0, 0);
+	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
+	
+	cudaMemcpy3D(&cudaCpyParams) ;
+}
+
+
+void TempCoherence::CPUExtrap(int begin, int end)
+{
+	for (int i=begin; i<end; i+=CHECK_STRIDE)
+	{
+		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
+		currTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
+
+		nextTempVolume[i] = currTempVolume[i];
+		currTempVolume[i] = nextTempVolume[i];	
+	}
+}
+
+
+void TempCoherence::CPUCompare(int begin, int end, VolumeDataset &volume)
+{
+	for (int i=begin; i<end; i++)
+	{
+		int z = i / (volume.xRes * volume.yRes);
+		int remainder = i % (volume.xRes * volume.yRes);
+
+		int y = remainder / volume.xRes;
+
+		int x = remainder % volume.xRes;
+
+		if (BlockCompare(volume, x, y, z) == false)
+		{
+//			int posInChunk = atomicNumBlocksCopied.load();
+//			atomicNumBlocksCopied++;
+
+			int posInChunk = atomicNumBlocksCopied.fetch_add(1);
+			blocksToBeCopied[posInChunk] = BlockID(x, y, z);
+			CopyBlockToChunk(volume, posInChunk, x, y, z);
+//
+//			numBlocksCopied++;
+		}
+//		else
+//			numBlocksExtrapolated++;
+	}
+}
+
+void TempCoherence::CPUPredict(VolumeDataset &volume)
+{
+	std::vector<std::thread> threads(NUM_THREADS);
+
+	int beginID = 0;
+	int numPerThread = volume.numVoxels / NUM_THREADS;
+//
+//	for (int i=0; i<NUM_THREADS-1; i++)
+//	{
+//		threads[i] = std::thread(&TempCoherence::CPUExtrap, this, beginID, beginID + numPerThread);
+//		beginID += numPerThread;
+//	}
+//	threads[NUM_THREADS-1] = std::thread(&TempCoherence::CPUExtrap, this, beginID, volume.numVoxels);
+//
+//	for (int i=0; i<NUM_THREADS; i++)
+//		threads[i].join();
+
+
+	// Beware of this, think it requires even stepsize
+	for (int i=0; i<volume.numVoxels; i+=CHECK_STRIDE)
+	{
+		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
+		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
+
+		prevTempVolume[i] = currTempVolume[i];
+		currTempVolume[i] = nextTempVolume[i];	
+	}
+//
+//	for (int z=0; z<numZBlocks; z++)
+//		for (int y =0; y<numYBlocks; y++)
+//			for (int x=0; x<numXBlocks; x++)
+//			{
+//				if (BlockCompare(volume, x, y, z) == false)
+//				{
+//					blocksToBeCopied[numBlocksCopied] = BlockID(x, y, z);
+//					CopyBlockToChunk(volume, x, y, z);
+//
+//					numBlocksCopied++;
+//				}
+//			}	
+//	
+	numPerThread = numBlocks / NUM_THREADS;
+	beginID = 0;
+
+	for (int i=0; i<NUM_THREADS-1; i++)
+	{
+		threads[i] = std::thread(&TempCoherence::CPUCompare, this, beginID, beginID + numPerThread, std::ref(volume));
+		beginID += numPerThread;
+	}
+	threads[NUM_THREADS-1] = std::thread(&TempCoherence::CPUCompare, this, beginID, numBlocks, std::ref(volume));
+
+	for (int i=0; i<NUM_THREADS; i++)
+		threads[i].join();
+	
+	numBlocksCopied = atomicNumBlocksCopied.load();
+
+		
+}
+
+/*
 void TempCoherence::CPUPredict(VolumeDataset &volume)
 {
 	// Beware of this, think it requires even stepsize
-	for (int i=0; i<volume.numVoxels; i++)
+	for (int i=0; i<volume.numVoxels; i+=CHECK_STRIDE)
 	{
 		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
 		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
@@ -243,6 +362,7 @@ void TempCoherence::CPUPredict(VolumeDataset &volume)
 					numBlocksExtrapolated++;
 			} 
 }
+*/
 
 
 void TempCoherence::CopyChunkToGPU(VolumeDataset &volume)
@@ -294,6 +414,7 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 {
 	currentTimestep = currentTimestep_;
 	numBlocksCopied = numBlocksExtrapolated = 0;
+	atomicNumBlocksCopied = 0;
 
 	GLuint temp = prevTexture3D;
 	prevTexture3D = currTexture3D;

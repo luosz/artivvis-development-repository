@@ -88,11 +88,5 @@
     <Text Include="TransFuncVertShader.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="VisibilityFragShader.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="VisibilityVertShader.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

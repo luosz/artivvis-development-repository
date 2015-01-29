@@ -14,19 +14,15 @@
 class TransferFunction
 {
 public:
-	std::vector<glm::vec4> origColors;
 	std::vector<glm::vec4> colors;
 	std::vector<float> intensities;
 	
 	int numIntensities;
 	GLuint tfTexture;
 
-	std::vector<glm::vec4> origColorTable;
-	std::vector<glm::vec4> currentColorTable;
+	std::vector<glm::vec4> colorTable;
 
 	void Init(const char *filename, VolumeDataset &volume_);
-	void Update();
-
 	void LoadXML(const char *filename);
 	void LoadLookup(std::vector<glm::vec4> &colorTable);
 	void CopyToTex(std::vector<glm::vec4> &data);
