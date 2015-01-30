@@ -4,7 +4,7 @@
 #include "VolumeDataset.h"
 #include "ShaderManager.h"
 #include "CudaHeaders.h"
-
+#include "../TransferFunctionEditor/AbstractGraphicsView.h"
 
 class VisibilityHistogram
 {
@@ -28,6 +28,10 @@ public:
 	std::vector<int> numVis;
 	std::vector<int> intensity_histogram;
 
+
+	// Qt GraphicsView for visibility histogram
+	AbstractGraphicsView *visibilityView;
+
 	cudaGraphicsResource_t resource;
 
 	float *cudaHistBins;
@@ -41,6 +45,11 @@ public:
 	GLuint GenerateSliceTexture();
 	glm::vec3 FindClosestCorner(Camera &camera);
 	glm::vec3 FindFarthestCorner(Camera &camera);
+
+	VisibilityHistogram()
+	{
+		visibilityView = NULL;
+	}
 
 };
 

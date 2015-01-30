@@ -359,9 +359,11 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	// Copy visibility info back to CPU memory for ease of access
 	HANDLE_ERROR(cudaMemcpy(&visibilities[0], cudaHistBins, 256 * sizeof(float), cudaMemcpyDeviceToHost));
 
+	// Copy numVis, which is used by HistogramView to draw visibility histogram, back to CPU memory
+	HANDLE_ERROR(cudaMemcpy(&numVis[0], cudaNumInBin, 256 * sizeof(int), cudaMemcpyDeviceToHost));
+
 	// Copy intensity histogram of frustum back to CPU memory for ease of access
 	HANDLE_ERROR(cudaMemcpy(&intensity_histogram[0], cudaNumInBin_intensity, 256 * sizeof(int), cudaMemcpyDeviceToHost));
-
 
 	// CPU average visbilities
 //	for (int i=0; i<256; i++)
@@ -375,6 +377,13 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 // Draw visibility histogram
 void VisibilityHistogram::DrawHistogram(ShaderManager shaderManager, Camera &camera)
 {
+	// update HistogramView
+	if (visibilityView)
+	{
+		visibilityView->setVisibilityHistogram(visibilities, numVis);
+		visibilityView->draw();
+	}
+
 	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
 
 	int uniformLoc;

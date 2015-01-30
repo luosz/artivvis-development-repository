@@ -34,12 +34,20 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 			transferFunction.tfView->updateViewFromTransferFunction();
 		}
 	}
-
-	if (transferFunction.visibilityView)
+	else
 	{
-		transferFunction.visibilityView->setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
-		transferFunction.visibilityView->draw();
+		std::cout << "Warning: transferFunction.tfView is empty" << std::endl;
 	}
+
+	//if (visibilityHistogram.visibilityView)
+	//{
+	//	visibilityHistogram.visibilityView->setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
+	//	visibilityHistogram.visibilityView->draw();
+	//}
+	//else
+	//{
+	//	std::cout << "Warning: visibilityHistogram.visibilityView is empty" << std::endl;
+	//}
 
 	OpenGLRenderer::Draw(volume, shaderManager, camera);
 }

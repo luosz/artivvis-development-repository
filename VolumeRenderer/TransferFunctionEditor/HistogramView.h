@@ -35,7 +35,7 @@ public:
 		QSize size = this->size();
 		scene()->clear();
 		HistogramPoint *node0 = NULL;
-		int numIntensities = intensities.size();
+		int numIntensities = intensity_list.size();
 		for (int i = 0; i < numIntensities; i++)
 		{
 			QColor color;
@@ -43,7 +43,7 @@ public:
 			color.setHsvF(gray, gray, gray);
 			HistogramPoint* node1 = new HistogramPoint(this, i, color);
 			scene()->addItem(node1);
-			node1->setPos(intensities[i] * size.width(), (1 - frequencies[i]) * size.height());
+			node1->setPos(intensity_list[i] * size.width(), (1 - frequency_list[i]) * size.height());
 			if (i >= 1)
 			{
 				scene()->addItem(new ControlEdge(static_cast<Node*>(node0), static_cast<Node*>(node1)));
@@ -58,13 +58,16 @@ public:
 		{
 			std::cout << "Error: visibilities and numVis should be the same size." << std::endl;
 		}
-		intensities.clear();
-		frequencies.clear();
+		intensity_list.clear();
+		frequency_list.clear();
 		int size = visibilities.size();
 		for (int i = 0; i < visibilities.size(); i++)
 		{
-			intensities.push_back(i / (float)size);
-			frequencies.push_back(visibilities[i] * numVis[i]);
+
+			std::cout << i << " " << visibilities[i] << " " << numVis[i] << std::endl;
+
+			intensity_list.push_back(i / (float)size);
+			frequency_list.push_back(visibilities[i] * numVis[i]);
 		}
 	}
 
@@ -94,8 +97,8 @@ protected:
 	virtual void timerEvent(QTimerEvent *event){}
 
 public:
-	std::vector<float> intensities;
-	std::vector<float> frequencies;
+	std::vector<float> intensity_list;
+	std::vector<float> frequency_list;
 	std::string _name;
 };
 

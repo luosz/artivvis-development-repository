@@ -4,8 +4,8 @@
 TransferFunctionEditor::TransferFunctionEditor(QWidget *parent) :
 QMainWindow(parent),
 ui(new Ui::TransferFunctionEditor),
-intensity_histogram("Intensity Histogram"),
-visibility_histogram("Visibility Histogram")
+intensity_histogram_view("Intensity Histogram"),
+visibility_histogram_view("Visibility Histogram")
 {
 	ui->setupUi(this);
 
@@ -13,8 +13,8 @@ visibility_histogram("Visibility Histogram")
 	ui->verticalLayout->addWidget(&tfView);
 
 	// add histogram widget
-	ui->verticalLayout_2->addWidget(&intensity_histogram);
-	ui->verticalLayout_3->addWidget(&visibility_histogram);
+	ui->verticalLayout_2->addWidget(&intensity_histogram_view);
+	ui->verticalLayout_3->addWidget(&visibility_histogram_view);
 
 	// load default transfer function
 	//	filename = "../../transferfuncs/nucleon.tfi";
@@ -31,10 +31,10 @@ visibility_histogram("Visibility Histogram")
 	for (int i = 0; i <= n;i++)
 	{
 		float intensity = i / (float)n;
-		intensity_histogram.intensities.push_back(intensity);
-		intensity_histogram.frequencies.push_back(intensity*intensity);
-		visibility_histogram.intensities.push_back(intensity);
-		visibility_histogram.frequencies.push_back(intensity*intensity);
+		intensity_histogram_view.intensity_list.push_back(intensity);
+		intensity_histogram_view.frequency_list.push_back(intensity*intensity);
+		visibility_histogram_view.intensity_list.push_back(intensity);
+		visibility_histogram_view.frequency_list.push_back(intensity*intensity);
 	}
 }
 

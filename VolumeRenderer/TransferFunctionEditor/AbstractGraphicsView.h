@@ -29,7 +29,7 @@ public:
 	virtual void updateViewFromTransferFunction(){}
 	virtual bool isMaOptimizerEnable(){ return false; }
 	virtual bool isLuoOptimizerEnable(){ return false; }
-	virtual void setVisibilityHistogram(std::vector<float> &visibilities, std::vector<int> &numVis){}
+	virtual void setVisibilityHistogram(const std::vector<float> &visibilities, const std::vector<int> &numVis){}
 };
 
 #endif // AbstractGraphicsView_h

@@ -156,30 +156,36 @@ public:
 			{
 				max = std::max((float)*i, max);
 			}
-			intensity_histogram.intensities.clear();
-			intensity_histogram.frequencies.clear();
+			intensity_histogram_view.intensity_list.clear();
+			intensity_histogram_view.frequency_list.clear();
 			for (int i = 0; i < size; i++)
 			{
-				intensity_histogram.intensities.push_back(i / (float)size);
-				intensity_histogram.frequencies.push_back(frequencies[i]/max);
+				intensity_histogram_view.intensity_list.push_back(i / (float)size);
+				intensity_histogram_view.frequency_list.push_back(frequencies[i]/max);
 				//std::cout<<"frequencies "<<i<<" "<<frequencies[i]<<std::endl;
 			}
-			intensity_histogram.draw();
-			//auto &visibilities = tfView.transfer_function->intensityOptimizerV2->visibilityHistogram->visibilities;
-			//auto &numVis = tfView.transfer_function->intensityOptimizerV2->visibilityHistogram->numVis;
-			auto &visibilities = optimizer()->visibilityHistogram->visibilities;
-			auto &numVis = optimizer()->visibilityHistogram->numVis;
-			std::cout << "visibilities size " << visibilities.size() << std::endl;
-			visibility_histogram.intensities.clear();
-			visibility_histogram.frequencies.clear();
-			for (int i = 0; i < visibilities.size();i++)
-			{
-				visibility_histogram.intensities.push_back(i / (float)size);
-				visibility_histogram.frequencies.push_back(visibilities[i]);
-			}
-			visibility_histogram.draw();
+			intensity_histogram_view.draw();
+
+			update_visibility_histogram_view();
 		}
 	}
+
+	void update_visibility_histogram_view()
+	{
+		auto &visibilities = optimizer()->visibilityHistogram->visibilities;
+		auto &numVis = optimizer()->visibilityHistogram->numVis;
+		auto size = visibilities.size();
+		std::cout << "visibilities size " << visibilities.size() << std::endl;
+		visibility_histogram_view.intensity_list.clear();
+		visibility_histogram_view.frequency_list.clear();
+		for (int i = 0; i < visibilities.size();i++)
+		{
+			visibility_histogram_view.intensity_list.push_back(i / (float)size);
+			visibility_histogram_view.frequency_list.push_back(visibilities[i]);
+		}
+		visibility_histogram_view.draw();
+	}
+
 #endif // NOT_USED_BY_VOLUME_RENDERER
 
 private slots:
@@ -215,8 +221,8 @@ public:
     std::vector<glm::vec4> colors;
     std::vector<float> intensities;
 	QString filename;
-	HistogramView intensity_histogram;
-	HistogramView visibility_histogram;
+	HistogramView intensity_histogram_view;
+	HistogramView visibility_histogram_view;
 };
 
 #endif // TRANSFERFUNCTIONEDITOR_H

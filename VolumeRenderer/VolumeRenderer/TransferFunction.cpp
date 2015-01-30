@@ -19,9 +19,6 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	LoadLookup(origColorTable);
 	LoadLookup(currentColorTable);
 
-	tfView = NULL;
-	visibilityView = NULL;
-
 	targetIntensity = 0.4f;
 	optimizeIntensity = false;
 }

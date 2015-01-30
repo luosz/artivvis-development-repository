@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 	tfEditor.init(volumeRenderer);
 	tfEditor.show();
 	volumeRenderer.renderer->transferFunction.tfView = &tfEditor.tfView;
-	volumeRenderer.renderer->transferFunction.visibilityView = &tfEditor.visibility_histogram;
+	volumeRenderer.renderer->visibilityHistogram.visibilityView = &tfEditor.visibility_histogram_view;
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);

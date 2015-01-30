@@ -24,8 +24,9 @@ public:
 	float targetIntensity;
 	bool optimizeIntensity;
 
+	// Qt GraphicsView for transfer function
 	AbstractGraphicsView *tfView;
-	AbstractGraphicsView *visibilityView;
+	//AbstractGraphicsView *visibilityView;
 
 	std::vector<glm::vec4> origColorTable;
 	std::vector<glm::vec4> currentColorTable;
@@ -38,6 +39,11 @@ public:
 	void CopyToTex(std::vector<glm::vec4> &data);
 
 	glm::vec4 LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity);
+
+	TransferFunction()
+	{
+		tfView = NULL;
+	}
 };
 
 #endif
