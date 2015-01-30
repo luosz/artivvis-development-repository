@@ -68,7 +68,7 @@ __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSur
 	}
 }
 
-void TempCoherence::GPUPredict(VolumeDataset &volume)
+void TempCoherence::MapTexturesToCuda()
 {
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], prevTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
 	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[1], currTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
@@ -76,25 +76,21 @@ void TempCoherence::GPUPredict(VolumeDataset &volume)
 
 	HANDLE_ERROR( cudaGraphicsMapResources(3, &cudaResources[0]) );
 
-	cudaArray *prevArry = 0;	
+	prevArry = 0;	
 	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&prevArry, cudaResources[0], 0, 0) ); 
 	HANDLE_ERROR( cudaBindTextureToArray(prevTexRef, prevArry) );
 
-	cudaArray *currArry = 0;	
+	currArry = 0;	
 	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&currArry, cudaResources[1], 0, 0) ); 
 	HANDLE_ERROR( cudaBindTextureToArray(currTexRef, currArry) );
 
-	cudaArray *nextArry = 0;	
-	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[2], 0, 0) ); 
+	nextArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[2], 0, 0) );
+}
 
-	cudaResourceDesc wdsc;
-	wdsc.resType = cudaResourceTypeArray;
-	wdsc.res.array.array = nextArry;
-	cudaSurfaceObject_t writeSurface;
-	HANDLE_ERROR( cudaCreateSurfaceObject(&writeSurface, &wdsc) );
 
-	CudaPredict <<<(volume.numVoxels + 255) / 256, 256>>>(volume.numVoxels, volume.xRes, volume.yRes, volume.zRes, writeSurface);
-
+void TempCoherence::UnmapTextures()
+{
 	// Unbind and unmap, must be done before OpenGL uses texture memory again
 	HANDLE_ERROR( cudaUnbindTexture(prevTexRef) );
 	HANDLE_ERROR( cudaUnbindTexture(currTexRef) );
@@ -105,7 +101,17 @@ void TempCoherence::GPUPredict(VolumeDataset &volume)
 	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );
 	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[1]) );
 	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[2]) );
+}
 
+void TempCoherence::GPUPredict(VolumeDataset &volume)
+{
+	cudaResourceDesc wdsc;
+	wdsc.resType = cudaResourceTypeArray;
+	wdsc.res.array.array = nextArry;
+	cudaSurfaceObject_t writeSurface;
+	HANDLE_ERROR( cudaCreateSurfaceObject(&writeSurface, &wdsc) );
+
+	CudaPredict <<<(volume.numVoxels + 255) / 256, 256>>>(volume.numVoxels, volume.xRes, volume.yRes, volume.zRes, writeSurface);
 }
 
 
@@ -122,11 +128,9 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 	float top, bottom;
 	top = bottom = 0.0f;
 
-	bool xAlternate = false;
-
 	for (int k=0; k<blockRes; k+=CHECK_STRIDE)
 	{
-		for (int j=0; j<blockRes; j+=1)
+		for (int j=0; j<blockRes; j+=CHECK_STRIDE)
 		{
 			for (int i=0; i<blockRes; i+=CHECK_STRIDE)
 			{
@@ -136,41 +140,25 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
 
-				if (xAlternate)
-					ID += 1;
-
 				unsigned char p = nextTempVolume[ID];
 				unsigned char n = nextVolume[ID];
 
-				if (n <= alpha)
-					beta = (float)n / float(alpha);
-				else
-					beta = ((float)(255 - n)) / ((float)(255 - alpha));
+//				if (n <= alpha)
+//					beta = (float)n / float(alpha);
+//				else
+//					beta = ((float)(255 - n)) / ((float)(255 - alpha));
 
-				omega = (float)histogram->values[n];
-//				omega *= beta;
+//				omega = (float)histogram->values[n];
 
 				int diff =  n - p;
 				
-				top += omega * glm::pow(diff, 2);
+				top += histogram->values[n] * diff * diff;
 			}
-
-			if (xAlternate)
-				xAlternate = false;
-			else
-				xAlternate = true;
 		}
-
-		if (xAlternate)
-			xAlternate = false;
-		else
-			xAlternate = true;
-
-//		xAlternate = false;
 	}
 
 	int numPerAxis = blockRes / CHECK_STRIDE;
-	bottom = numPerAxis * numPerAxis * blockRes;
+	bottom = numPerAxis * numPerAxis * numPerAxis;
 
 	float similar = glm::sqrt(top / bottom);
 
@@ -195,7 +183,7 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 
 
-void TempCoherence::CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z)
+void TempCoherence::CopyBlockToGPU(VolumeDataset &volume, int x, int y, int z)
 {
 	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
 	cudaPos offset = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
@@ -266,8 +254,8 @@ void TempCoherence::CPUExtrap(int begin, int end)
 		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
 		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
 
-		prevTempVolume[i] = currTempVolume[i];
-		currTempVolume[i] = nextTempVolume[i];
+//		prevTempVolume[i] = currTempVolume[i];
+//		currTempVolume[i] = nextTempVolume[i];
 	}
 }
 
@@ -285,9 +273,10 @@ void TempCoherence::CPUCompare(int begin, int end, VolumeDataset &volume)
 
 		if (BlockCompare(volume, x, y, z) == false)
 		{
-			int posInChunk = atomicNumBlocksCopied.fetch_add(1);
-			blocksToBeCopied[posInChunk] = BlockID(x, y, z);
-			CopyBlockToChunk(volume, posInChunk, x, y, z);
+			CopyBlockToGPU(std::ref(volume), x, y, z);
+//			int posInChunk = atomicNumBlocksCopied.fetch_add(1);
+//			blocksToBeCopied[posInChunk] = BlockID(x, y, z);
+//			CopyBlockToChunk(volume, posInChunk, x, y, z);
 		}
 	}
 }
@@ -306,6 +295,9 @@ void TempCoherence::CPUPredict(VolumeDataset &volume)
 
 	for (int i=0; i<NUM_THREADS; i++)
 		threads[i].join();
+
+	std::memcpy(&prevTempVolume[0], &currTempVolume[0], volume.numVoxels * volume.bytesPerElement);
+	std::memcpy(&currTempVolume[0], &nextTempVolume[0], volume.numVoxels * volume.bytesPerElement);
 
 	numPerThread = numBlocks / NUM_THREADS;
 	beginID = 0;
@@ -427,16 +419,12 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 	}
 	else
 	{
-
+		MapTexturesToCuda();
 		GPUPredict(volume);
 		histogram->Update(currentTimestep, volume, currTexture3D, tf.tfTexture, shaderManager, camera);
 		CPUPredict(volume);
-
-		CopyChunkToGPU(volume);
-
-//		glBindTexture(GL_TEXTURE_3D, nextTexture3D);
-//		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, (volume.memblock3D + (textureSize * currentTimestep)));
-//		glBindTexture(GL_TEXTURE_3D, 0);
+		UnmapTextures();
+//		CopyChunkToGPU(volume);
 	}
 	
 	return nextTexture3D;
@@ -492,7 +480,7 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 				int diff =  p - n;
 				int absDiff = glm::abs(diff);
 
-				if (absDiff > epsilon)
+				if (absDiff > EPSILON)
 					goto copy;
 			}
 

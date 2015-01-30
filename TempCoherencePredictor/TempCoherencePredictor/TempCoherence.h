@@ -15,8 +15,8 @@
 #include <atomic>
 
 #define EXTRAP_CONST 2
-#define EPSILON 1.0f
-#define CHECK_STRIDE 2
+#define EPSILON 2.0f
+#define CHECK_STRIDE 1
 #define NUM_THREADS 7
 
 
@@ -54,6 +54,7 @@ public:
 	int currentTimestep;
 
 	std::vector<cudaGraphicsResource_t> cudaResources;
+	cudaArray *prevArry, *currArry, *nextArry;
 	
 	std::vector<BlockID> blocksToBeCopied;
 	unsigned char *chunkToBeCopied;
@@ -74,7 +75,10 @@ public:
 	void CPUExtrap(int begin, int end);
 	void CPUCompare(int begin, int end, VolumeDataset &volume);
 
-	void CopyBlockToGPU(VolumeDataset &volume, cudaArray *nextArry, int x, int y, int z);
+	void MapTexturesToCuda();
+	void UnmapTextures();
+
+	void CopyBlockToGPU(VolumeDataset &volume, int x, int y, int z);
 	void CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z);
 	void CopyBlockToChunk(VolumeDataset &volume, int posInChunk, int x, int y, int z);
 	void CopyChunkToGPU(VolumeDataset &volume);

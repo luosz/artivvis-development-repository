@@ -62,8 +62,8 @@ void VolumeRenderer::Update()
 		
 	}
 
-	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
-	raycaster->Raycast(transferFunction, shaderProgramID, camera, interpTex3D);
+//	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
+//	raycaster->Raycast(transferFunction, shaderProgramID, camera, interpTex3D);
 
 	glutSwapBuffers();
 }
