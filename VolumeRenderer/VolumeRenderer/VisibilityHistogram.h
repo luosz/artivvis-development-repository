@@ -26,12 +26,13 @@ public:
 
 	std::vector<float> visibilities;
 	std::vector<int> numVis;
+	std::vector<int> intensity_histogram;
 
 	cudaGraphicsResource_t resource;
 
 	float *cudaHistBins;
 	int *cudaNumInBin;
-
+	int *cudaNumInBin_intensity;
 
 	void Init(int screenWidth, int screenHeight);
 	void CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera);

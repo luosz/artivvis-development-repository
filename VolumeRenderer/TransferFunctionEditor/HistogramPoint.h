@@ -49,7 +49,9 @@ public:
 		}
 		painter->setBrush(gradient);
 
-		painter->setPen(QPen(Qt::black, 0));
+		//// draw node boundary
+		//painter->setPen(QPen(Qt::black, 0));
+
 		painter->drawEllipse(-5, -5, 10, 10);
 	}
 
