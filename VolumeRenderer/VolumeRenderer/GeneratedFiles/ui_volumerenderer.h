@@ -584,6 +584,7 @@ public:
          << QApplication::translate("VolumeRendererClass", "Depth Shader", 0)
          << QApplication::translate("VolumeRendererClass", "Normals Shader", 0)
          << QApplication::translate("VolumeRendererClass", "Shadow Shader", 0)
+         << QApplication::translate("VolumeRendererClass", "TransFuncXtoon", 0)
         );
         shaderComboBox->setCurrentText(QApplication::translate("VolumeRendererClass", "Transfer Func Shader", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("VolumeRendererClass", "Shaders", 0));

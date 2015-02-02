@@ -377,13 +377,6 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 // Draw visibility histogram
 void VisibilityHistogram::DrawHistogram(ShaderManager shaderManager, Camera &camera)
 {
-	// update HistogramView
-	if (visibilityView)
-	{
-		visibilityView->setVisibilityHistogram(visibilities, numVis);
-		visibilityView->draw();
-	}
-
 	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
 
 	int uniformLoc;

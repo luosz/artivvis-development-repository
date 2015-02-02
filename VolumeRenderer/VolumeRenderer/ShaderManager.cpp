@@ -70,6 +70,9 @@ void ShaderManager::LoadShaders()
 
 	shader.Load("RegionVisibilityVertShader.txt", "RegionVisibilityFragShader.txt");
 	shaders.push_back(shader);
+
+	shader.Load("TransFuncXtoon.vert", "TransFuncXtoon.frag");
+	shaders.push_back(shader);
 }
 
 

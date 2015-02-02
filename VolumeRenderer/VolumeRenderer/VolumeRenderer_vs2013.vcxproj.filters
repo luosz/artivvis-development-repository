@@ -153,6 +153,12 @@
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="TransFuncXtoon.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="TransFuncXtoon.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BurnsContours.h">

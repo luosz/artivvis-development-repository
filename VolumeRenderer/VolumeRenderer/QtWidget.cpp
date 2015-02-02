@@ -227,6 +227,8 @@ void QtWidget::ChangeShader(QString qStr)
 		shaderManager->currentShader = SmokeShader;
 	else if (qStr == "Transfer Func Shader")
 		shaderManager->currentShader = TFShader;
+	else if (qStr == "TransFuncXtoon")
+		shaderManager->currentShader = TransFuncXtoonShader;
 }
 
 #pragma endregion ShadersTab

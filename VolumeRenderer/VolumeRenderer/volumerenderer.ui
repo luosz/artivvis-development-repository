@@ -571,6 +571,11 @@
         <string>Shadow Shader</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>TransFuncXtoon</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
