@@ -16,7 +16,6 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDockWidget>
 #include <QtWidgets/QDoubleSpinBox>
-#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -50,10 +49,6 @@ public:
     QWidget *tab_3;
     QHBoxLayout *horizontalLayout_7;
     QVBoxLayout *verticalLayout_3;
-    QWidget *tab_4;
-    QHBoxLayout *horizontalLayout_8;
-    QVBoxLayout *verticalLayout_4;
-    QGraphicsView *graphicsView;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QToolBar *mainToolBar;
@@ -140,25 +135,6 @@ public:
         horizontalLayout_7->addLayout(verticalLayout_3);
 
         tabWidget->addTab(tab_3, QString());
-        tab_4 = new QWidget();
-        tab_4->setObjectName(QStringLiteral("tab_4"));
-        horizontalLayout_8 = new QHBoxLayout(tab_4);
-        horizontalLayout_8->setSpacing(6);
-        horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
-        horizontalLayout_8->setContentsMargins(0, 0, 0, 0);
-        verticalLayout_4 = new QVBoxLayout();
-        verticalLayout_4->setSpacing(6);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        graphicsView = new QGraphicsView(tab_4);
-        graphicsView->setObjectName(QStringLiteral("graphicsView"));
-
-        verticalLayout_4->addWidget(graphicsView);
-
-
-        horizontalLayout_8->addLayout(verticalLayout_4);
-
-        tabWidget->addTab(tab_4, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
@@ -292,7 +268,7 @@ public:
 
         retranslateUi(TransferFunctionEditor);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(TransferFunctionEditor);
@@ -306,7 +282,6 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "intensity histogram", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TransferFunctionEditor", "Page", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
         label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
         rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));

@@ -63,11 +63,9 @@ public:
 		int size = visibilities.size();
 		for (int i = 0; i < visibilities.size(); i++)
 		{
-
-			std::cout << i << " " << visibilities[i] << " " << numVis[i] << std::endl;
-
 			intensity_list.push_back(i / (float)size);
 			frequency_list.push_back(visibilities[i] * numVis[i]);
+			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << *intensity_list.rbegin() << " " << *frequency_list.rbegin() << std::endl;
 		}
 	}
 
