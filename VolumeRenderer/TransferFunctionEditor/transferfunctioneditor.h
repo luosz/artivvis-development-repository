@@ -124,16 +124,6 @@ public:
 	}
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	TransferFunction *transferFunction()
-	{
-		return tfView.transfer_function;
-	}
-
-	IntensityTFOptimizerV2 *optimizer()
-	{
-		//return tfView.optimizer();
-		return tfView.intensityTFOptimizerV2;
-	}
 
 	void init(VolumeRenderer &volumeRenderer)
 	{
@@ -145,10 +135,10 @@ public:
 
 		tfView.init(volumeRenderer);
 
-		if (transferFunction())
+		if (tfView.transferFunction())
 		{
 			//auto &frequencies = tfView.transfer_function->intensityOptimizerV2->frequencies;
-			auto &frequencies = optimizer()->frequencies;
+			auto &frequencies = tfView.optimizer()->frequencies;
 			std::cout << "frequencies size " << frequencies.size() << std::endl;
 			auto size = frequencies.size();
 			float max = 0;
@@ -172,8 +162,8 @@ public:
 
 	void update_visibility_histogram_view()
 	{
-		auto &visibilities = optimizer()->visibilityHistogram->visibilities;
-		auto &numVis = optimizer()->visibilityHistogram->numVis;
+		auto &visibilities = tfView.optimizer()->visibilityHistogram->visibilities;
+		auto &numVis = tfView.optimizer()->visibilityHistogram->numVis;
 		auto size = visibilities.size();
 		std::cout << "visibilities size " << visibilities.size() << std::endl;
 		visibility_histogram_view.intensity_list.clear();
@@ -211,6 +201,8 @@ private slots:
     void on_checkBox_2_clicked();
 
     void on_flatButton_clicked();
+
+    void on_visibilityHistogramButton_clicked();
 
 private:
     Ui::TransferFunctionEditor *ui;

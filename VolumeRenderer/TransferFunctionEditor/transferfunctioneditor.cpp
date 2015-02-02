@@ -101,14 +101,14 @@ void TransferFunctionEditor::on_rampButton_clicked()
 void TransferFunctionEditor::on_entropyButton_clicked()
 {
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	if (transferFunction())
+	if (tfView.transferFunction())
 	{
 		std::cout<<"on_entropyButton_clicked\n";
 
 		tfView.updateTransferFunctionFromView();
-		optimizer()->numIterations = ui->spinBox->value();
-		optimizer()->BalanceEdges();
-		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
+		tfView.optimizer()->numIterations = ui->spinBox->value();
+		tfView.optimizer()->BalanceEdges();
+		tfView.transferFunction()->LoadLookup(tfView.transferFunction()->currentColorTable);
 
 		tfView.updateViewFromTransferFunction();
 	}
@@ -118,14 +118,14 @@ void TransferFunctionEditor::on_entropyButton_clicked()
 void TransferFunctionEditor::on_visibilityButton_clicked()
 {
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	if (transferFunction())
+	if (tfView.transferFunction())
 	{
 		std::cout<<"on_visibilityButton_clicked\n";
 
 		tfView.updateTransferFunctionFromView();
-		optimizer()->numIterations = ui->spinBox->value();
-		optimizer()->BalanceVisibility();
-		transferFunction()->LoadLookup(transferFunction()->currentColorTable);
+		tfView.optimizer()->numIterations = ui->spinBox->value();
+		tfView.optimizer()->BalanceVisibility();
+		tfView.transferFunction()->LoadLookup(tfView.transferFunction()->currentColorTable);
 
 		tfView.updateViewFromTransferFunction();
 	}
@@ -151,4 +151,13 @@ void TransferFunctionEditor::on_checkBox_2_clicked()
 void TransferFunctionEditor::on_flatButton_clicked()
 {
 	tfView.makeFlat(ui->doubleSpinBox->value());
+}
+
+void TransferFunctionEditor::on_visibilityHistogramButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	auto visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
+	visibility_histogram_view.setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
+	visibility_histogram_view.draw();
+#endif // NOT_USED_BY_VOLUME_RENDERER
 }

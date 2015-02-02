@@ -24,12 +24,15 @@ public:
 	virtual void addControlPoint(double intensity, double opacity){}
 	virtual void setSelectedIndex(int index){}
 	virtual void changeControlPointColor(int index, QColor color){}
-	virtual void draw(){}
 	virtual void updateTransferFunctionFromView(bool upate_origColors = true){}
 	virtual void updateViewFromTransferFunction(){}
 	virtual bool isMaOptimizerEnable(){ return false; }
 	virtual bool isLuoOptimizerEnable(){ return false; }
-	virtual void setVisibilityHistogram(const std::vector<float> &visibilities, const std::vector<int> &numVis){}
+	virtual void draw() = 0;
+	virtual void setVisibilityHistogram(const std::vector<float> &visibilities, const std::vector<int> &numVis)
+	{
+		std::cout << "AbstractGraphicsView::setVisibilityHistogram is not implemented." << std::endl;
+	}
 };
 
 #endif // AbstractGraphicsView_h

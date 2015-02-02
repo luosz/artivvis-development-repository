@@ -33,7 +33,7 @@ public:
 
 #ifndef NOT_USED_BY_VOLUME_RENDERER
 		transfer_function = NULL;
-		volumeRenderer = NULL;
+		volume_renderer = NULL;
 		intensityTFOptimizerV2 = NULL;
 #endif // NOT_USED_BY_VOLUME_RENDERER
 
@@ -352,7 +352,7 @@ public:
 	{
 		std::cout << "TransferFunctionView::init" << std::endl;
 		transfer_function = &volumeRenderer.renderer->transferFunction;
-		this->volumeRenderer = &volumeRenderer;
+		this->volume_renderer = &volumeRenderer;
 		intensityTFOptimizerV2 = volumeRenderer.renderer->intensityTFOptimizerV2();
 	}
 
@@ -361,9 +361,19 @@ public:
 		return intensityTFOptimizerV2;
 	}
 
+	TransferFunction *transferFunction()
+	{
+		return transfer_function;
+	}
+
+	VolumeRenderer *volumeRenderer()
+	{
+		return volume_renderer;
+	}
+
 public:
 	TransferFunction *transfer_function;
-	VolumeRenderer *volumeRenderer;
+	VolumeRenderer *volume_renderer;
 	IntensityTFOptimizerV2 *intensityTFOptimizerV2;
 
 #endif // NOT_USED_BY_VOLUME_RENDERER

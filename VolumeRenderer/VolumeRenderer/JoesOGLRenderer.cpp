@@ -41,6 +41,7 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 
 	//if (visibilityHistogram.visibilityView)
 	//{
+	//	std::cout << "visibilityHistogram.visibilityView is not empty" << std::endl;
 	//	visibilityHistogram.visibilityView->setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
 	//	visibilityHistogram.visibilityView->draw();
 	//}

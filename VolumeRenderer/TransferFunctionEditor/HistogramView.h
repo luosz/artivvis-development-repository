@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	virtual void setVisibilityHistogram(std::vector<float> &visibilities, std::vector<int> &numVis)
+	virtual void setVisibilityHistogram(const std::vector<float> &visibilities, const std::vector<int> &numVis)
 	{
 		if (visibilities.size() != numVis.size())
 		{
