@@ -60,12 +60,21 @@ public:
 		}
 		intensity_list.clear();
 		frequency_list.clear();
-		int size = visibilities.size();
+		float max = 0;
 		for (int i = 0; i < visibilities.size(); i++)
 		{
-			intensity_list.push_back(i / (float)size);
+			intensity_list.push_back(i / (float)visibilities.size());
 			frequency_list.push_back(visibilities[i] * numVis[i]);
-			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << *intensity_list.rbegin() << " " << *frequency_list.rbegin() << std::endl;
+			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << intensity_list[i] << " " << frequency_list[i] << std::endl;
+			max = std::max(frequency_list[i], max);
+		}
+		if (max > 0)
+		{
+			for (auto i = frequency_list.begin(); i != frequency_list.end(); i++)
+			{
+				*i = *i / max;
+				//std::cout << "normalized visibility " << *i << std::endl;
+			}		
 		}
 	}
 

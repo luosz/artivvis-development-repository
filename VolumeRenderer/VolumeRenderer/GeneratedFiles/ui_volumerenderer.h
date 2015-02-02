@@ -279,7 +279,6 @@ public:
         shaderComboBox->setObjectName(QStringLiteral("shaderComboBox"));
         shaderComboBox->setGeometry(QRect(80, 30, 201, 21));
         shaderComboBox->setEditable(false);
-        shaderComboBox->setMaxVisibleItems(16);
         tabWidget->addTab(tab_3, QString());
         tab_4 = new QWidget();
         tab_4->setObjectName(QStringLiteral("tab_4"));
@@ -587,7 +586,7 @@ public:
          << QApplication::translate("VolumeRendererClass", "Shadow Shader", 0)
          << QApplication::translate("VolumeRendererClass", "TransFuncXtoon", 0)
         );
-        shaderComboBox->setProperty("currentText", QVariant(QApplication::translate("VolumeRendererClass", "Transfer Func Shader", 0)));
+        shaderComboBox->setCurrentText(QApplication::translate("VolumeRendererClass", "Transfer Func Shader", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("VolumeRendererClass", "Shaders", 0));
         label_4->setText(QApplication::translate("VolumeRendererClass", "Time Per Frame", 0));
         timingLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));

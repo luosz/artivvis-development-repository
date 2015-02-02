@@ -137,42 +137,36 @@ public:
 
 		if (tfView.transferFunction())
 		{
-			//auto &frequencies = tfView.transfer_function->intensityOptimizerV2->frequencies;
-			auto &frequencies = tfView.optimizer()->frequencies;
-			std::cout << "frequencies size " << frequencies.size() << std::endl;
-			auto size = frequencies.size();
-			float max = 0;
-			for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
-			{
-				max = std::max((float)*i, max);
-			}
-			intensity_histogram_view.intensity_list.clear();
-			intensity_histogram_view.frequency_list.clear();
-			for (int i = 0; i < size; i++)
-			{
-				intensity_histogram_view.intensity_list.push_back(i / (float)size);
-				intensity_histogram_view.frequency_list.push_back(frequencies[i]/max);
-				//std::cout<<"frequencies "<<i<<" "<<frequencies[i]<<std::endl;
-			}
-			intensity_histogram_view.draw();
-
+			update_intensity_histogram_view();
 			update_visibility_histogram_view();
 		}
 	}
 
+	void update_intensity_histogram_view()
+	{
+		std::vector<int> &frequencies = tfView.optimizer()->frequencies;
+		//std::cout << "frequencies size " << frequencies.size() << std::endl;
+		auto size = frequencies.size();
+		float max = 0;
+		for (auto i=frequencies.begin(); i!=frequencies.end(); i++)
+		{
+			max = std::max((float)*i, max);
+		}
+		intensity_histogram_view.intensity_list.clear();
+		intensity_histogram_view.frequency_list.clear();
+		for (int i = 0; i < size; i++)
+		{
+			intensity_histogram_view.intensity_list.push_back(i / (float)size);
+			intensity_histogram_view.frequency_list.push_back(frequencies[i]/max);
+		}
+		intensity_histogram_view.draw();
+	}
+
 	void update_visibility_histogram_view()
 	{
-		auto &visibilities = tfView.optimizer()->visibilityHistogram->visibilities;
-		auto &numVis = tfView.optimizer()->visibilityHistogram->numVis;
-		auto size = visibilities.size();
-		std::cout << "visibilities size " << visibilities.size() << std::endl;
-		visibility_histogram_view.intensity_list.clear();
-		visibility_histogram_view.frequency_list.clear();
-		for (int i = 0; i < visibilities.size();i++)
-		{
-			visibility_histogram_view.intensity_list.push_back(i / (float)size);
-			visibility_histogram_view.frequency_list.push_back(visibilities[i]);
-		}
+		VisibilityHistogram &visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
+		std::cout << "update_visibility_histogram_view visibilityHistogram.size=" << visibilityHistogram.visibilities.size() << std::endl;
+		visibility_histogram_view.setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
 		visibility_histogram_view.draw();
 	}
 

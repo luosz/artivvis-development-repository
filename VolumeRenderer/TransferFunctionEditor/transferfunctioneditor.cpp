@@ -156,7 +156,7 @@ void TransferFunctionEditor::on_flatButton_clicked()
 void TransferFunctionEditor::on_visibilityHistogramButton_clicked()
 {
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	auto visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
+	VisibilityHistogram &visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
 	visibility_histogram_view.setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
 	visibility_histogram_view.draw();
 #endif // NOT_USED_BY_VOLUME_RENDERER
