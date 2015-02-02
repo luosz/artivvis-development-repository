@@ -253,9 +253,6 @@ void TempCoherence::CPUExtrap(int begin, int end)
 	{
 		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
 		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
-
-//		prevTempVolume[i] = currTempVolume[i];
-//		currTempVolume[i] = nextTempVolume[i];
 	}
 }
 
