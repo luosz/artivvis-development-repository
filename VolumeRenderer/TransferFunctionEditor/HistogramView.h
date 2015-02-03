@@ -10,12 +10,12 @@
 #include "edge.h"
 #include "graphwidget.h"
 #include "HistogramPoint.h"
-#include "AbstractGraphicsView.h"
+#include "MyGraphicsView.h"
 
-class HistogramView : public AbstractGraphicsView
+class HistogramView : public MyGraphicsView
 {
 public:
-	HistogramView(std::string name = "", QWidget *parent = 0) : AbstractGraphicsView(parent)
+	HistogramView(std::string name = "", QWidget *parent = 0) : MyGraphicsView(parent)
 	{
 		setName(name);
 		QSize size = this->size();
@@ -78,35 +78,35 @@ public:
 		}
 	}
 
-	void setName(std::string name)
-	{
-		this->_name = name;
-	}
+	//void setName(std::string name)
+	//{
+	//	this->_name = name;
+	//}
 
-protected:
-
-	virtual void resizeEvent(QResizeEvent * event)
-	{
-		QSize size = event->size();
-		std::cout << "HistogramView::resizeEvent size " << size.width() << " " << size.height() << "\t";
-		scene()->setSceneRect(0, 0, size.width(), size.height());
-		QRectF rect = this->sceneRect();
-		std::cout << "sceneRect " << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height() << std::endl;
-		draw();
-	}
-
-	virtual void drawBackground(QPainter *painter, const QRectF &rect)
-	{
-		QRectF sceneRect = this->sceneRect();
-		painter->drawRect(sceneRect);
-	}
-
-	virtual void timerEvent(QTimerEvent *event){}
+//protected:
+//
+//	virtual void resizeEvent(QResizeEvent * event)
+//	{
+//		QSize size = event->size();
+//		std::cout << "HistogramView::resizeEvent size " << size.width() << " " << size.height() << "\t";
+//		scene()->setSceneRect(0, 0, size.width(), size.height());
+//		QRectF rect = this->sceneRect();
+//		std::cout << "sceneRect " << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height() << std::endl;
+//		draw();
+//	}
+//
+//	virtual void drawBackground(QPainter *painter, const QRectF &rect)
+//	{
+//		QRectF sceneRect = this->sceneRect();
+//		painter->drawRect(sceneRect);
+//	}
+//
+//	virtual void timerEvent(QTimerEvent *event){}
 
 public:
 	std::vector<float> intensity_list;
 	std::vector<float> frequency_list;
-	std::string _name;
+	//std::string _name;
 };
 
 #endif // HistogramView_h

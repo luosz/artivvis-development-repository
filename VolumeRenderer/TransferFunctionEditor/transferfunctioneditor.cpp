@@ -15,6 +15,7 @@ visibility_histogram_view("Visibility Histogram")
 	// add histogram widget
 	ui->verticalLayout_2->addWidget(&intensity_histogram_view);
 	ui->verticalLayout_3->addWidget(&visibility_histogram_view);
+	ui->verticalLayout_4->addWidget(&gradient_view);
 
 	// load default transfer function
 	//	filename = "../../transferfuncs/nucleon.tfi";

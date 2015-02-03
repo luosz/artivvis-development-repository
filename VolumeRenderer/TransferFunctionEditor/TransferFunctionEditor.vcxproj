@@ -132,6 +132,7 @@
     <ClInclude Include="..\gl\include\tinyxml2.h" />
     <ClInclude Include="AbstractGraphicsView.h" />
     <ClInclude Include="ControlEdge.h" />
+    <ClInclude Include="GradientView.h" />
     <ClInclude Include="HistogramPoint.h" />
     <ClInclude Include="HistogramView.h" />
     <ClInclude Include="import_transfer_function_editor.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="edge.h" />
     <ClInclude Include="import_volume_renderer.h" />
     <ClInclude Include="GeneratedFiles\ui_transferfunctioneditor.h" />
+    <ClInclude Include="MyGraphicsView.h" />
     <ClInclude Include="TransferFunctionScene.h" />
     <CustomBuild Include="TransferFunctionView.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

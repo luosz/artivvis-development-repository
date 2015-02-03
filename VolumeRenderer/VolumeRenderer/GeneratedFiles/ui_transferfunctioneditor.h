@@ -49,6 +49,9 @@ public:
     QWidget *tab_3;
     QHBoxLayout *horizontalLayout_7;
     QVBoxLayout *verticalLayout_3;
+    QWidget *tab_4;
+    QHBoxLayout *horizontalLayout_8;
+    QVBoxLayout *verticalLayout_4;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QToolBar *mainToolBar;
@@ -135,6 +138,20 @@ public:
         horizontalLayout_7->addLayout(verticalLayout_3);
 
         tabWidget->addTab(tab_3, QString());
+        tab_4 = new QWidget();
+        tab_4->setObjectName(QStringLiteral("tab_4"));
+        horizontalLayout_8 = new QHBoxLayout(tab_4);
+        horizontalLayout_8->setSpacing(6);
+        horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
+        horizontalLayout_8->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_4 = new QVBoxLayout();
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+
+        horizontalLayout_8->addLayout(verticalLayout_4);
+
+        tabWidget->addTab(tab_4, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
@@ -268,7 +285,7 @@ public:
 
         retranslateUi(TransferFunctionEditor);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(TransferFunctionEditor);
@@ -282,6 +299,7 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "intensity histogram", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TransferFunctionEditor", "xtoon", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
         label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
         rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));

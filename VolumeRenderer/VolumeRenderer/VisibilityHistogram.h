@@ -4,7 +4,7 @@
 #include "VolumeDataset.h"
 #include "ShaderManager.h"
 #include "CudaHeaders.h"
-#include "../TransferFunctionEditor/AbstractGraphicsView.h"
+#include "../TransferFunctionEditor/MyGraphicsView.h"
 
 class VisibilityHistogram
 {
@@ -30,7 +30,7 @@ public:
 
 
 	// Qt GraphicsView for visibility histogram
-	AbstractGraphicsView *visibilityView;
+	MyGraphicsView *visibilityView;
 
 	cudaGraphicsResource_t resource;
 

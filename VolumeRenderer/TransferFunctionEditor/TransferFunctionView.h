@@ -266,24 +266,24 @@ public:
 		updateTransferFunctionFromView_and_drawTransferFunction(true);
 	}
 
-protected:
-	virtual void resizeEvent(QResizeEvent * event)
-	{
-		QSize size = event->size();
-		std::cout << "TransferFunctionView::resizeEvent size " << size.width() << " " << size.height() << "\t";
-		scene()->setSceneRect(0, 0, size.width(), size.height());
-		QRectF rect = this->sceneRect();
-		std::cout << "sceneRect " << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height() << std::endl;
-		draw();
-	}
-
-	virtual void drawBackground(QPainter *painter, const QRectF &rect)
-	{
-		QRectF sceneRect = this->sceneRect();
-		painter->drawRect(sceneRect);
-	}
-
-	virtual void timerEvent(QTimerEvent *event){}
+//protected:
+//	virtual void resizeEvent(QResizeEvent * event)
+//	{
+//		QSize size = event->size();
+//		std::cout << "TransferFunctionView::resizeEvent size " << size.width() << " " << size.height() << "\t";
+//		scene()->setSceneRect(0, 0, size.width(), size.height());
+//		QRectF rect = this->sceneRect();
+//		std::cout << "sceneRect " << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height() << std::endl;
+//		draw();
+//	}
+//
+//	virtual void drawBackground(QPainter *painter, const QRectF &rect)
+//	{
+//		QRectF sceneRect = this->sceneRect();
+//		painter->drawRect(sceneRect);
+//	}
+//
+//	virtual void timerEvent(QTimerEvent *event){}
 
 public:
 	int numIntensities;

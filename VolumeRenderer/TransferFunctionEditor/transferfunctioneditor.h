@@ -14,6 +14,7 @@
 #include "ControlPoint.h"
 #include "TransferFunctionView.h"
 #include "HistogramView.h"
+#include "GradientView.h"
 
 namespace Ui {
 class TransferFunctionEditor;
@@ -209,6 +210,7 @@ public:
 	QString filename;
 	HistogramView intensity_histogram_view;
 	HistogramView visibility_histogram_view;
+	GradientView gradient_view;
 };
 
 #endif // TRANSFERFUNCTIONEDITOR_H

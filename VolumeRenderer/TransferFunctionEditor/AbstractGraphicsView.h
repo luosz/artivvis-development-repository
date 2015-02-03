@@ -3,12 +3,12 @@
 #ifndef AbstractGraphicsView_h
 #define AbstractGraphicsView_h
 
-#include "graphwidget.h"
+#include "MyGraphicsView.h"
 
-class AbstractGraphicsView : public GraphWidget
+class AbstractGraphicsView : public MyGraphicsView
 {
 public:
-	AbstractGraphicsView(QWidget *parent = 0) : GraphWidget(parent)
+	AbstractGraphicsView(QWidget *parent = 0) : MyGraphicsView(parent)
 	{
 	}
 
@@ -28,7 +28,6 @@ public:
 	virtual void updateViewFromTransferFunction(){}
 	virtual bool isMaOptimizerEnable(){ return false; }
 	virtual bool isLuoOptimizerEnable(){ return false; }
-	virtual void draw() = 0;
 	virtual void setVisibilityHistogram(const std::vector<float> &visibilities, const std::vector<int> &numVis)
 	{
 		std::cout << "AbstractGraphicsView::setVisibilityHistogram is not implemented." << std::endl;
