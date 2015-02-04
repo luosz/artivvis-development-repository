@@ -1,0 +1,774 @@
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+#include "Camera.h"
+#include "GLM.h"
+#include <vector>
+#include "VolumeDataset.h"
+#include "TransferFunction.h"
+#include "CudaHeaders.h"
+#include "FrequencyHistogram.h"
+#include "VisibilityHistogram.h"
+#include <thread>
+#include <atomic>
+#include <typeinfo>
+
+#define EXTRAP_CONST 2
+#define EPSILON 2.0f
+#define CHECK_STRIDE 1
+#define NUM_THREADS 1
+#define VOXEL_TYPE float
+
+
+struct BlockID
+{
+	int x, y, z;
+
+	BlockID() { }
+
+	BlockID(int x_, int y_, int z_)
+	{
+		x = x_;
+		y = y_;
+		z = z_;
+	}
+};
+
+class TempCoherence
+{
+public:
+	int blockRes;
+	int numBlocks;
+	int numXBlocks, numYBlocks, numZBlocks;
+
+	int textureSize;
+	GLuint currTexture3D;
+	GLuint prevTexture3D;
+	GLuint nextTexture3D;
+	VOXEL_TYPE *prevTempVolume;
+	VOXEL_TYPE *currTempVolume;
+	VOXEL_TYPE *nextTempVolume;
+	
+	std::atomic<int> atomicNumBlocksCopied;
+	int numBlocksCopied, numBlocksExtrapolated;
+	int currentTimestep;
+
+	std::vector<cudaGraphicsResource_t> cudaResources;
+	cudaArray *prevArry, *currArry, *nextArry;
+	
+	std::vector<BlockID> blocksToBeCopied;
+	unsigned char *chunkToBeCopied;
+	unsigned char *cudaCopiedChunk;
+
+	int alpha;
+	Histogram *histogram;
+
+	std::vector<std::thread> threads;
+
+	TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume);
+	GLuint GenerateTexture(VolumeDataset &volume);
+	void CopyTex(VolumeDataset &volume);
+
+	GLuint TemporalCoherence(VolumeDataset &volume, int currentTimestep_, TransferFunction &tf, ShaderManager &shaderManager, Camera &camera);
+	void GPUPredict(VolumeDataset &volume);
+	void CPUPredict(VolumeDataset &volume);
+	bool BlockCompare(VolumeDataset &volume, int x, int y, int z);
+	void CPUExtrap(int begin, int end);
+	void CPUCompare(int begin, int end, VolumeDataset &volume);
+
+	void MapTexturesToCuda();
+	void UnmapTextures();
+
+	void CopyBlockToGPU(VolumeDataset &volume, int x, int y, int z);
+	void CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z);
+	void CopyBlockToChunk(VolumeDataset &volume, int posInChunk, int x, int y, int z);
+	void CopyChunkToGPU(VolumeDataset &volume);
+};
+
+#endif
+
+
+
+
+#include "TempCoherence.h"
+
+texture <VOXEL_TYPE, cudaTextureType3D, cudaReadModeElementType> prevTexRef;
+texture <VOXEL_TYPE, cudaTextureType3D, cudaReadModeElementType> currTexRef;
+texture <VOXEL_TYPE, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
+
+TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume)
+{
+	blockRes = 8;
+	alpha = 6;
+
+	histogram = new FrequencyHistogram();
+//	histogram = new VisibilityHistogram(screenWidth, screenHeight);
+
+	numXBlocks = glm::ceil((float)volume.xRes / (float)blockRes);
+	numYBlocks = glm::ceil((float)volume.yRes / (float)blockRes);
+	numZBlocks = glm::ceil((float)volume.zRes / (float)blockRes);
+	numBlocks = numXBlocks * numYBlocks * numZBlocks;
+
+	currentTimestep = 0;
+
+	textureSize = volume.xRes * volume.yRes * volume.zRes * volume.bytesPerElement;
+	prevTexture3D = GenerateTexture(volume);
+	currTexture3D = GenerateTexture(volume);
+	nextTexture3D = GenerateTexture(volume);
+
+	for (int i=0; i<3; i++)
+		cudaResources.push_back(cudaGraphicsResource_t());
+
+	prevTempVolume = new VOXEL_TYPE[volume.numVoxels];
+	currTempVolume = new VOXEL_TYPE[volume.numVoxels];
+	nextTempVolume = new VOXEL_TYPE[volume.numVoxels];
+	chunkToBeCopied = new unsigned char[numBlocks * blockRes * blockRes * blockRes];
+
+	HANDLE_ERROR( cudaMalloc((void**)&cudaCopiedChunk, numBlocks * blockRes * blockRes * blockRes) );
+
+	blocksToBeCopied.resize(numBlocks);
+
+	threads.resize(NUM_THREADS);
+
+	histogram->Init(volume);
+}
+
+__global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface, bool isChar)
+{
+	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
+
+	if (tid < numVoxels)
+	{
+		int z = tid / (xRes * yRes);
+		int remainder = tid % (xRes * yRes);
+
+		int y = remainder / xRes;
+
+		int x = remainder % xRes;
+
+		VOXEL_TYPE prevVal, currVal, nextVal;
+
+		prevVal = tex3D(prevTexRef, x, y, z);
+		currVal = tex3D(currTexRef, x, y, z);
+
+		float temp = (EXTRAP_CONST * currVal) - prevVal;
+
+		if (isChar)
+		{
+			nextVal = (unsigned char)glm::clamp(temp, 0.0f, 255.0f);
+			surf3Dwrite(temp, surface, x, y, z);
+		}
+		else
+		{
+			nextVal = glm::max(0.0f, temp);
+			surf3Dwrite(temp, surface, x*sizeof(float), y, z);
+		}
+		
+	}
+}
+
+void TempCoherence::MapTexturesToCuda()
+{
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], prevTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[1], currTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[2], nextTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsSurfaceLoadStore) );
+
+	HANDLE_ERROR( cudaGraphicsMapResources(3, &cudaResources[0]) );
+
+	prevArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&prevArry, cudaResources[0], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(prevTexRef, prevArry) );
+
+	currArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&currArry, cudaResources[1], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(currTexRef, currArry) );
+
+	nextArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[2], 0, 0) );
+}
+
+
+void TempCoherence::UnmapTextures()
+{
+	// Unbind and unmap, must be done before OpenGL uses texture memory again
+	HANDLE_ERROR( cudaUnbindTexture(prevTexRef) );
+	HANDLE_ERROR( cudaUnbindTexture(currTexRef) );
+	HANDLE_ERROR( cudaUnbindTexture(nextTexRef) );
+
+	HANDLE_ERROR( cudaGraphicsUnmapResources(3, &cudaResources[0]) );
+
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[1]) );
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[2]) );
+}
+
+void TempCoherence::GPUPredict(VolumeDataset &volume)
+{
+	cudaResourceDesc wdsc;
+	wdsc.resType = cudaResourceTypeArray;
+	wdsc.res.array.array = nextArry;
+	cudaSurfaceObject_t writeSurface;
+	HANDLE_ERROR( cudaCreateSurfaceObject(&writeSurface, &wdsc) );
+
+	bool isChar = (typeid(VOXEL_TYPE) == typeid(unsigned char));
+	isChar = false;
+
+	CudaPredict <<<(volume.numVoxels + 255) / 256, 256>>>(volume.numVoxels, volume.xRes, volume.yRes, volume.zRes, writeSurface, isChar);
+}
+
+
+bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
+{
+	VOXEL_TYPE *nextVolume; 
+	
+//	if (volume.elementType == "MET_UCHAR")
+//		nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
+//	else if (volume.elementType == "FLOAT")
+		nextVolume = volume.fMemblock3D + (currentTimestep * volume.numVoxels);
+
+	int xMin = x * blockRes;
+	int yMin = y * blockRes;
+	int zMin = z * blockRes;
+
+	int ID;
+	float omega, beta;
+	float top, bottom;
+	top = bottom = 0.0f;
+
+	for (int k=0; k<blockRes; k+=CHECK_STRIDE)
+	{
+		for (int j=0; j<blockRes; j+=CHECK_STRIDE)
+		{
+			for (int i=0; i<blockRes; i+=CHECK_STRIDE)
+			{
+
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				VOXEL_TYPE p = nextTempVolume[ID];
+				VOXEL_TYPE n = nextVolume[ID];
+
+//				if (n <= alpha)
+//					beta = (float)n / float(alpha);
+//				else
+//					beta = ((float)(255 - n)) / ((float)(255 - alpha));
+
+//				omega = (float)histogram->values[n];
+
+				float diff =  n - p;
+				diff *= 255.0f;
+
+//				if (diff > 0.001f)
+//					std::cout << diff << endl;
+				
+				top += histogram->values[n] * diff * diff;
+			}
+		}
+	}
+
+	int numPerAxis = blockRes / CHECK_STRIDE;
+	bottom = numPerAxis * numPerAxis * numPerAxis;
+
+	float similar = glm::sqrt(top / bottom);
+
+	if (similar < 1.0f)
+		return true;
+
+
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
+			{
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				currTempVolume[ID] = nextVolume[ID];
+			}
+
+	return false;
+}
+
+
+
+void TempCoherence::CopyBlockToGPU(VolumeDataset &volume, int x, int y, int z)
+{
+//	if (z > 6)
+//		return;
+
+	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels * volume.bytesPerElement);
+
+//	VOXEL_TYPE *currentTimeAddress = volume.fMemblock3D + (currentTimestep * volume.numVoxels);
+	cudaPos offset = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+//	std::cout << x << ", " << y << ", " << z << std::endl;
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToDevice;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.dstPos = offset;
+	cudaCpyParams.dstArray = nextArry;
+	
+	cudaCpyParams.srcPos = offset;
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes * volume.bytesPerElement, volume.yRes, volume.zRes);
+
+	cudaMemcpy3D(&cudaCpyParams);
+}
+
+void TempCoherence::CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z)
+{
+	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
+	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+//	if (x == numXBlocks - 1)
+//		extent.width = volume.xRes % blockRes;
+//	if (y == numYBlocks - 1)
+//		extent.height = volume.yRes % blockRes;
+//	if (z == numZBlocks - 1)
+//		extent.depth = volume.zRes % blockRes;
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToHost;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.srcPos = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
+
+	cudaCpyParams.dstPos = make_cudaPos((numBlocksCopied * blockRes), 0, 0);
+	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
+	
+	cudaMemcpy3D(&cudaCpyParams) ;
+}
+
+
+void TempCoherence::CopyBlockToChunk(VolumeDataset &volume, int posInChunk, int x, int y, int z)
+{
+	GLubyte *currentTimeAddress = volume.memblock3D + (currentTimestep * volume.numVoxels);
+	cudaExtent extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToHost;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.srcPos = make_cudaPos((x * blockRes), (y * blockRes), (z * blockRes));
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)currentTimeAddress, volume.xRes, volume.yRes, volume.zRes);
+
+	cudaCpyParams.dstPos = make_cudaPos((posInChunk * blockRes), 0, 0);
+	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
+	
+	cudaMemcpy3D(&cudaCpyParams) ;
+}
+
+
+void TempCoherence::CPUExtrap(int begin, int end)
+{
+	for (int i=begin; i<end; i++)
+	{
+		float temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
+
+//		if (typeid(VOXEL_TYPE) == typeid(unsigned char))
+//			nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0.0f, 255.0f);
+//		else
+			nextTempVolume[i] = glm::max(0.0f, temp);
+	}
+}
+
+
+void TempCoherence::CPUCompare(int begin, int end, VolumeDataset &volume)
+{
+	for (int i=begin; i<end; i++)
+	{
+		int z = i / (numXBlocks * numYBlocks);
+		int remainder = i % (numXBlocks * numYBlocks);
+
+		int y = remainder / numXBlocks;
+
+		int x = remainder % numXBlocks;
+
+		if (BlockCompare(volume, x, y, z) == false)
+		{
+			CopyBlockToGPU(std::ref(volume), x, y, z);
+//			int posInChunk = atomicNumBlocksCopied.fetch_add(1);
+//			blocksToBeCopied[posInChunk] = BlockID(x, y, z);
+//			CopyBlockToChunk(volume, posInChunk, x, y, z);
+		}
+	}
+}
+
+void TempCoherence::CPUPredict(VolumeDataset &volume)
+{
+	int beginID = 0;
+	int numPerThread = volume.numVoxels / NUM_THREADS;
+
+	for (int i=0; i<NUM_THREADS-1; i++)
+	{
+		threads[i] = std::thread(&TempCoherence::CPUExtrap, this, beginID, beginID + numPerThread);
+		beginID += numPerThread;
+	}
+	threads[NUM_THREADS-1] = std::thread(&TempCoherence::CPUExtrap, this, beginID, volume.numVoxels);
+
+	for (int i=0; i<NUM_THREADS; i++)
+		threads[i].join();
+
+	std::memcpy(&prevTempVolume[0], &currTempVolume[0], volume.numVoxels * volume.bytesPerElement);
+	std::memcpy(&currTempVolume[0], &nextTempVolume[0], volume.numVoxels * volume.bytesPerElement);
+
+	numPerThread = numBlocks / NUM_THREADS;
+	beginID = 0;
+
+	for (int i=0; i<NUM_THREADS-1; i++)
+	{
+		threads[i] = std::thread(&TempCoherence::CPUCompare, this, beginID, beginID + numPerThread, std::ref(volume));
+		beginID += numPerThread;
+	}
+	threads[NUM_THREADS-1] = std::thread(&TempCoherence::CPUCompare, this, beginID, numBlocks, std::ref(volume));
+
+	for (int i=0; i<NUM_THREADS; i++)
+		threads[i].join();
+	
+	numBlocksCopied = atomicNumBlocksCopied.load();		
+}
+
+/*
+void TempCoherence::CPUPredict(VolumeDataset &volume)
+{
+	// Beware of this, think it requires even stepsize
+	for (int i=0; i<volume.numVoxels; i+=CHECK_STRIDE)
+	{
+		int temp = (EXTRAP_CONST * currTempVolume[i]) - prevTempVolume[i];
+		nextTempVolume[i] = (unsigned char)glm::clamp(temp, 0, 255);
+
+		prevTempVolume[i] = currTempVolume[i];
+		currTempVolume[i] = nextTempVolume[i];	
+	}
+
+	for (int z=0; z<numZBlocks; z++)
+		for (int y =0; y<numYBlocks; y++)
+			for (int x=0; x<numXBlocks; x++)
+			{
+				if (BlockCompare(volume, x, y, z) == false)
+				{
+					blocksToBeCopied[numBlocksCopied] = BlockID(x, y, z);
+					CopyBlockToChunk(volume, x, y, z);
+
+					numBlocksCopied++;
+				}
+				else
+					numBlocksExtrapolated++;
+			} 
+}
+*/
+
+
+void TempCoherence::CopyChunkToGPU(VolumeDataset &volume)
+{
+	cudaExtent extent = make_cudaExtent(numBlocksCopied * blockRes, blockRes, blockRes);
+
+	cudaMemcpy3DParms cudaCpyParams = {0};
+	cudaCpyParams.kind = cudaMemcpyHostToDevice;
+	cudaCpyParams.extent = extent;
+
+	cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)chunkToBeCopied, numBlocks * blockRes, blockRes, blockRes);
+
+	cudaCpyParams.dstPtr = make_cudaPitchedPtr((void*)cudaCopiedChunk, numBlocks * blockRes, blockRes, blockRes);
+	
+	cudaMemcpy3D(&cudaCpyParams);
+
+
+	HANDLE_ERROR( cudaGraphicsGLRegisterImage(&cudaResources[0], nextTexture3D, GL_TEXTURE_3D, cudaGraphicsRegisterFlagsNone) );
+	HANDLE_ERROR( cudaGraphicsMapResources(1, &cudaResources[0]) );
+	cudaArray *nextArry = 0;	
+	HANDLE_ERROR( cudaGraphicsSubResourceGetMappedArray(&nextArry, cudaResources[0], 0, 0) ); 
+	HANDLE_ERROR( cudaBindTextureToArray(nextTexRef, nextArry) );
+
+
+	extent = make_cudaExtent(blockRes, blockRes, blockRes);
+
+	cudaCpyParams = cudaMemcpy3DParms();
+	cudaCpyParams.kind = cudaMemcpyDeviceToDevice;
+	cudaCpyParams.extent = extent;
+
+	for (int i=0; i<numBlocksCopied; i++)
+	{
+		cudaCpyParams.srcPos = make_cudaPos((i * blockRes), 0, 0);
+		cudaCpyParams.srcPtr = make_cudaPitchedPtr((void*)cudaCopiedChunk, numBlocks * blockRes, blockRes, blockRes);
+		
+		cudaCpyParams.dstPos = make_cudaPos((blocksToBeCopied[i].x * blockRes), (blocksToBeCopied[i].y * blockRes), (blocksToBeCopied[i].z * blockRes));
+		cudaCpyParams.dstArray = nextArry;
+
+		cudaMemcpy3D(&cudaCpyParams) ;
+	}
+
+	HANDLE_ERROR( cudaUnbindTexture(nextTexRef) );
+	HANDLE_ERROR( cudaGraphicsUnmapResources(1, &cudaResources[0]) );
+	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResources[0]) );
+}
+
+
+GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimestep_, TransferFunction &tf, ShaderManager &shaderManager, Camera &camera)
+{
+	currentTimestep = currentTimestep_;
+	numBlocksCopied = numBlocksExtrapolated = 0;
+	atomicNumBlocksCopied = 0;
+
+	GLuint temp = prevTexture3D;
+	prevTexture3D = currTexture3D;
+	currTexture3D = nextTexture3D;
+	nextTexture3D = temp;
+
+	if (currentTimestep < 2)
+	{
+		CopyTex(volume);
+
+		if (currentTimestep == 1)
+		{
+			std::memcpy(&prevTempVolume[0], volume.memblock3D, textureSize);
+			std::memcpy(&currTempVolume[0], volume.memblock3D + textureSize, textureSize);				
+		}
+	}
+	else
+	{
+//		CopyTex(volume);
+
+		MapTexturesToCuda();
+		GPUPredict(volume);
+		histogram->Update(currentTimestep, volume, currTexture3D, tf.tfTexture, shaderManager, camera);
+		CPUPredict(volume);
+		UnmapTextures();
+//		CopyChunkToGPU(volume);
+	}
+	
+	return nextTexture3D;
+}
+
+
+void TempCoherence::CopyTex(VolumeDataset &volume)
+{
+	glBindTexture(GL_TEXTURE_3D, nextTexture3D);
+
+	if (volume.elementType == "MET_UCHAR")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, volume.memblock3D + (textureSize * currentTimestep));
+
+	else if (volume.elementType == "SHORT")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_UNSIGNED_SHORT, volume.memblock3D + (textureSize * currentTimestep));
+
+	else if (volume.elementType == "FLOAT")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_FLOAT, volume.memblock3D + (textureSize * currentTimestep));
+
+
+	glBindTexture(GL_TEXTURE_3D, 0);
+}
+
+GLuint TempCoherence::GenerateTexture(VolumeDataset &volume)
+{
+	GLuint tex;
+
+	glEnable(GL_TEXTURE_3D);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_3D, tex);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	if (volume.elementType == "MET_UCHAR")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, volume.memblock3D + (textureSize * currentTimestep));
+
+	else if (volume.elementType == "SHORT")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_UNSIGNED_SHORT, volume.memblock3D + (textureSize * currentTimestep));
+
+	else if (volume.elementType == "FLOAT")
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_FLOAT, volume.memblock3D + (textureSize * currentTimestep));
+
+
+	glBindTexture(GL_TEXTURE_3D, 0);
+
+	return tex;
+}
+
+
+
+
+/*
+bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
+{
+	GLubyte *nextVolume = volume.memblock3D + (currentTimestep * volume.numVoxels);
+
+	int xMin = x * blockRes;
+	int yMin = y * blockRes;
+	int zMin = z * blockRes;
+
+	int ID;
+
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
+			{
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				unsigned char p = nextTempVolume[ID];
+				unsigned char n = nextVolume[ID];
+
+				int diff =  p - n;
+				int absDiff = glm::abs(diff);
+
+				if (absDiff > EPSILON)
+					goto copy;
+			}
+
+	return true;
+
+	// Put a goto to avoid an extra if, only gets here if entire block needs to be copied
+	copy:
+	for (int k=0; k<blockRes; k++)
+		for (int j=0; j<blockRes; j++)
+			for (int i=0; i<blockRes; i++)
+			{
+				if ((xMin + i) >= volume.xRes || (yMin + j) >= volume.yRes || (zMin + k) >= volume.zRes)
+					continue;
+
+				ID = (xMin + i) + ((yMin + j) * volume.xRes) + ((zMin + k) * volume.xRes * volume.yRes);
+
+				currTempVolume[ID] = nextVolume[ID];
+			}
+
+	return false;
+}
+*/
+
+
+#ifndef FREQUENCY_HISTOGRAM_H
+#define FREQUENCY_HISTOGRAM_H
+
+#include "Histogram.h"
+#include <thread>
+#include <atomic>
+
+class FrequencyHistogram  :  public Histogram
+{
+public:
+	std::atomic<int> atomicValues[256];
+	std::vector<std::thread> threads;
+	int numThreads;
+	float bucketSize;
+
+	FrequencyHistogram()
+	{
+		numBins = 256;
+		values.resize(numBins);
+
+		numThreads = 7;
+		threads.resize(numThreads);
+	}
+
+	void Init(VolumeDataset &volume)
+	{
+		float max = 0.0f;
+
+		if (volume.elementType == "MET_UCHAR")
+			bucketSize = 1.0f;
+		else
+		{
+			
+			for (int i=0; i<volume.numVoxels; i++)
+				max = glm::max(max, volume.fMemblock3D[i]);
+
+			bucketSize = max / 255.0f;
+		}
+	}
+
+
+	void Bin(int begin, int end, int currentTimestep, VolumeDataset &volume)
+	{
+		for (int i=begin; i<end; i++)
+		{
+			int bucket;
+				
+			if (volume.elementType == "MET_UCHAR")
+				bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
+			else if (volume.elementType == "FLOAT")
+			{
+				float val = volume.fMemblock3D[(currentTimestep*volume.numVoxels) + i];
+				bucket = val / bucketSize;
+			}
+
+			if (bucket != 0)
+				atomicValues[bucket].fetch_add((int)1);
+		}
+	}
+
+	void Update(int currentTimestep, VolumeDataset &volume, GLuint tex3D, GLuint &tfTexture, ShaderManager &shaderManager, Camera &camera)
+	{
+		Init(volume);
+
+		for (int i=0; i<numBins; i++)
+			atomicValues[i].store(0);
+		
+		int beginID = 0;
+		int numPerThread = volume.numVoxels / numThreads;
+
+		for (int i=0; i<numThreads-1; i++)
+		{
+			threads[i] = std::thread(&FrequencyHistogram::Bin, this, beginID, beginID + numPerThread, currentTimestep, std::ref(volume));
+			beginID += numPerThread;
+		}
+		threads[numThreads-1] = std::thread(&FrequencyHistogram::Bin, this, beginID, volume.numVoxels, currentTimestep, std::ref(volume));
+
+		for (int i=0; i<numThreads; i++)
+			threads[i].join();
+
+		maxFrequency = 0;
+		for (int i=1; i<256; i++)
+		{
+			int freq = atomicValues[i];
+			maxFrequency = glm::max(maxFrequency, freq);
+		}
+
+		for (int i=1; i<256; i++)
+		{
+			values[i] = atomicValues[i] / (float)maxFrequency;
+		}
+
+		values[0] = 1.0f;
+	}
+
+	
+//	void Update(int currentTimestep, VolumeDataset &volume, GLuint tex3D, GLuint &tfTexture, ShaderManager &shaderManager, Camera &camera)
+//	{
+//		std::fill(values.begin(), values.end(), 0);
+//
+//		for (int i=0; i<volume.numVoxels; i++)
+//		{
+//			int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
+//			values[bucket]++;
+//		}
+//
+//		maxFrequency = 0;
+//		for (int i=1; i<256; i++)
+//		{
+//			int freq = values[i];
+//			maxFrequency = glm::max(maxFrequency, freq);
+//		}
+//
+//		for (int i=1; i<256; i++)
+//		{
+//			values[i] /= (float)maxFrequency;
+//		}
+//
+//		values[0] = 1.0f;
+//	}
+	
+
+private:
+	int maxFrequency;
+};
+
+#endif
