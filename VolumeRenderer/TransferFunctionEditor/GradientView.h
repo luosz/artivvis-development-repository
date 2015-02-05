@@ -13,7 +13,7 @@ public:
 	{
 		setName(name);
 		QSize size = this->size();
-		std::cout << _name << " HistogramView size " << size.width() << " " << size.height() << "\t";
+		std::cout << _name << " GradientView size " << size.width() << " " << size.height() << "\t";
 		scene()->setSceneRect(0, 0, size.width(), size.height());
 		QRectF rect = this->sceneRect();
 		std::cout << "sceneRect " << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height() << std::endl;
