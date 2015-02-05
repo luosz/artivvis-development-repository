@@ -24,6 +24,7 @@ public:
 	BruteForce *bruteForce;
 	TestSuite tester;
 	WriteToFile fileWriter;
+	GLubyte* pixelBuffer[800*800*4];
 
 	bool writeToFile;
 	

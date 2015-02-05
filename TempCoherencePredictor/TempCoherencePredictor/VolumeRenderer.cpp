@@ -20,8 +20,8 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 
 
 	writeToFile = false;
-	if (writeToFile)
-		fileWriter.Init();
+//	if (writeToFile)
+		fileWriter.Init(screenWidth, screenHeight);
 
 
 	oldTime = clock();
@@ -57,13 +57,21 @@ void VolumeRenderer::Update()
 			
 			if (writeToFile)
 				fileWriter.Write(currentTimestep, *tempCoherence, tester);
+
 		}
 
-		
+		if (currentTimestep == 598)
+			getchar();
 	}
 
+	
+
 	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
+
 	raycaster->Raycast(transferFunction, shaderProgramID, camera, interpTex3D);
+
+	fileWriter.WriteImage(currentTimestep);
+
 
 	glutSwapBuffers();
 }

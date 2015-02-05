@@ -2,8 +2,8 @@
 #include "CudaHeaders.h"
 #include <stdlib.h>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
 
 VolumeRenderer volumeRenderer;
 

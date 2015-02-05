@@ -16,8 +16,8 @@ void TestSuite::Test(VolumeDataset &volume, TransferFunction &transferFunction, 
 {
 	errorMetrics.FindError(transferFunction, shaderManager, camera, raycaster, bruteTex3D, interpTex3D);
 
-	if (curretTimestep != 0)
-		changeBetweenFrames.Find(volume, curretTimestep, bruteTex3D);
+//	if (curretTimestep != 0)
+//		changeBetweenFrames.Find(volume, curretTimestep, bruteTex3D);
 }
 
 
