@@ -55,7 +55,7 @@ void VisibilityHistogram::Init(int screenWidth, int screenHeight)
 	// Allocate memory on GPU
 	HANDLE_ERROR( cudaMalloc((void**)&cudaHistBins, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin, 256 * sizeof(int)) );
-	HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin_intensity, 256 * sizeof(int)) );
+	//HANDLE_ERROR( cudaMalloc((void**)&cudaNumInBin_intensity, 256 * sizeof(int)) );
 
 	grabFrustum = false;
 	frustumExtent = 5;
@@ -162,7 +162,7 @@ __global__ void CudaNormalize(int numBins, float *histBins, int *numInBin)
 }
 
 
-__global__ void CudaGrabFrustum(int numFrustumPixels, int frustumExtent, int mousePosX, int mousePosY, float *histBins, int *numInBin, int *numInBin_intensity)
+__global__ void CudaGrabFrustum(int numFrustumPixels, int frustumExtent, int mousePosX, int mousePosY, float *histBins, int *numInBin)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
 
@@ -187,7 +187,7 @@ __global__ void CudaGrabFrustum(int numFrustumPixels, int frustumExtent, int mou
 
 			atomicAdd(&(histBins[bin]), (float)color.x);
 			atomicAdd(&(numInBin[bin]), (int)1);
-			atomicAdd(&(numInBin_intensity[bin]), (int)1);
+			//atomicAdd(&(numInBin_intensity[bin]), (int)1);
 		}
 	}
 }
@@ -203,7 +203,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	// Set all values for GPU memory to zero
 	HANDLE_ERROR( cudaMemset(cudaHistBins, 0, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMemset(cudaNumInBin, 0, 256 * sizeof(int)) );
-	HANDLE_ERROR(cudaMemset(cudaNumInBin_intensity, 0, 256 * sizeof(int)));
+	//HANDLE_ERROR(cudaMemset(cudaNumInBin_intensity, 0, 256 * sizeof(int)));
 
 	// Bind visibility shader and framebuffer with a write texture attached
 	GLuint shaderProgramID = shaderManager.UseShader(VisibilityShader);
@@ -325,7 +325,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 		else
 		{
 			int numFrustumPixels = ((frustumExtent*2) + 1) * ((frustumExtent*2) + 1);
-			CudaGrabFrustum <<<(numFrustumPixels + 255) / 256, 256>>> (numFrustumPixels, frustumExtent, mousePosX, 800 - mousePosY, cudaHistBins, cudaNumInBin, cudaNumInBin_intensity);
+			CudaGrabFrustum <<<(numFrustumPixels + 255) / 256, 256>>> (numFrustumPixels, frustumExtent, mousePosX, 800 - mousePosY, cudaHistBins, cudaNumInBin);
 		}
 
 		// Unbind and unmap, must be done before OpenGL uses texture memory again
@@ -363,7 +363,8 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	HANDLE_ERROR(cudaMemcpy(&numVis[0], cudaNumInBin, 256 * sizeof(int), cudaMemcpyDeviceToHost));
 
 	// Copy intensity histogram of frustum back to CPU memory for ease of access
-	HANDLE_ERROR(cudaMemcpy(&intensity_histogram[0], cudaNumInBin_intensity, 256 * sizeof(int), cudaMemcpyDeviceToHost));
+	////HANDLE_ERROR(cudaMemcpy(&intensity_histogram[0], cudaNumInBin_intensity, 256 * sizeof(int), cudaMemcpyDeviceToHost));
+	HANDLE_ERROR(cudaMemcpy(&intensity_histogram[0], cudaNumInBin, 256 * sizeof(int), cudaMemcpyDeviceToHost));
 
 	// CPU average visbilities
 //	for (int i=0; i<256; i++)

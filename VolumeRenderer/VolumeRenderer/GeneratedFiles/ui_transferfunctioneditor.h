@@ -52,6 +52,9 @@ public:
     QWidget *tab_4;
     QHBoxLayout *horizontalLayout_8;
     QVBoxLayout *verticalLayout_4;
+    QWidget *tab_5;
+    QHBoxLayout *horizontalLayout_9;
+    QVBoxLayout *verticalLayout_5;
     QMenuBar *menuBar;
     QMenu *menu_File;
     QToolBar *mainToolBar;
@@ -71,6 +74,7 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *checkBox;
     QCheckBox *checkBox_2;
+    QPushButton *computeDistanceButton;
     QPushButton *visibilityHistogramButton;
     QHBoxLayout *horizontalLayout_2;
     QSpinBox *spinBox;
@@ -152,6 +156,20 @@ public:
         horizontalLayout_8->addLayout(verticalLayout_4);
 
         tabWidget->addTab(tab_4, QString());
+        tab_5 = new QWidget();
+        tab_5->setObjectName(QStringLiteral("tab_5"));
+        horizontalLayout_9 = new QHBoxLayout(tab_5);
+        horizontalLayout_9->setSpacing(6);
+        horizontalLayout_9->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
+        horizontalLayout_9->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_5 = new QVBoxLayout();
+        verticalLayout_5->setSpacing(6);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+
+        horizontalLayout_9->addLayout(verticalLayout_5);
+
+        tabWidget->addTab(tab_5, QString());
 
         horizontalLayout->addWidget(tabWidget);
 
@@ -243,6 +261,11 @@ public:
 
         horizontalLayout_4->addWidget(checkBox_2);
 
+        computeDistanceButton = new QPushButton(dockWidgetContents);
+        computeDistanceButton->setObjectName(QStringLiteral("computeDistanceButton"));
+
+        horizontalLayout_4->addWidget(computeDistanceButton);
+
         visibilityHistogramButton = new QPushButton(dockWidgetContents);
         visibilityHistogramButton->setObjectName(QStringLiteral("visibilityHistogramButton"));
 
@@ -299,7 +322,8 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "intensity histogram", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TransferFunctionEditor", "xtoon", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TransferFunctionEditor", "frustum", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("TransferFunctionEditor", "xtoon", 0));
         menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
         label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
         rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
@@ -310,6 +334,7 @@ public:
         peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
         checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
         checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));
+        computeDistanceButton->setText(QApplication::translate("TransferFunctionEditor", "compute distance", 0));
         visibilityHistogramButton->setText(QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
         entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));
         visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", 0));

@@ -15,7 +15,8 @@ visibility_histogram_view("Visibility Histogram")
 	// add histogram widget
 	ui->verticalLayout_2->addWidget(&intensity_histogram_view);
 	ui->verticalLayout_3->addWidget(&visibility_histogram_view);
-	ui->verticalLayout_4->addWidget(&gradient_view);
+	ui->verticalLayout_4->addWidget(&frustum_histogram_view);
+	ui->verticalLayout_5->addWidget(&gradient_view);
 
 	// load default transfer function
 	//	filename = "../../transferfuncs/nucleon.tfi";
@@ -160,5 +161,39 @@ void TransferFunctionEditor::on_visibilityHistogramButton_clicked()
 	VisibilityHistogram &visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
 	visibility_histogram_view.setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
 	visibility_histogram_view.draw();
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_computeDistanceButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	VisibilityHistogram &visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
+	//for (int i=0; i<visibilityHistogram.visibilities.size(); i++)
+	//{
+	//	std::cout<<i<<" "<<visibilityHistogram.visibilities[i]<<" "<<visibilityHistogram.numVis[i]<<" "<<visibilityHistogram.intensity_histogram[i]<<std::endl;
+	//}
+	//frustum_histogram_view.setHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
+	//frustum_histogram_view.draw();
+
+	std::vector<float> weights;
+	weights.resize(tfView.intensities.size());
+	auto size = visibilityHistogram.visibilities.size();
+	float sum = 0;
+	for (int i=0; i<tfView.intensities.size(); i++)
+	{
+		weights[i] = 0;
+		for (int j=0; j<size; j++)
+		{
+			weights[i] += abs(tfView.intensities[i] - (j / (float)size)) * ( - visibilityHistogram.visibilities[j] * visibilityHistogram.numVis[j]);
+		}
+		sum += weights[i];
+	}
+	for (int i=0; i<tfView.intensities.size(); i++)
+	{
+		weights[i] = weights[i] / sum;
+	}
+
+	frustum_histogram_view.setHistogram(weights);
+	frustum_histogram_view.draw();
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }

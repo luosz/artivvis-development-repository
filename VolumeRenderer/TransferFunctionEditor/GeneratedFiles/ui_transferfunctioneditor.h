@@ -71,6 +71,7 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *checkBox;
     QCheckBox *checkBox_2;
+    QPushButton *computeDistanceButton;
     QPushButton *visibilityHistogramButton;
     QHBoxLayout *horizontalLayout_2;
     QSpinBox *spinBox;
@@ -243,6 +244,11 @@ public:
 
         horizontalLayout_4->addWidget(checkBox_2);
 
+        computeDistanceButton = new QPushButton(dockWidgetContents);
+        computeDistanceButton->setObjectName(QStringLiteral("computeDistanceButton"));
+
+        horizontalLayout_4->addWidget(computeDistanceButton);
+
         visibilityHistogramButton = new QPushButton(dockWidgetContents);
         visibilityHistogramButton->setObjectName(QStringLiteral("visibilityHistogramButton"));
 
@@ -285,7 +291,7 @@ public:
 
         retranslateUi(TransferFunctionEditor);
 
-        tabWidget->setCurrentIndex(3);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(TransferFunctionEditor);
@@ -310,6 +316,7 @@ public:
         peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
         checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
         checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));
+        computeDistanceButton->setText(QApplication::translate("TransferFunctionEditor", "compute distance", 0));
         visibilityHistogramButton->setText(QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
         entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));
         visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", 0));

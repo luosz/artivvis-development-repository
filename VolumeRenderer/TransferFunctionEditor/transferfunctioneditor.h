@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <iostream>
 #include <QFileDialog>
+#include <cmath>
 
 #include "import_volume_renderer.h"
 
@@ -199,6 +200,8 @@ private slots:
 
     void on_visibilityHistogramButton_clicked();
 
+    void on_computeDistanceButton_clicked();
+
 private:
     Ui::TransferFunctionEditor *ui;
 
@@ -210,6 +213,7 @@ public:
 	QString filename;
 	HistogramView intensity_histogram_view;
 	HistogramView visibility_histogram_view;
+	HistogramView frustum_histogram_view;
 	GradientView gradient_view;
 };
 

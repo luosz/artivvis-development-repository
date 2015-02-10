@@ -113,7 +113,7 @@
       </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
-        <string>xtoon</string>
+        <string>frustum</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <property name="leftMargin">
@@ -130,6 +130,28 @@
         </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>xtoon</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5"/>
         </item>
        </layout>
       </widget>
@@ -294,6 +316,13 @@
         <widget class="QCheckBox" name="checkBox_2">
          <property name="text">
           <string>Luo's Optimizer</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="computeDistanceButton">
+         <property name="text">
+          <string>compute distance</string>
          </property>
         </widget>
        </item>

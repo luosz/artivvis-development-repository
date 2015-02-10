@@ -65,7 +65,7 @@ public:
 		{
 			intensity_list.push_back(i / (float)visibilities.size());
 			frequency_list.push_back(visibilities[i] * numVis[i]);
-			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << intensity_list[i] << " " << frequency_list[i] << std::endl;
+			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << frequency_list[i] << " " << intensity_list[i] << std::endl;
 			max = std::max(frequency_list[i], max);
 		}
 		if (max > 0)
@@ -75,6 +75,58 @@ public:
 				*i = *i / max;
 				//std::cout << "normalized visibility " << *i << std::endl;
 			}		
+		}
+	}
+
+	virtual void setHistogram(const std::vector<float> &visibilities, const std::vector<int> &numVis)
+	{
+		if (visibilities.size() != numVis.size())
+		{
+			std::cout << "Error: visibilities and numVis should be the same size." << std::endl;
+		}
+		intensity_list.clear();
+		frequency_list.clear();
+		float max = 0;
+		for (int i = 0; i < visibilities.size(); i++)
+		{
+			intensity_list.push_back(i / (float)visibilities.size());
+			frequency_list.push_back(visibilities[i] * numVis[i]);
+			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << frequency_list[i] << " " << intensity_list[i] << std::endl;
+			max = std::max(frequency_list[i], max);
+		}
+		if (max > 0)
+		{
+			for (auto i = frequency_list.begin(); i != frequency_list.end(); i++)
+			{
+				*i = *i / max;
+				//std::cout << "normalized visibility " << *i << std::endl;
+			}
+		}
+	}
+
+	virtual void setHistogram(const std::vector<float> &weights)
+	{
+		//if (visibilities.size() != numVis.size())
+		//{
+		//	std::cout << "Error: visibilities and numVis should be the same size." << std::endl;
+		//}
+		intensity_list.clear();
+		frequency_list.clear();
+		float max = 0;
+		for (int i = 0; i < weights.size(); i++)
+		{
+			intensity_list.push_back(i / (float)weights.size());
+			frequency_list.push_back(weights[i]);
+			std::cout << i << " " << weights[i] << " " << intensity_list[i] << std::endl;
+			max = std::max(frequency_list[i], max);
+		}
+		if (max > 0)
+		{
+			for (auto i = frequency_list.begin(); i != frequency_list.end(); i++)
+			{
+				*i = *i / max;
+				//std::cout << "normalized visibility " << *i << std::endl;
+			}
 		}
 	}
 
