@@ -240,6 +240,7 @@
     </CustomBuild>
     <ClInclude Include="BurnsContours.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraSerializer.h" />
     <ClInclude Include="ContourDrawer.h" />
     <ClInclude Include="CPURaycaster.h" />
     <ClInclude Include="CPURenderer.h" />

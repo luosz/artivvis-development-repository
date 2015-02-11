@@ -74,6 +74,7 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *checkBox;
     QCheckBox *checkBox_2;
+    QPushButton *cameraButton;
     QPushButton *computeDistanceButton;
     QPushButton *visibilityHistogramButton;
     QHBoxLayout *horizontalLayout_2;
@@ -261,6 +262,11 @@ public:
 
         horizontalLayout_4->addWidget(checkBox_2);
 
+        cameraButton = new QPushButton(dockWidgetContents);
+        cameraButton->setObjectName(QStringLiteral("cameraButton"));
+
+        horizontalLayout_4->addWidget(cameraButton);
+
         computeDistanceButton = new QPushButton(dockWidgetContents);
         computeDistanceButton->setObjectName(QStringLiteral("computeDistanceButton"));
 
@@ -334,6 +340,7 @@ public:
         peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
         checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
         checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));
+        cameraButton->setText(QApplication::translate("TransferFunctionEditor", "save camera", 0));
         computeDistanceButton->setText(QApplication::translate("TransferFunctionEditor", "compute distance", 0));
         visibilityHistogramButton->setText(QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
         entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));

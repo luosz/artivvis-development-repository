@@ -202,6 +202,8 @@ private slots:
 
     void on_computeDistanceButton_clicked();
 
+    void on_cameraButton_clicked();
+
 private:
     Ui::TransferFunctionEditor *ui;
 

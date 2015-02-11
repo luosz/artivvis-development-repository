@@ -320,6 +320,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="cameraButton">
+         <property name="text">
+          <string>save camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="computeDistanceButton">
          <property name="text">
           <string>compute distance</string>

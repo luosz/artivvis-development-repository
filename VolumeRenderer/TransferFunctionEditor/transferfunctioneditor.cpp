@@ -197,3 +197,14 @@ void TransferFunctionEditor::on_computeDistanceButton_clicked()
 	frustum_histogram_view.draw();
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }
+
+void TransferFunctionEditor::on_cameraButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	CameraSerializer::to_file(tfView.volume_renderer->camera, "d:/camera.txt");
+	auto camera = CameraSerializer::from_file("d:/camera.txt");
+	std::cout<<"CameraSerializer\n";
+	std::cout << camera.position.x << "\t" << camera.position.y << "\t" << camera.position.z << std::endl;
+	std::cout << camera.xPixels << "\t" << camera.yPixels << std::endl;
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
