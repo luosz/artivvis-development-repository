@@ -65,7 +65,7 @@ public:
 		{
 			intensity_list.push_back(i / (float)visibilities.size());
 			frequency_list.push_back(visibilities[i] * numVis[i]);
-			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << frequency_list[i] << " " << intensity_list[i] << std::endl;
+			//std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << frequency_list[i] << " " << intensity_list[i] << std::endl;
 			max = std::max(frequency_list[i], max);
 		}
 		if (max > 0)
@@ -91,7 +91,7 @@ public:
 		{
 			intensity_list.push_back(i / (float)visibilities.size());
 			frequency_list.push_back(visibilities[i] * numVis[i]);
-			std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << frequency_list[i] << " " << intensity_list[i] << std::endl;
+			//std::cout << i << " " << visibilities[i] << " " << numVis[i] << " " << frequency_list[i] << " " << intensity_list[i] << std::endl;
 			max = std::max(frequency_list[i], max);
 		}
 		if (max > 0)

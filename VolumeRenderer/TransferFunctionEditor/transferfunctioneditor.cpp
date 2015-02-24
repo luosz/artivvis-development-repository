@@ -7,6 +7,8 @@ ui(new Ui::TransferFunctionEditor),
 intensity_histogram_view("Intensity Histogram"),
 visibility_histogram_view("Visibility Histogram")
 {
+	srand((unsigned int)time(NULL));
+
 	ui->setupUi(this);
 
 	// add transfer function widget
@@ -201,10 +203,23 @@ void TransferFunctionEditor::on_computeDistanceButton_clicked()
 void TransferFunctionEditor::on_cameraButton_clicked()
 {
 #ifndef NOT_USED_BY_VOLUME_RENDERER
-	CameraSerializer::to_file(tfView.volume_renderer->camera, "d:/camera.txt");
-	auto camera = CameraSerializer::from_file("d:/camera.txt");
-	std::cout<<"CameraSerializer\n";
-	std::cout << camera.position.x << "\t" << camera.position.y << "\t" << camera.position.z << std::endl;
-	std::cout << camera.xPixels << "\t" << camera.yPixels << std::endl;
+	//CameraSerializer::to_file(tfView.volumeRenderer()->camera, "d:/camera.txt");
+	//auto camera = CameraSerializer::from_file("d:/camera.txt");
+	//std::cout<<"CameraSerializer\n";
+	//std::cout << camera.position.x << "\t" << camera.position.y << "\t" << camera.position.z << std::endl;
+	//std::cout << camera.xPixels << "\t" << camera.yPixels << std::endl;
+	//auto x = (rand() % 100) / 100.0f - 0.5f;
+	//auto y = (rand() % 100) / 100.0f - 0.5f;
+	//auto z = (rand() % 100) / 100.0f - 0.5f;
+	//glm::vec3 d(x, y, z);
+	//auto p = tfView.volumeRenderer()->camera.position;
+	//std::cout << "camera " << p.x << " " << p.y << " " << p.z << "\t";
+	//tfView.volumeRenderer()->camera.position += d;
+	//p = tfView.volumeRenderer()->camera.position;
+	//std::cout << p.x << " " << p.y << " " << p.z << std::endl;
+	//auto degree = rand() % 20 - 10;
+	tfView.volumeRenderer()->camera.Rotate(15);
+
+
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }

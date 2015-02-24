@@ -5,6 +5,8 @@
 #include <iostream>
 #include <QFileDialog>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 #include "import_volume_renderer.h"
 
