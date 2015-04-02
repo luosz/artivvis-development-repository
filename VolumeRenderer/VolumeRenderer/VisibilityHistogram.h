@@ -36,7 +36,7 @@ public:
 
 	float *cudaHistBins;
 	int *cudaNumInBin;
-	int *cudaNumInBin_intensity;
+	//int *cudaNumInBin_intensity;
 
 	void Init(int screenWidth, int screenHeight);
 	void CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera);

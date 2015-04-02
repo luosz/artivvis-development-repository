@@ -7,6 +7,8 @@ ui(new Ui::TransferFunctionEditor),
 intensity_histogram_view("Intensity Histogram"),
 visibility_histogram_view("Visibility Histogram")
 {
+	srand((unsigned int)time(NULL));
+
 	ui->setupUi(this);
 
 	// add transfer function widget
@@ -15,7 +17,8 @@ visibility_histogram_view("Visibility Histogram")
 	// add histogram widget
 	ui->verticalLayout_2->addWidget(&intensity_histogram_view);
 	ui->verticalLayout_3->addWidget(&visibility_histogram_view);
-	ui->verticalLayout_4->addWidget(&gradient_view);
+	ui->verticalLayout_4->addWidget(&frustum_histogram_view);
+	ui->verticalLayout_5->addWidget(&gradient_view);
 
 	// load default transfer function
 	//	filename = "../../transferfuncs/nucleon.tfi";
@@ -160,5 +163,63 @@ void TransferFunctionEditor::on_visibilityHistogramButton_clicked()
 	VisibilityHistogram &visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
 	visibility_histogram_view.setVisibilityHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
 	visibility_histogram_view.draw();
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_computeDistanceButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	VisibilityHistogram &visibilityHistogram = tfView.volumeRenderer()->renderer->visibilityHistogram;
+	//for (int i=0; i<visibilityHistogram.visibilities.size(); i++)
+	//{
+	//	std::cout<<i<<" "<<visibilityHistogram.visibilities[i]<<" "<<visibilityHistogram.numVis[i]<<" "<<visibilityHistogram.intensity_histogram[i]<<std::endl;
+	//}
+	//frustum_histogram_view.setHistogram(visibilityHistogram.visibilities, visibilityHistogram.numVis);
+	//frustum_histogram_view.draw();
+
+	std::vector<float> weights;
+	weights.resize(tfView.intensities.size());
+	auto size = visibilityHistogram.visibilities.size();
+	float sum = 0;
+	for (int i=0; i<tfView.intensities.size(); i++)
+	{
+		weights[i] = 0;
+		for (int j=0; j<size; j++)
+		{
+			weights[i] += abs(tfView.intensities[i] - (j / (float)size)) * ( - visibilityHistogram.visibilities[j] * visibilityHistogram.numVis[j]);
+		}
+		sum += weights[i];
+	}
+	for (int i=0; i<tfView.intensities.size(); i++)
+	{
+		weights[i] = weights[i] / sum;
+	}
+
+	frustum_histogram_view.setHistogram(weights);
+	frustum_histogram_view.draw();
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_cameraButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	//CameraSerializer::to_file(tfView.volumeRenderer()->camera, "d:/camera.txt");
+	//auto camera = CameraSerializer::from_file("d:/camera.txt");
+	//std::cout<<"CameraSerializer\n";
+	//std::cout << camera.position.x << "\t" << camera.position.y << "\t" << camera.position.z << std::endl;
+	//std::cout << camera.xPixels << "\t" << camera.yPixels << std::endl;
+	//auto x = (rand() % 100) / 100.0f - 0.5f;
+	//auto y = (rand() % 100) / 100.0f - 0.5f;
+	//auto z = (rand() % 100) / 100.0f - 0.5f;
+	//glm::vec3 d(x, y, z);
+	//auto p = tfView.volumeRenderer()->camera.position;
+	//std::cout << "camera " << p.x << " " << p.y << " " << p.z << "\t";
+	//tfView.volumeRenderer()->camera.position += d;
+	//p = tfView.volumeRenderer()->camera.position;
+	//std::cout << p.x << " " << p.y << " " << p.z << std::endl;
+	//auto degree = rand() % 20 - 10;
+	tfView.volumeRenderer()->camera.Rotate(15);
+
+
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }

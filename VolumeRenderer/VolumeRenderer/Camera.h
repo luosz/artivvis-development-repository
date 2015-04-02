@@ -3,8 +3,6 @@
 
 #include "GLM.h"
 
-
-
 class Camera
 {
 public:
@@ -24,7 +22,36 @@ public:
 	void Translate(glm::vec3 translateAmount);
 	void Rotate(float rotateAmount);
 	glm::vec3 GetViewDirection();
-};
 
+	Camera()
+	{
+		position = glm::vec3(0.0f, 0.0f, 2.0f);
+		focus = glm::vec3(0.0f);
+		distFromFocus = glm::distance(position, focus);
+		xPixels = 800;
+		yPixels = 800;
+		float nearPlane = 0.1f;
+		float farPlane = 1000.0f;
+		FoV = 67.0f;
+		float aspect = (float)xPixels / (float)yPixels;
+		projMat = glm::perspective(FoV, aspect, nearPlane, farPlane);
+		viewMat = glm::lookAt(position, focus, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	Camera(int screenWidth, int screenHeight, glm::vec3 _position)
+	{
+		position = _position;
+		focus = glm::vec3(0.0f);
+		distFromFocus = glm::distance(position, focus);
+		xPixels = screenWidth;
+		yPixels = screenHeight;
+		float nearPlane = 0.1f;
+		float farPlane = 1000.0f;
+		FoV = 67.0f;
+		float aspect = (float)xPixels / (float)yPixels;
+		projMat = glm::perspective(FoV, aspect, nearPlane, farPlane);
+		viewMat = glm::lookAt(position, focus, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+};
 
 #endif
