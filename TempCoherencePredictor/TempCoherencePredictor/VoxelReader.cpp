@@ -9,20 +9,23 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/TJet/";
 //	headerFile = folderPath + "DSTJet.mhd";
 
-	folderPath = "../../Samples/SmokeSim/";
-	headerFile = folderPath + "SmokeSimDS.mhd";
+//	folderPath = "../../Samples/SmokeSim/";
+//	headerFile = folderPath + "SmokeSimDS.mhd";
 
 //	folderPath = "../../Samples/SmokeSim/";
 //	headerFile = folderPath + "SmokeSimBig.mhd";
 
-//	folderPath = "../../Samples/SmokeSim/";
-//	headerFile = folderPath + "SmokeSimSideways.mhd";
+	folderPath = "../../Samples/SmokeSim/";
+	headerFile = folderPath + "SmokeSimSideways.mhd";
 
 //	folderPath = "../../Samples/CTknee/";
 //	headerFile = folderPath + "CTknee.mhd";
 
 //	folderPath = "../../Samples/downsampled vortex/";
 //	headerFile = folderPath + "dsVort.mhd";
+
+//	folderPath = "../../Samples/TVlung/";
+//	headerFile = folderPath + "TVlung.mhd";
 
 	ReadMHD(folderPath, headerFile, properties);
 	ReadRaw(properties);

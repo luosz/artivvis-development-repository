@@ -1,0 +1,23 @@
+#version 330
+
+in vec2 texCoords;
+uniform sampler2D volumeTex;
+uniform sampler2D backgroundTex;
+
+out vec4 FragColor;
+
+void main()
+{
+
+	vec4 volume = vec4(texture2D(volumeTex, texCoords));
+	vec4 background = vec4(texture2D(backgroundTex, vec2(texCoords.x, 1.0f - texCoords.y)));
+
+	FragColor = (volume * volume.w) + (background * (1.0f - volume.w));
+
+
+
+//	if (grid.w > -0.2f)
+//		FragColor = volume * 0.75f + grid * 0.25f;
+//	else
+//		FragColor = volume * 0.25f + grid * 0.75f;
+}

@@ -14,6 +14,8 @@ uniform float gradientStepSize;
 
 uniform vec3 lightPosition;
 
+uniform sampler2D grid;
+
 
 vec3 CalculateNormal(vec3 texCoord)
 {
@@ -57,11 +59,22 @@ void main()
 	vec4 color;
 	vec3 normal;
 
+	float tempDepth;
+	bool depthBeenSet = false;
+
 	vec3 direction = position - camPos;
 	direction = normalize(direction);
 
 	float absorption = 0.0f;
 	float opacity;
+
+//	while (position.z > 0.0f)
+//	{
+//		position = position + (direction * rayStepSize);
+//
+//		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+//			return;
+//	}
 	
 	for(int i=0; i<maxRaySteps; i++)
 	{
@@ -94,6 +107,8 @@ void main()
 			break;
 		}
 	}
+
+	finalColor.w = absorption;
 
 	FragColor = finalColor;
 }

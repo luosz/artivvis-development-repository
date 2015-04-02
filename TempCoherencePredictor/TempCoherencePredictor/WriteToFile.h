@@ -14,7 +14,7 @@ class WriteToFile
 {
 public:
 	std::string targetFileName;
-	GLubyte* pixelBuffer[800*800*4];
+	GLubyte* pixelBuffer[1920*1080*4];
 	int xPixels, yPixels;
 
 	void Init(int xPixels_, int yPixels_)
@@ -53,18 +53,28 @@ public:
 		ILboolean success;
 		ILuint imageID;
 		ilInit();
-		std::string imageName("ImageDumps/Ep_1_0_Time_" + std::to_string(currentTimestep) + ".png");
+
+		std::string prefix;
+
+		if (currentTimestep < 10)
+			prefix = "00";
+		else if (currentTimestep < 100)
+			prefix = "0";
+		else
+			prefix = "";
+
+		std::string imageName("ImageDumps/Block_Vis_Clip_Plane_Fade_Time_" + prefix + std::to_string(currentTimestep) + ".png");
 		ilGenImages(1, &imageID);
 		ilBindImage(imageID);
 
-		glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_UNSIGNED_BYTE, pixelBuffer);
+		glReadPixels(0, 0, 1920, 1080, GL_RGBA, GL_UNSIGNED_BYTE, pixelBuffer);
 
 		GLenum err = glGetError();
 
 		if (err != GL_NO_ERROR)
 		    printf("glError: %s\n", gluErrorString(err));
 
-		success = ilTexImage(xPixels, yPixels, 0, 4, IL_RGBA, IL_UNSIGNED_BYTE, pixelBuffer);
+		success = ilTexImage(1920, 1080, 0, 4, IL_RGBA, IL_UNSIGNED_BYTE, pixelBuffer);
 
 		success = ilSave(IL_PNG, imageName.c_str());
 

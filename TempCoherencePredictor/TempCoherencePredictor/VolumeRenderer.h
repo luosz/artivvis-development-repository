@@ -26,6 +26,11 @@ public:
 	WriteToFile fileWriter;
 	GLubyte* pixelBuffer[800*800*4];
 
+	Framebuffer framebuffer;
+	GLuint gridTexture;
+	GLuint volumeTexture;
+	GLuint imageTexture;
+
 	bool writeToFile;
 	
 

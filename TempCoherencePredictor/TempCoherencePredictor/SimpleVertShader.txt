@@ -4,12 +4,14 @@ in vec3 vPosition;
 layout (location = 3) in vec3 vColor;
 
 out vec3 color;
+out vec3 position;
 
 uniform mat4 proj, view, model;
 
 void main()
 {
 	color = vColor;
+	position = vPosition;
 
 	gl_Position = proj * view * model * vec4(vPosition.x,vPosition.y,vPosition.z,1.0);	
 }

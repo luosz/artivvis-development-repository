@@ -28,6 +28,12 @@ void ShaderManager::LoadShaders()
 
 	shader.Load("VisibilityVertShader.txt", "VisibilityFragShader.txt");
 	shaders.push_back(shader);
+
+	shader.Load("TextureVertShader.txt", "TextureFragShader.txt");
+	shaders.push_back(shader);
+
+	shader.Load("TextureComboVertShader.txt", "TextureComboFragShader.txt");
+	shaders.push_back(shader);
 }
 
 

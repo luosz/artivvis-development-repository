@@ -5,7 +5,7 @@
 #include <vector>
 #include "GLM.h"
 
-enum ShaderType {	SimpleShader, TFShader, BlockShader, GreyShader, VisibilityShader  };
+enum ShaderType {	SimpleShader, TFShader, BlockShader, GreyShader, VisibilityShader, TextureShader, TextureComboShader  };
 
 class ShaderManager
 {

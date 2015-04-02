@@ -32,7 +32,8 @@ void TransferFunction::LoadXML(const char *filename)
 	tinyxml2::XMLDocument doc;
 
 //	auto r = doc.LoadFile("../../transferfuncs/nucleon.tfi");
-	auto r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
+	auto r = doc.LoadFile("../../transferfuncs/test4.tfi");
+//	auto r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
 //	auto r = doc.LoadFile("../../transferfuncs/00.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)

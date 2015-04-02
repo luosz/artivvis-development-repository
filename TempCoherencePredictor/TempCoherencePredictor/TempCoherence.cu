@@ -4,6 +4,9 @@ texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> prevTexRef;
 texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> currTexRef;
 texture <unsigned char, cudaTextureType3D, cudaReadModeElementType> nextTexRef;
 
+
+
+
 TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume)
 {
 	blockRes = 8;
@@ -41,6 +44,10 @@ TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &v
 	blocksToBeCopied.resize(numBlocks);
 
 	threads.resize(NUM_THREADS);
+
+	blocksToBeDrawn.resize(numBlocks);
+
+	
 }
 
 __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface)
@@ -152,7 +159,7 @@ bool TempCoherence::BlockCompare(VolumeDataset &volume, int x, int y, int z)
 
 				int diff =  n - p;
 				
-				top += histogram->values[n] * diff * diff;
+				top += (float)histogram->values[n] * diff * diff;
 			}
 		}
 	}
@@ -271,10 +278,13 @@ void TempCoherence::CPUCompare(int begin, int end, VolumeDataset &volume)
 		if (BlockCompare(volume, x, y, z) == false)
 		{
 			CopyBlockToGPU(std::ref(volume), x, y, z);
+			blocksToBeDrawn[x + y*numXBlocks + z*numXBlocks*numYBlocks] = true;
 //			int posInChunk = atomicNumBlocksCopied.fetch_add(1);
 //			blocksToBeCopied[posInChunk] = BlockID(x, y, z);
 //			CopyBlockToChunk(volume, posInChunk, x, y, z);
 		}
+		else
+			numBlocksExtrapolated++;
 	}
 }
 
@@ -309,7 +319,8 @@ void TempCoherence::CPUPredict(VolumeDataset &volume)
 	for (int i=0; i<NUM_THREADS; i++)
 		threads[i].join();
 	
-	numBlocksCopied = atomicNumBlocksCopied.load();		
+
+	std::cout << numBlocksExtrapolated << " - " << numBlocks - numBlocksCopied << std::endl;
 }
 
 /*
@@ -393,6 +404,7 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 	currentTimestep = currentTimestep_;
 	numBlocksCopied = numBlocksExtrapolated = 0;
 	atomicNumBlocksCopied = 0;
+	std::fill(blocksToBeDrawn.begin(), blocksToBeDrawn.end(), false);
 
 	GLuint temp = prevTexture3D;
 	prevTexture3D = currTexture3D;
@@ -446,6 +458,165 @@ GLuint TempCoherence::GenerateTexture(VolumeDataset &volume)
 	glBindTexture(GL_TEXTURE_3D, 0);
 
 	return tex;
+}
+
+
+void TempCoherence::DrawBoxes(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
+{
+	GLuint shaderProgramID = shaderManager.UseShader(SimpleShader);
+	glm::mat4 model_mat = glm::mat4(1.0f);
+
+	GLuint uniformLoc = glGetUniformLocation (shaderProgramID, "proj");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.projMat[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "view");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &camera.viewMat[0][0]);
+
+	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
+	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
+
+	glm::vec3 volumeMin = glm::vec3(-1.0f);
+	float blockWidth = (2.0f / (float)numXBlocks);
+	glm::vec3 botBackLeft;
+
+	
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glBegin(GL_QUADS);
+
+
+	for (int ID=0; ID<numBlocks; ID++)
+	{
+		int z = ID / (numXBlocks*numYBlocks);
+		int remainder = ID % (numXBlocks*numYBlocks);
+
+		int y = remainder / (numXBlocks);
+		remainder = remainder % numXBlocks;
+
+		int x = remainder;
+
+		if (z >= numZBlocks / 2)
+			continue;
+
+//		glEnable(GL_BLEND);
+//		glBlendFunc(GL_ONE, GL_ONE);
+
+
+		if (!blocksToBeDrawn[ID])
+			continue;
+//			glColor3f(1.0f, 1.0f, 1.0f);		
+		else
+			glColor3f(1.0f, 0.0f, 0.0f);
+//			continue;
+
+		botBackLeft = glm::vec3(x * blockWidth + volumeMin.x, y * blockWidth + volumeMin.y, z * blockWidth + volumeMin.z);
+
+
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z);
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z);
+
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+
+
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z + blockWidth);
+	}
+
+
+
+	for (int ID=0; ID<numBlocks; ID++)
+	{
+		int z = ID / (numXBlocks*numYBlocks);
+		int remainder = ID % (numXBlocks*numYBlocks);
+
+		int y = remainder / (numXBlocks);
+		remainder = remainder % numXBlocks;
+
+		int x = remainder;
+
+		if (z >= numZBlocks / 2)
+			continue;
+
+//		glEnable(GL_BLEND);
+//		glBlendFunc(GL_ONE, GL_ONE);
+
+
+		if (!blocksToBeDrawn[ID])
+//			continue;
+			glColor3f(1.0f, 1.0f, 1.0f);		
+		else
+//			glColor3f(1.0f, 0.0f, 0.0f);
+			continue;
+
+		botBackLeft = glm::vec3(x * blockWidth + volumeMin.x, y * blockWidth + volumeMin.y, z * blockWidth + volumeMin.z);
+
+
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z);
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z);
+
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+
+
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z);
+		glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z + blockWidth);
+		glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z + blockWidth);
+	}
+
+//	glDisable(GL_BLEND);
+	
+
+
+//	glColor3f(1.0f, 0.0f, 0.0f);
+//	botBackLeft = glm::vec3(-1.0f);
+//	blockWidth = 2.0f;
+//
+//	glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z);
+//	glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z);
+//
+//	glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z + blockWidth);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z + blockWidth);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+//	glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+//
+//
+//	glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+//	glVertex3f(botBackLeft.x, botBackLeft.y + blockWidth, botBackLeft.z + blockWidth);
+//
+//	glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z);
+//	glVertex3f(botBackLeft.x + blockWidth, botBackLeft.y, botBackLeft.z + blockWidth);
+//	glVertex3f(botBackLeft.x, botBackLeft.y, botBackLeft.z + blockWidth);
+//
+	glEnd();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
 }
 
 

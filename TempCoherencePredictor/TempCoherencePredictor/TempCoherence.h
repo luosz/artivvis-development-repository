@@ -15,7 +15,7 @@
 #include <atomic>
 
 #define EXTRAP_CONST 2
-#define EPSILON 1.0f
+#define EPSILON 0.5f
 #define CHECK_STRIDE 1
 #define NUM_THREADS 7
 
@@ -64,6 +64,7 @@ public:
 	Histogram *histogram;
 
 	std::vector<std::thread> threads;
+	std::vector<bool> blocksToBeDrawn;
 
 	TempCoherence(int screenWidth, int screenHeight, VolumeDataset &volume);
 	GLuint GenerateTexture(VolumeDataset &volume);
@@ -82,6 +83,8 @@ public:
 	void CopyBlockToChunk(VolumeDataset &volume, int x, int y, int z);
 	void CopyBlockToChunk(VolumeDataset &volume, int posInChunk, int x, int y, int z);
 	void CopyChunkToGPU(VolumeDataset &volume);
+
+	void DrawBoxes(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
 };
 
 #endif

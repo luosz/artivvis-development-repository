@@ -39,7 +39,7 @@ void Init()
 
 void CopyToFile()
 {
-	std::string targetFileName = "../../Samples/SmokeSim/SmokeSimSideways/smokeSim.";
+	std::string targetFileName = "../../Samples/SmokeSim/SmokeSimSideways100500/smokeSim.";
 
 	memcpy(buffer, &fluid.hostDensities[0], rawDataSize);
 
@@ -51,7 +51,7 @@ void CopyToFile()
 		outStream.close();
 	}
 
-	if (numFiles == 200)
+	if (numFiles == 500)
 	{
 		cudaDeviceReset();
 		exit(0);
@@ -84,13 +84,13 @@ void Update()
 
 	fluid.Update();
 
-//	CopyToFile();
+	CopyToFile();
 
-	glEnable(GL_DEPTH_TEST);
-	GLuint shaderProgramID = shaderManager.UseShader(SmokeShader);
-	raycaster.Raycast(shaderProgramID, camera, fluid.hostDensities, fluid.hostTemperatures);
-
-	glutSwapBuffers();
+//	glEnable(GL_DEPTH_TEST);
+//	GLuint shaderProgramID = shaderManager.UseShader(SmokeShader);
+//	raycaster.Raycast(shaderProgramID, camera, fluid.hostDensities, fluid.hostTemperatures);
+//
+//	glutSwapBuffers();
 
 }
 

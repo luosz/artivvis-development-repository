@@ -66,6 +66,8 @@
     <Text Include="GreyScaleVertShader.txt" />
     <Text Include="SimpleFragShader.txt" />
     <Text Include="SimpleVertShader.txt" />
+    <Text Include="TextureComboFragShader.txt" />
+    <Text Include="TextureComboVertShader.txt" />
     <Text Include="TransFuncFragShader.txt" />
     <Text Include="TransFuncVertShader.txt" />
     <Text Include="VisibilityFragShader.txt" />

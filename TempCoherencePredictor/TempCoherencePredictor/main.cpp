@@ -2,8 +2,8 @@
 #include "CudaHeaders.h"
 #include <stdlib.h>
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 VolumeRenderer volumeRenderer;
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 {
 	// Set up the window
 	glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     glutCreateWindow("Volume Renderer");
 
