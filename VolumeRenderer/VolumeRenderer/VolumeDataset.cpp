@@ -99,15 +99,44 @@ GLuint VolumeDataset::GenerateTexture()
 }
 
 
-void VolumeDataset::UpdateTexture()
+GLuint VolumeDataset::LoadTextureAsync()
 {
-	glDeleteTextures(1, &currTexture3D);
-	currTexture3D = nextTexture3D;
-
 	if (currentTimestep < timesteps-1)
 		voxelReader.CopyFileToBuffer(memblock3D, currentTimestep+1);
 	else
 		voxelReader.CopyFileToBuffer(memblock3D, 0);
 
-	nextTexture3D = GenerateTexture();
+//	nextTexture3D = GenerateTexture();
+
+	return 0;
 }
+
+void VolumeDataset::UpdateTexture()
+{
+	asyncTexLoad.wait();
+
+	nextTexture3D = GenerateTexture();
+
+
+	glDeleteTextures(1, &currTexture3D);
+	currTexture3D = nextTexture3D;
+	
+	asyncTexLoad = std::async(&VolumeDataset::LoadTextureAsync, this);
+
+	
+}
+
+//void VolumeDataset::UpdateTexture()
+//{
+//	glDeleteTextures(1, &currTexture3D);
+//	currTexture3D = nextTexture3D;
+//
+//	
+//
+//	if (currentTimestep < timesteps-1)
+//		voxelReader.CopyFileToBuffer(memblock3D, currentTimestep+1);
+//	else
+//		voxelReader.CopyFileToBuffer(memblock3D, 0);
+//
+//	nextTexture3D = GenerateTexture();
+//}

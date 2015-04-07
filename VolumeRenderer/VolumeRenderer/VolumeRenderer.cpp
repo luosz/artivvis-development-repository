@@ -8,13 +8,9 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	shaderManager.Init();
 	volume.Init();
 
-#ifndef USE_JoesOGLRenderer
-	std::cout << "Tom's OpenGL renderer is used." << std::endl;
 	renderer = new TomsOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
-#else
-	std::cout << "Joe's OpenGL renderer is used." << std::endl;
-	renderer = new JoesOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
-#endif
+//	renderer = new JoesOGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
+
 
 	grabRegion = false;
 }
@@ -22,7 +18,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 
 void VolumeRenderer::Update()
 {
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 

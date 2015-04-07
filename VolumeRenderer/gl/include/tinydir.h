@@ -83,7 +83,7 @@ typedef struct
 	tinydir_file *_files;
 #ifdef _WIN32
 	HANDLE _h;
-	WIN32_FIND_DATA _f;
+	WIN32_FIND_DATAA _f;
 #else
 	DIR *_d;
 	struct dirent *_e;
@@ -142,9 +142,12 @@ int tinydir_open(tinydir_dir *dir, const char *path)
 
 	strcpy(dir->path, path);
 #ifdef _WIN32
-	strcat(dir->path, "\\*");
-	dir->_h = FindFirstFile((LPCWSTR)dir->path, &dir->_f);
-	dir->path[strlen(dir->path) - 2] = '\0';
+//	strcat(dir->path, "\\*");
+//	dir->_h = FindFirstFile((LPCWSTR)dir->path, &dir->_f);
+//	dir->path[strlen(dir->path) - 2] = '\0';
+	strcat(dir->path, "/*");
+	dir->_h = FindFirstFileA(dir->path, &dir->_f);
+	dir->path[strlen(dir->path) - 1] = '\0';
 	if (dir->_h == INVALID_HANDLE_VALUE)
 #else
 	dir->_d = opendir(path);
@@ -283,7 +286,7 @@ int tinydir_next(tinydir_dir *dir)
 	}
 
 #ifdef _WIN32
-	if (FindNextFile(dir->_h, &dir->_f) == 0)
+	if (FindNextFileA(dir->_h, &dir->_f) == 0)
 #else
 	dir->_e = readdir(dir->_d);
 	if (dir->_e == NULL)

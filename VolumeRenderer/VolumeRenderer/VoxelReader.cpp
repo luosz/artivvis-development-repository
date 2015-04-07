@@ -49,10 +49,13 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 		//	headerFile = folderPath + "SmokeSim.mhd";
 
 		//	folderPath = "../../Samples/SmokeSim/";
-		//	headerFile = folderPath + "SmokeSimSideways.mhd";
+		//	headerFile = folderPath + "SmokeSimBig.mhd";
 
-			folderPath = "../../Samples/CTknee/";
-			headerFile = folderPath + "CTknee.mhd";
+			folderPath = "../../Samples/SmokeSim/";
+			headerFile = folderPath + "SmokeSimSideways.mhd";
+
+		//	folderPath = "../../Samples/CTknee/";
+		//	headerFile = folderPath + "CTknee.mhd";
 
 		//	folderPath = "../../Samples/downsampled vortex/";
 		//	headerFile = folderPath + "dsVort.mhd";
@@ -156,7 +159,7 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 	int numBytesInBufferFilled = 0;
 
 	std::string directory = properties.rawFilePath;
-	directory.append("/*");
+//	directory.append("/*");
 
 
 	struct stat status;
@@ -170,7 +173,10 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 		{
 			tinydir_file file;
 			tinydir_readfile(&dir, &file);
-			files.push_back(std::string(file.name));
+
+			if (file.is_reg)
+				files.push_back(std::string(file.name));
+
 			tinydir_next(&dir);
 		}
 
@@ -179,8 +185,8 @@ void VoxelReader::ReadRaw(VolumeProperties &properties)
 		for (int i = 0; i < files.size(); i++)
 			files[i] = std::string(properties.rawFilePath + "/" + files[i]);
 
-		std::string currentFile(properties.rawFilePath + "/" + files[0]);
-		CopyFileToBuffer(currentFile, numBytesInBufferFilled, properties);
+
+		CopyFileToBuffer(files[0], numBytesInBufferFilled, properties);
 	}
 	else
 	{
@@ -207,7 +213,7 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 		numBytesInBufferFilled += size;
 	}
 	else
-		std::cout << "Unable to open file" << std::endl;
+		std::cout << "Unable to open file: " << fileName.c_str() << std::endl;
 
 
 }

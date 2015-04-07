@@ -33,9 +33,10 @@ void TransferFunction::Update()
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
-//	auto r = doc.LoadFile("nucleon.tfi");
-	tinyxml2::XMLError r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
-//	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("nucleon.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
+	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/BlueSmoke.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;

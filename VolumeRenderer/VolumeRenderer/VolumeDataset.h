@@ -9,6 +9,7 @@
 #include <time.h>
 #include "GLM.h"
 #include "Camera.h"
+#include <future>
 
 #ifndef MAX_PATH
 #define MAX_PATH          260
@@ -31,6 +32,7 @@ public:
 
 	int currentTimestep;
 	clock_t oldTime;
+	std::future<GLuint> asyncTexLoad;
 
 	VoxelReader voxelReader;
 
@@ -39,6 +41,7 @@ public:
 	void ReverseEndianness();
 	GLuint GenerateTexture();
 	void UpdateTexture();
+	GLuint LoadTextureAsync();
 
 	//////////////////////////////////////////////////////////////////////////
 	std::string folderPath;

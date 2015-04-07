@@ -6,8 +6,9 @@ OpenGLRenderer::OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset 
 
 	if (volume.timesteps > 1)
 	{
-		volume.voxelReader.CopyFileToBuffer(volume.memblock3D, 1);
-		volume.nextTexture3D = volume.GenerateTexture();
+		volume.asyncTexLoad = std::async(&VolumeDataset::LoadTextureAsync, &volume);
+//		volume.voxelReader.CopyFileToBuffer(volume.memblock3D, 1);
+//		volume.nextTexture3D = volume.GenerateTexture();
 	}
 
 	raycaster = new GPURaycaster(screenWidth, screenHeight, volume);
