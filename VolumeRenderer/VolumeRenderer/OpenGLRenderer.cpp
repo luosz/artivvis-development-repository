@@ -2,17 +2,8 @@
 
 OpenGLRenderer::OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
 {
-	volume.currTexture3D = volume.GenerateTexture();
-
-	if (volume.timesteps > 1)
-	{
-		volume.asyncTexLoad = std::async(&VolumeDataset::LoadTextureAsync, &volume);
-//		volume.voxelReader.CopyFileToBuffer(volume.memblock3D, 1);
-//		volume.nextTexture3D = volume.GenerateTexture();
-	}
-
+	volume.InitTexture();
 	raycaster = new GPURaycaster(screenWidth, screenHeight, volume);
-	visibilityHistogram.Init(screenWidth, screenHeight);
 	transferFunction.Init(" ", volume);
 
 	_optimizer = new VisibilityTFOptimizer(&volume, &visibilityHistogram, &transferFunction);
@@ -29,6 +20,4 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 
 	if (optimizer())
 		optimizer()->Draw(shaderManager, camera);
-
-	visibilityHistogram.DrawHistogram(shaderManager, camera);
 }

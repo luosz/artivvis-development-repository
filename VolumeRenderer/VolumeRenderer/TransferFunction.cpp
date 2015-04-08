@@ -20,14 +20,7 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	LoadLookup(currentColorTable);
 
 	targetIntensity = 0.4f;
-	optimizeIntensity = false;
 }
-
-void TransferFunction::Update()
-{
-
-}
-
 
 
 void TransferFunction::LoadXML(const char *filename)

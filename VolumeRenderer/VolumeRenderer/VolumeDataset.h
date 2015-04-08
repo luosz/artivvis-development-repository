@@ -20,7 +20,9 @@ class VolumeDataset
 public:
 	GLubyte *memblock3D;
 	GLuint currTexture3D;
-	GLuint nextTexture3D;
+
+	std::string folderPath;
+	std::string headerFile;
 
 	int timesteps;
 	float timePerFrame;
@@ -32,49 +34,20 @@ public:
 
 	int currentTimestep;
 	clock_t oldTime;
-	std::future<GLuint> asyncTexLoad;
+	std::future<void> asyncTexLoad;
 
 	VoxelReader voxelReader;
 
 	void Init();
 	void Update();
 	void ReverseEndianness();
+	void InitTexture();
 	GLuint GenerateTexture();
 	void UpdateTexture();
-	GLuint LoadTextureAsync();
+	void LoadTextureAsync();
+	void CopyToTexture();
 
-	//////////////////////////////////////////////////////////////////////////
-	std::string folderPath;
-	std::string headerFile;
-
-	/// Read mhd filename from command-line argument in argv[1] and extract folder path from mhd filename
-	void ParseArguments(int argc, char *argv[])
-	{
-		// Read filename from command-line argument argv[1] if available
-		if (argc >= 2)
-		{
-			char filename[MAX_PATH];
-			strcpy(filename, argv[1]);
-			// Try both Windows and Linux directory separators ('\\' and '/')
-			char *p = strrchr(filename, '\\');
-			if (!p)
-			{
-				p = strrchr(filename, '/');
-			}
-			if (p)
-			{
-				headerFile = std::string(filename);
-				if (strlen(p) >= 2)
-				{
-					// Extract folder path from volume filename
-					p[1] = '\0';
-				}
-				folderPath = std::string(filename);
-				std::cout << "headerFile=" << headerFile << std::endl << "folderPath=" << folderPath << std::endl;
-			}
-		}
-	}
-	//////////////////////////////////////////////////////////////////////////
+	void ParseArguments(int argc, char *argv[]);
 };
 
 #endif

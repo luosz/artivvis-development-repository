@@ -153,14 +153,11 @@ bool NumericalFileSort(const std::string a, const std::string b)
 // Reads in the raw binary data using properties copied in from header
 void VoxelReader::ReadRaw(VolumeProperties &properties)
 {
-	//	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement * properties.timesteps;
 	int bufferSize = properties.xRes * properties.yRes * properties.zRes * properties.bytesPerElement;
 	properties.bufferAddress = new GLubyte[bufferSize];
 	int numBytesInBufferFilled = 0;
 
 	std::string directory = properties.rawFilePath;
-//	directory.append("/*");
-
 
 	struct stat status;
 	stat(directory.c_str(), &status);
@@ -219,6 +216,7 @@ void VoxelReader::CopyFileToBuffer(std::string fileName, int &numBytesInBufferFi
 }
 
 
+// Copies file for single timestep to main memory buffer
 void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
 {
 	std::string fileName = files[fileIndex];

@@ -138,7 +138,7 @@ void QtWidget::AdjustIntensityFocus(int x)
 
 void QtWidget::ToggleIntensityOptimize(bool x)
 {
-	transferFunction->optimizeIntensity = x;
+
 }
 
 #pragma endregion TransferFuncTab

@@ -22,7 +22,6 @@ public:
 	int numIntensities;
 	GLuint tfTexture;
 	float targetIntensity;
-	bool optimizeIntensity;
 
 	// Qt GraphicsView for transfer function
 	AbstractGraphicsView *tfView;
@@ -32,7 +31,6 @@ public:
 	std::vector<glm::vec4> currentColorTable;
 
 	void Init(const char *filename, VolumeDataset &volume_);
-	void Update();
 
 	void LoadXML(const char *filename);
 	void LoadLookup(std::vector<glm::vec4> &colorTable);

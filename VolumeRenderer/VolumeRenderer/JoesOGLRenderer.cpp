@@ -3,6 +3,13 @@
 
 JoesOGLRenderer::JoesOGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera) : OpenGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera)
 {
+	visibilityHistogram.Init(screenWidth, screenHeight);
+
+	_optimizer = new VisibilityTFOptimizer(&volume, &visibilityHistogram, &transferFunction);
+	_intensityTFOptimizerV2 = new IntensityTFOptimizerV2(&volume, &transferFunction, &visibilityHistogram);
+//	_optimizer = new RegionVisibilityOptimizer(&volume, &transferFunction, raycaster, &shaderManager, &camera);
+//	_optimizer = new IntensityTFOptimizer(&volume, &transferFunction);
+
 	//intensityOptimizerV2 = std::make_shared<IntensityTFOptimizerV2>(&volume, &transferFunction, &visibilityHistogram);
 }
 
@@ -51,4 +58,9 @@ void JoesOGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, 
 	//}
 
 	OpenGLRenderer::Draw(volume, shaderManager, camera);
+
+//	if (optimizer())
+//		optimizer()->Draw(shaderManager, camera);
+//
+//	visibilityHistogram.DrawHistogram(shaderManager, camera);
 }
