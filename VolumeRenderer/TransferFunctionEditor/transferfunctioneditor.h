@@ -139,11 +139,11 @@ public:
 
 		tfView.init(volumeRenderer);
 
-		if (tfView.transferFunction())
-		{
-			update_intensity_histogram_view();
-			update_visibility_histogram_view();
-		}
+//		if (tfView.transferFunction())
+//		{
+//			update_intensity_histogram_view();
+//			update_visibility_histogram_view();
+//		}
 	}
 
 	void update_intensity_histogram_view()

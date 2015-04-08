@@ -354,6 +354,8 @@ public:
 		transfer_function = &volumeRenderer.renderer->transferFunction;
 		this->volume_renderer = &volumeRenderer;
 		intensityTFOptimizerV2 = volumeRenderer.renderer->intensityTFOptimizerV2();
+
+		updateViewFromTransferFunction();
 	}
 
 	IntensityTFOptimizerV2 *optimizer()

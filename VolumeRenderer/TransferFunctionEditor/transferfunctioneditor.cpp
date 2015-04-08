@@ -22,13 +22,13 @@ visibility_histogram_view("Visibility Histogram")
 
 	// load default transfer function
 	//	filename = "../../transferfuncs/nucleon.tfi";
-	filename = "../../transferfuncs/CT-Knee_spectrum_16_balance.tfi";
-	//	filename = "../../transferfuncs/00.tfi";
-
-	QByteArray array = filename.toLocal8Bit();
-	char* buffer = array.data();
-	openTransferFunctionFromVoreenXML(buffer);
-	tfView.setTransferFunction(numIntensities, colors, intensities);
+//	filename = "../../transferfuncs/CT-Knee_spectrum_16_balance.tfi";
+//	//	filename = "../../transferfuncs/00.tfi";
+//
+//	QByteArray array = filename.toLocal8Bit();
+//	char* buffer = array.data();
+//	openTransferFunctionFromVoreenXML(buffer);
+//	tfView.setTransferFunction(numIntensities, colors, intensities);
 
 	// set up histogram
 	int n = 16;
