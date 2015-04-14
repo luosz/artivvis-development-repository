@@ -19,7 +19,6 @@ void VolumeDataset::Init()
 
 	currentTimestep = 0;
 	oldTime = clock();
-
 }
 
 // Generate the 3D texture and launch the first background thread to load the next timestep
@@ -27,8 +26,18 @@ void VolumeDataset::InitTexture()
 {
 	currTexture3D = GenerateTexture();
 
+	int bufferSize = xRes * yRes * zRes * bytesPerElement;
+
+	for (int i=0; i<NUM_STREAMING_THREADS; i++)
+		threadBlock[i] = new GLubyte[bufferSize];
+
 	if (timesteps > 1)
-		asyncTexLoad = std::async(&VolumeDataset::LoadTextureAsync, this);
+	{
+		asyncTexLoad[0] = std::async(&VolumeDataset::LoadTextureAsync, this, 0, NUM_STREAMING_THREADS);
+
+		for (int i=1; i<NUM_STREAMING_THREADS; i++)
+			asyncTexLoad[i] = std::async(&VolumeDataset::LoadTextureAsync, this, i, i);
+	}
 }
 
 
@@ -113,12 +122,12 @@ GLuint VolumeDataset::GenerateTexture()
 
 
 // Run in a background thread to load next timestep from disk
-void VolumeDataset::LoadTextureAsync()
+void VolumeDataset::LoadTextureAsync(int currentThread, int stepToBuffer)
 {
-	if (currentTimestep < timesteps-1)
-		voxelReader.CopyFileToBuffer(memblock3D, currentTimestep+1);
-	else
-		voxelReader.CopyFileToBuffer(memblock3D, 0);
+	
+	voxelReader.CopyFileToBuffer(threadBlock[currentThread], stepToBuffer);
+//	else
+//		voxelReader.CopyFileToBuffer(threadBlock[currentThread], (currentTimestep + NUM_STREAMING_THREADS) % timesteps);
 
 	return;
 }
@@ -133,13 +142,13 @@ void VolumeDataset::CopyToTexture()
 		glPixelStoref(GL_UNPACK_SWAP_BYTES, true);
 
 	if (elementType == "MET_UCHAR")
-		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, xRes, yRes, zRes, GL_RED, GL_UNSIGNED_BYTE, memblock3D);
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, xRes, yRes, zRes, GL_RED, GL_UNSIGNED_BYTE, currMemblock);
 
 	else if (elementType == "SHORT")
-		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, xRes, yRes, zRes, GL_RED, GL_UNSIGNED_SHORT, memblock3D);
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, xRes, yRes, zRes, GL_RED, GL_UNSIGNED_SHORT, currMemblock);
 
 	else if (elementType == "FLOAT")
-		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, xRes, yRes, zRes, GL_RED, GL_FLOAT, memblock3D);
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, xRes, yRes, zRes, GL_RED, GL_FLOAT, currMemblock);
 
 	glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
 
@@ -150,11 +159,21 @@ void VolumeDataset::CopyToTexture()
 // Waits for thread loading next timestep to complete then copies data to GPU texture
 void VolumeDataset::UpdateTexture()
 {
-	asyncTexLoad.wait();
+	int currentThread = currentTimestep % NUM_STREAMING_THREADS;
+	currMemblock = threadBlock[currentThread];
+
+	asyncTexLoad[currentThread].wait();
 
 	CopyToTexture();
-	
-	asyncTexLoad = std::async(&VolumeDataset::LoadTextureAsync, this);	
+
+	int stepToBuffer;
+
+	if (currentTimestep + NUM_STREAMING_THREADS < timesteps)
+		stepToBuffer = currentTimestep + NUM_STREAMING_THREADS;
+	else
+		stepToBuffer = currentThread;//(currentTimestep + NUM_STREAMING_THREADS) % timesteps;
+
+	asyncTexLoad[currentThread] = std::async(&VolumeDataset::LoadTextureAsync, this, currentThread, stepToBuffer);	
 }
 
 

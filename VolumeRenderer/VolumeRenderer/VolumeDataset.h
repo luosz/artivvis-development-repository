@@ -15,10 +15,14 @@
 #define MAX_PATH          260
 #endif
 
+#define NUM_STREAMING_THREADS 2
+
 class VolumeDataset
 {
 public:
 	GLubyte *memblock3D;
+	GLubyte *threadBlock[NUM_STREAMING_THREADS];
+	GLubyte *currMemblock;
 	GLuint currTexture3D;
 
 	std::string folderPath;
@@ -34,7 +38,7 @@ public:
 
 	int currentTimestep;
 	clock_t oldTime;
-	std::future<void> asyncTexLoad;
+	std::future<void> asyncTexLoad[NUM_STREAMING_THREADS];
 
 	VoxelReader voxelReader;
 
@@ -44,7 +48,7 @@ public:
 	void InitTexture();
 	GLuint GenerateTexture();
 	void UpdateTexture();
-	void LoadTextureAsync();
+	void LoadTextureAsync(int currentThread, int stepsToBuffer);
 	void CopyToTexture();
 
 	void ParseArguments(int argc, char *argv[]);

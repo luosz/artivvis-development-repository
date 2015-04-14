@@ -12,6 +12,9 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 		//	folderPath = "../../Samples/Nucleon/";
 		//	headerFile = folderPath + "nucleon.mhd";
 
+		//	folderPath = "../../Samples/colon/";
+		//	headerFile = folderPath + "colon.mhd";
+
 		//	folderPath = "../../Samples/CThead/";
 		//	headerFile = folderPath + "CThead.mhd";
 
@@ -48,8 +51,8 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 		//	folderPath = "../../Samples/SmokeSim/";
 		//	headerFile = folderPath + "SmokeSim.mhd";
 
-			folderPath = "../../Samples/SmokeSim/";
-			headerFile = folderPath + "SmokeSimBig.mhd";
+		//	folderPath = "../../Samples/SmokeSim/";
+		//	headerFile = folderPath + "SmokeSimBig.mhd";
 
 		//	folderPath = "../../Samples/SmokeSim/";
 		//	headerFile = folderPath + "SmokeSimSideways.mhd";
@@ -59,6 +62,21 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 
 		//	folderPath = "../../Samples/downsampled vortex/";
 		//	headerFile = folderPath + "dsVort.mhd";
+
+		//	folderPath = "../../Samples/aneurism/";
+		//	headerFile = folderPath + "aneurism.mhd";
+
+		//	folderPath = "../../Samples/VisMale/";
+		//	headerFile = folderPath + "VisMale.mhd";
+
+		//	folderPath = "../../Samples/MRIWoman/";
+		//	headerFile = folderPath + "MRIWoman.mhd";
+
+		//	folderPath = "../../Samples/combustion/";
+		//	headerFile = folderPath + "combustion.mhd";
+
+			folderPath = "../../Samples/supernova/";
+			headerFile = folderPath + "supernova.mhd";
 	}
 
 	ReadMHD(folderPath, headerFile, properties);
