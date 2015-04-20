@@ -1,0 +1,32 @@
+#version 330
+
+out vec4 FragColor;
+
+in vec2 texCoords;
+
+uniform sampler2D slice2D;
+uniform sampler1D transferFunc;
+uniform vec3 camPos;
+
+void main()
+{
+	vec4 finalColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	float scalar = texture(slice2D, texCoords).x;
+
+	finalColor = vec4(texture(transferFunc, scalar));	
+
+//	finalColor.xyz *= finalColor.w * 1.0f;
+
+	FragColor = finalColor;
+}
+
+
+/*
+opacity = color.w;
+
+if ((absorption + opacity) > 1.0f)
+	finalColor += color*(1.0f - absorption);
+else
+	finalColor += color*opacity;
+	*/

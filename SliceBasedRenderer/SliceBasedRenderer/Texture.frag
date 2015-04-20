@@ -1,0 +1,11 @@
+#version 330
+
+in vec2 texCoords;
+uniform sampler2D texColor;
+
+out vec4 FragColor;
+
+void main()
+{
+	FragColor = vec4(texture(texColor, texCoords));
+}
