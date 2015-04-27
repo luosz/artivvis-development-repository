@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{0849b1aa-dac0-4e92-b173-0a3fe8fc89b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{97b3b74e-36a6-4708-9edb-1513b90ec92f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{ca458853-356c-4526-81c2-f129106a0e0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Duplicated">
+      <UniqueIdentifier>{3174ca15-7bac-473a-b862-ad89f4e67436}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\VRServer\NetworkingMisc.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VRServer\Packet.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VRServer\Socket.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VRServer\TCPSocket.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VRServer\UDPSocket.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientNetworkManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GLM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Raycaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TransferFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeDataset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\VRServer\Packet.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VRServer\Socket.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VRServer\TCPSocket.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VRServer\UDPSocket.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientNetworkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Raycaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TransferFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeDataset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
