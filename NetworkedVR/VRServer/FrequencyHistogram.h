@@ -28,7 +28,7 @@ public:
 	{
 		for (int i=begin; i<end; i++)
 		{
-			int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
+			int bucket = volume.currMemblock[i];
 
 			if (bucket != 0)
 				atomicValues[bucket].fetch_add((int)1);
@@ -69,13 +69,13 @@ public:
 //	}
 
 	
-	void Update(int currentTimestep, VolumeDataset &volume, GLuint tex3D, GLuint &tfTexture, Camera &camera)
+	void Update(int currentTimestep, VolumeDataset &volume, GLuint tex3D)
 	{
 		std::fill(values.begin(), values.end(), 0);
 
 		for (int i=0; i<volume.numVoxels; i++)
 		{
-			int bucket = volume.memblock3D[(currentTimestep*volume.numVoxels) + i];
+			int bucket = volume.currMemblock[i];
 			values[bucket]++;
 		}
 

@@ -200,6 +200,6 @@ void VoxelReader::CopyFileToBuffer(GLubyte* bufferAddress, int fileIndex)
 VolumeProperties::VolumeProperties()
 {
 	timesteps = 1;
-	timePerFrame = 0.2f;
+	timePerFrame = 0.1f;
 }
 

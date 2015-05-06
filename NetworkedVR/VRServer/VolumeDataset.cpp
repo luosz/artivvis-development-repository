@@ -6,7 +6,7 @@ void VolumeDataset::Init()
 	VolumeProperties properties;
 	voxelReader.LoadVolume(std::string(), std::string(), properties);
 
-	memblock3D = properties.bufferAddress;
+	currMemblock = properties.bufferAddress;
 	timesteps = properties.timesteps;
 	timePerFrame = properties.timePerFrame;
 	numDims = properties.numDims;
@@ -19,15 +19,12 @@ void VolumeDataset::Init()
 
 	numVoxels = xRes * yRes * zRes;
 
-	currentTimestep = 0;
-	oldTime = clock();
-
 	InitTexture();
 }
 
 void VolumeDataset::InitTexture()
 {
-	currTexture3D = GenerateTexture();
+//	currTexture3D = GenerateTexture();
 
 	int bufferSize = xRes * yRes * zRes * bytesPerElement;
 
@@ -65,13 +62,13 @@ GLuint VolumeDataset::GenerateTexture()
 		glPixelStoref(GL_UNPACK_SWAP_BYTES, true);
 
 	if (elementType == "MET_UCHAR")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8,xRes, yRes, zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, memblock3D);
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R8,xRes, yRes, zRes, 0,  GL_RED, GL_UNSIGNED_BYTE, NULL);
 
 	else if (elementType == "SHORT")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_UNSIGNED_SHORT, memblock3D);
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_UNSIGNED_SHORT, NULL);
 
 	else if (elementType == "FLOAT")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_FLOAT, memblock3D);
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_FLOAT, NULL);
 
 	glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
 	
@@ -141,7 +138,7 @@ void VolumeDataset::UpdateTexture()
 	asyncTexLoad[currentThread].wait();
 	currMemblock = threadBlock[currentThread];
 
-	CopyToTexture();
+//	CopyToTexture();
 
 	int stepToBuffer;
 

@@ -1,9 +1,8 @@
 #include "ServerNetworkManager.h"
 
-void NetworkManager::Init(VolumeRenderer *renderer_)
+void NetworkManager::Init(VolumeDataset &volume_)
 {
-	renderer = renderer_;
-	volume = &renderer->volume;
+	volume = &volume_;
 
 	udpPort = 40000;
 	tcpPort = 40001;
@@ -65,54 +64,60 @@ void NetworkManager::Update()
 {
 	if (clients.size() > 0)
 	{
-		if (lastTimestepSent < volume->currentTimestep || lastTimestepSent == volume->timesteps-1)
-			SendState();
+//		if (lastTimestepSent < volume->currentTimestep || lastTimestepSent == volume->timesteps-1)
+//			SendState();
 	}
 }
 
 
-void NetworkManager::SendState()
+void NetworkManager::SendState(int numXBlocks, int numYBlocks, int numZBlocks, int blockRes)
 {
-	TempCoherence *tempCoh = renderer->tempCoherence;
-	int ID;
-
-	lastTimestepSent = volume->currentTimestep;
+//	lastTimestepSent = volume->currentTimestep;
 
 	// Then send entire volume
-	for (int k=0; k<tempCoh->numZBlocks; k++)
-		for (int j=0; j<tempCoh->numYBlocks; j++)
-			for (int i=0; i<tempCoh->numXBlocks; i++)
+	for (int k=0; k<numZBlocks; k++)
+		for (int j=0; j<numYBlocks; j++)
+			for (int i=0; i<numXBlocks; i++)
 			{
-				int xMin = i * tempCoh->blockRes;
-				int yMin = j * tempCoh->blockRes;
-				int zMin = k * tempCoh->blockRes;
-
-				Packet packet(PacketType::BLOCK);
-
-				packet.WriteInt(i);
-				packet.WriteInt(j);
-				packet.WriteInt(k);
-
-				for (int z=0; z<tempCoh->blockRes; z++)
-					for (int y=0; y<tempCoh->blockRes; y++)
-						for (int x=0; x<tempCoh->blockRes; x++)
-						{
-							if ((xMin + x) >= volume->xRes || (yMin + y) >= volume->yRes || (zMin + z) >= volume->zRes)
-								continue;
-
-							ID = (xMin + x) + ((yMin + y) * volume->xRes) + ((zMin + z) * volume->xRes * volume->yRes);
-
-							packet.WriteByte(volume->currMemblock[ID]);
-						}
-
-				for (auto &client : clients)
-				{
-					if (!udpSocket.Send(client.ipAddress, packet))
-						std::cout << "Failed to send " << packet.size << "bytes to " << client.ipAddress.udpPort << " - Error: " << WSAGetLastError() << std::endl;
-					else
-						std::cout << "Sent: " << i << " - " << j << " - " << k << std::endl;
-				}
+				SendBlock(i, j, k, blockRes);
 			}
+}
+
+
+void NetworkManager::SendBlock(int i, int j, int k, int blockRes)
+{
+	int ID;
+
+	int xMin = i * blockRes;
+	int yMin = j * blockRes;
+	int zMin = k * blockRes;
+
+	Packet packet(PacketType::BLOCK);
+
+	packet.WriteInt(blockRes);
+	packet.WriteInt(i);
+	packet.WriteInt(j);
+	packet.WriteInt(k);
+
+	for (int z=0; z<blockRes; z++)
+		for (int y=0; y<blockRes; y++)
+			for (int x=0; x<blockRes; x++)
+			{
+				if ((xMin + x) >= volume->xRes || (yMin + y) >= volume->yRes || (zMin + z) >= volume->zRes)
+					continue;
+
+				ID = (xMin + x) + ((yMin + y) * volume->xRes) + ((zMin + z) * volume->xRes * volume->yRes);
+
+				packet.WriteByte(volume->currMemblock[ID]);
+			}
+
+	for (auto &client : clients)
+	{
+		if (!udpSocket.Send(client.ipAddress, packet))
+			std::cout << "Failed to send " << packet.size << "bytes to " << client.ipAddress.udpPort << " - Error: " << WSAGetLastError() << std::endl;
+		else
+			std::cout << "Sent: " << i << " - " << j << " - " << k << std::endl;
+	}
 }
 
 
@@ -120,7 +125,6 @@ void NetworkManager::SendState()
 void NetworkManager::InitializeClient(Client &client)
 {
 	// Send initial info
-	TempCoherence *tempCoh = renderer->tempCoherence;
 	int ID;
 
 	Packet initPacket;
@@ -134,11 +138,6 @@ void NetworkManager::InitializeClient(Client &client)
 	initPacket.WriteInt(volume->bytesPerElement);
 	initPacket.WriteBool(volume->littleEndian);
 
-	initPacket.WriteInt(tempCoh->numXBlocks);
-	initPacket.WriteInt(tempCoh->numYBlocks);
-	initPacket.WriteInt(tempCoh->numZBlocks);
-	initPacket.WriteInt(tempCoh->blockRes);
-
 	initPacket.WriteCheckSum();
 
 	bool initSent = false;
@@ -147,46 +146,46 @@ void NetworkManager::InitializeClient(Client &client)
 		initSent = client.linkedSocket.Send(initPacket);
 
 
-	lastTimestepSent = volume->currentTimestep;
-
-	// Then send entire volume
-	for (int k=0; k<tempCoh->numZBlocks; k++)
-		for (int j=0; j<tempCoh->numYBlocks; j++)
-			for (int i=0; i<tempCoh->numXBlocks; i++)
-			{
-				int xMin = i * tempCoh->blockRes;
-				int yMin = j * tempCoh->blockRes;
-				int zMin = k * tempCoh->blockRes;
-
-				Packet packet;
-				packet.WriteInt(0);
-				packet.WriteByte((unsigned char)PacketType::BLOCK);
-
-				packet.WriteInt(i);
-				packet.WriteInt(j);
-				packet.WriteInt(k);
-
-				for (int z=0; z<tempCoh->blockRes; z++)
-					for (int y=0; y<tempCoh->blockRes; y++)
-						for (int x=0; x<tempCoh->blockRes; x++)
-						{
-							if ((xMin + x) >= volume->xRes || (yMin + y) >= volume->yRes || (zMin + z) >= volume->zRes)
-								continue;
-
-							ID = (xMin + x) + ((yMin + y) * volume->xRes) + ((zMin + z) * volume->xRes * volume->yRes);
-
-							packet.WriteByte(volume->currMemblock[ID]);
-						}
-
-				packet.WriteCheckSum();
-
-				bool sentSuccess = false;
-
-				while (!sentSuccess)
-					sentSuccess = client.linkedSocket.Send(packet);
-
-				std::cout << "Geometry packet sent size: " << packet.size << std::endl;
-			}
+//	lastTimestepSent = volume->currentTimestep;
+//
+//	// Then send entire volume
+//	for (int k=0; k<tempCoh->numZBlocks; k++)
+//		for (int j=0; j<tempCoh->numYBlocks; j++)
+//			for (int i=0; i<tempCoh->numXBlocks; i++)
+//			{
+//				int xMin = i * tempCoh->blockRes;
+//				int yMin = j * tempCoh->blockRes;
+//				int zMin = k * tempCoh->blockRes;
+//
+//				Packet packet;
+//				packet.WriteInt(0);
+//				packet.WriteByte((unsigned char)PacketType::BLOCK);
+//
+//				packet.WriteInt(i);
+//				packet.WriteInt(j);
+//				packet.WriteInt(k);
+//
+//				for (int z=0; z<tempCoh->blockRes; z++)
+//					for (int y=0; y<tempCoh->blockRes; y++)
+//						for (int x=0; x<tempCoh->blockRes; x++)
+//						{
+//							if ((xMin + x) >= volume->xRes || (yMin + y) >= volume->yRes || (zMin + z) >= volume->zRes)
+//								continue;
+//
+//							ID = (xMin + x) + ((yMin + y) * volume->xRes) + ((zMin + z) * volume->xRes * volume->yRes);
+//
+//							packet.WriteByte(volume->currMemblock[ID]);
+//						}
+//
+//				packet.WriteCheckSum();
+//
+//				bool sentSuccess = false;
+//
+//				while (!sentSuccess)
+//					sentSuccess = client.linkedSocket.Send(packet);
+//
+//				std::cout << "Geometry packet sent size: " << packet.size << std::endl;
+//			}
 }
 
 

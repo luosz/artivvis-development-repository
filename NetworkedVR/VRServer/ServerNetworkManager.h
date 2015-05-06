@@ -5,8 +5,7 @@
 #include "TCPSocket.h"
 #include <vector>
 #include <tchar.h>
-#include "TempCoherence.h"
-#include "VolumeRenderer.h"
+#include "VolumeDataset.h"
 
 struct Client
 {
@@ -25,7 +24,6 @@ struct Client
 class NetworkManager
 {
 public:
-	VolumeRenderer *renderer;
 	VolumeDataset *volume;
 	int lastTimestepSent;
 
@@ -37,9 +35,10 @@ public:
 	
 	int udpPort, tcpPort;
 
-	void Init(VolumeRenderer *renderer_);
+	void Init(VolumeDataset &volume_);
 	void Update();
-	void SendState();
+	void SendState(int numXBlocks, int numYBlocks, int numZBlocks, int blockRes);
+	void SendBlock(int i, int j, int k, int blockRes);
 
 	void InitializeClient(Client &client);
 

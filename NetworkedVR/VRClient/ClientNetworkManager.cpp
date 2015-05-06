@@ -143,11 +143,6 @@ void NetworkManager::ReceiveInitialization(Packet &packet)
 	volume->bytesPerElement = packet.ReadInt();
 	volume->littleEndian = packet.ReadBool();
 
-	numXBlocks = packet.ReadInt();
-	numYBlocks = packet.ReadInt();
-	numZBlocks = packet.ReadInt();
-	blockRes = packet.ReadInt();
-
 	volume->Init();
 }
 
@@ -155,6 +150,7 @@ void NetworkManager::UpdateBlock(Packet &packet)
 {
 	int ID;
 
+	int blockRes = packet.ReadInt();
 	int blockX = packet.ReadInt();
 	int blockY = packet.ReadInt();
 	int blockZ = packet.ReadInt();

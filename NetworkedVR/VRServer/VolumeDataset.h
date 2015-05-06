@@ -10,12 +10,11 @@
 #include "Camera.h"
 #include <future>
 
-#define NUM_STREAMING_THREADS 2
+#define NUM_STREAMING_THREADS 1
 
 class VolumeDataset
 {
 public:
-	GLubyte *memblock3D;
 	GLubyte *threadBlock[NUM_STREAMING_THREADS];
 	GLubyte *currMemblock;
 	GLuint currTexture3D;

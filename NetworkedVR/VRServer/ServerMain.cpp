@@ -1,24 +1,57 @@
-#include"VolumeRenderer.h"
+#include"ServerRenderer.h"
 #include "CudaHeaders.h"
 #include <stdlib.h>
 #include "ServerNetworkManager.h"
+#include "TempCoherence.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
 VolumeRenderer volumeRenderer;
 NetworkManager networkManager;
+TempCoherence *tempCoherence;
+VolumeDataset volume;
+
 
 // For mouse control
 int xclickedAt = -1;
 int yclickedAt = -1;
 
 
+void Init()
+{
+	volume.Init();
+	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT, volume);
+	tempCoherence = new TempCoherence(SCREEN_WIDTH, SCREEN_HEIGHT, volume, &networkManager);
+	networkManager.Init(volume);
+}
+
 // Update renderer and check for Qt events
 void MainLoop()
 {
+	if (volume.timesteps > 1)
+	{
+		clock_t currentTime = clock();
+		float time = (currentTime - volume.oldTime) / (float) CLOCKS_PER_SEC;
+
+		if (time > volume.timePerFrame)
+		{
+			if (volume.currentTimestep < volume.timesteps - 1)
+				volume.currentTimestep++;
+			else
+				volume.currentTimestep = 0;
+
+			volume.oldTime = currentTime;
+
+			volume.UpdateTexture();
+
+			volume.currTexture3D = tempCoherence->TemporalCoherence(volume, volume.currentTimestep);
+		}
+	}
+
 	volumeRenderer.Update();
-	networkManager.Update();
+
+//	networkManager.Update();
 }
 
 
@@ -112,9 +145,7 @@ int main(int argc, char *argv[])
     }
 
 		
-	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
-	networkManager.Init(&volumeRenderer);
-
+	Init();
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);

@@ -37,7 +37,7 @@
     <ClInclude Include="TransferFunction.h" />
     <ClInclude Include="UDPSocket.h" />
     <ClInclude Include="VolumeDataset.h" />
-    <ClInclude Include="VolumeRenderer.h" />
+    <ClInclude Include="ServerRenderer.h" />
     <ClInclude Include="VoxelReader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -54,7 +54,7 @@
     <ClCompile Include="TransferFunction.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
-    <ClCompile Include="VolumeRenderer.cpp" />
+    <ClCompile Include="ServerRenderer.cpp" />
     <ClCompile Include="VoxelReader.cpp" />
   </ItemGroup>
   <ItemGroup>

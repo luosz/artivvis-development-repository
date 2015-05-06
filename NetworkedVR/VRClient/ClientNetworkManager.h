@@ -17,9 +17,6 @@ public:
 	UDPSocket udpSocket;
 	TCPSocket tcpSocket;
 
-	int numXBlocks, numYBlocks, numZBlocks;
-	int blockRes;
-
 	HWND msgWnd;
 	
 	int udpPort, tcpPort;
