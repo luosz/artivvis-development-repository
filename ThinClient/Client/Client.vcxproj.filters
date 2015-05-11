@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{96eef1a6-d553-41aa-89c5-0954dfbd8942}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{cb98a77f-bb59-4ef4-90cd-6bc716f03fa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{f74a1eb8-b24c-463a-a6a6-7d7f0b94afba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Duplicated">
+      <UniqueIdentifier>{20041f42-e1ec-4d03-97f1-71e75cf02c2a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ClientNetworkManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server\Packet.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server\Shader.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server\ShaderManager.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server\Socket.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server\TCPSocket.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Server\UDPSocket.h">
+      <Filter>Duplicated</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ClientMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientNetworkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server\Packet.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server\Shader.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server\ShaderManager.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server\Socket.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server\TCPSocket.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Server\UDPSocket.cpp">
+      <Filter>Duplicated</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

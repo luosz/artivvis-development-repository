@@ -15,10 +15,10 @@
 #include "ServerNetworkManager.h"
 
 #define EXTRAP_CONST 2
-#define EPSILON 10.0f
+#define EPSILON 0.0f
 #define CHECK_STRIDE 1
 #define NUM_THREADS 7
-#define BLOCK_RES 8
+#define BLOCK_RES 4
 
 
 struct BlockID

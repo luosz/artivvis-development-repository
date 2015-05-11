@@ -5,13 +5,13 @@ NetworkManager::NetworkManager()
 	// Binding sockets to zero auto detects an open port
 	udpPort = 0;
 	tcpPort = 0;
-	connected = false;
 }
 
-void NetworkManager::Init(VolumeRenderer *renderer_)
+void NetworkManager::Init(int screenWidth_, int screenHeight_, unsigned char *buffer)
 {
-	renderer = renderer_;
-	volume = &renderer->volume;
+	screenWidth = screenWidth_;
+	screenHeight = screenHeight_;
+	pixelBuffer = buffer;
 
 	WSADATA wsaData;
 	if ( WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR )
@@ -135,15 +135,6 @@ bool NetworkManager::CheckForMessages()
 
 void NetworkManager::ReceiveInitialization(Packet &packet)
 {
-	volume->timesteps = packet.ReadInt();
-	volume->timePerFrame = packet.ReadFloat();
-	volume->xRes = packet.ReadInt();
-	volume->yRes = packet.ReadInt();
-	volume->zRes = packet.ReadInt();
-	volume->bytesPerElement = packet.ReadInt();
-	volume->littleEndian = packet.ReadBool();
-
-	volume->Init();
 }
 
 void NetworkManager::UpdateBlock(Packet &packet)
@@ -153,57 +144,67 @@ void NetworkManager::UpdateBlock(Packet &packet)
 	int blockRes = packet.ReadInt();
 	int blockX = packet.ReadInt();
 	int blockY = packet.ReadInt();
-	int blockZ = packet.ReadInt();
 
 	int xMin = blockX * blockRes;
 	int yMin = blockY * blockRes;
-	int zMin = blockZ * blockRes;
 
-	std::cout << blockX << " - " << blockY << " - " << blockZ << std::endl;
+//	std::cout << blockX << " - " << blockY << std::endl;
 
-	for (int z=0; z<blockRes; z++)
-		for (int y=0; y<blockRes; y++)
-			for (int x=0; x<blockRes; x++)
-			{
-				if ((xMin + x) >= volume->xRes || (yMin + y) >= volume->yRes || (zMin + z) >= volume->zRes)
-					continue;
+	for (int y=0; y<blockRes; y++)
+		for (int x=0; x<blockRes; x++)
+		{
+			if ((xMin + x) >= screenWidth || (yMin + y) >= screenHeight)
+				continue;
 
-				ID = (xMin + x) + ((yMin + y) * volume->xRes) + ((zMin + z) * volume->xRes * volume->yRes);
+			ID = (xMin + x) + ((yMin + y) * screenWidth);
 
-				volume->memblock3D[ID] = packet.ReadByte();
-			}
+			ID *= 3;
+
+			for (int i = 0; i<3; i++)
+				pixelBuffer[ID + i] = packet.ReadByte();
+		}
 }
 
 
 
 void NetworkManager::ReadMessage(WPARAM wParam)
 {
-	Packet packet;
+	int newPackSize = recv(wParam, (char*)(tcpPacket.message + tcpPacket.size), MAX_PACKET_SIZE - tcpPacket.size, 0);
+	tcpPacket.size += newPackSize;
 
-	packet.size = recv(wParam, (char*)packet.message, MAX_PACKET_SIZE, 0);
-
-	if (packet.size <= 0)
+	if (tcpPacket.size <= 0)
 		return;
 
 	int amountRead = 0;
 	int chunkSize = 0;
 
-	while (amountRead < packet.size)
+	while (amountRead < tcpPacket.size)
 	{
-		chunkSize = packet.ReadInt();
-		packet.type = (PacketType)packet.ReadByte();
+		chunkSize = tcpPacket.ReadInt();
 
-		switch (packet.type)
+		// Checks if a smaller packet has been split at the end of the bigger one and buffers the beginning of it to be complete on the next packet received
+		if (chunkSize + amountRead > tcpPacket.size)
+		{
+			std::memcpy(tcpPacket.message, tcpPacket.message + amountRead, chunkSize);
+			tcpPacket.size -= amountRead;
+			tcpPacket.readPosition = 0;
+
+			return;
+		}
+
+		tcpPacket.type = (PacketType)tcpPacket.ReadByte();
+
+		switch (tcpPacket.type)
 		{
 			case PacketType::INITIALIZATION:
-				std::cout << packet.size << " initialization packet received" << std::endl;
-				ReceiveInitialization(packet);
+				std::cout << tcpPacket.size << " initialization packet received" << std::endl;
+				ReceiveInitialization(tcpPacket);
 
 				break;
 
 			case PacketType::BLOCK:
-				std::cout << "Block packet size: " << chunkSize << std::endl;
-				UpdateBlock(packet);
+//				std::cout << "Block packet size: " << chunkSize << std::endl;
+				UpdateBlock(tcpPacket);
 				break;
 
 			default:
@@ -212,6 +213,9 @@ void NetworkManager::ReadMessage(WPARAM wParam)
 
 		amountRead += chunkSize;
 	}
+
+	tcpPacket.size = 0;
+	tcpPacket.readPosition = 0;
 }
 
 LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -222,7 +226,7 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 		    break;
 
 		case FD_READ:
-		    std::cout << "Incoming data: " << std::endl;
+//		    std::cout << "Incoming data: " << std::endl;
 			ReadMessage(wParam);
 		    break;
 		
