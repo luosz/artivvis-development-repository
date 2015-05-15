@@ -120,7 +120,7 @@ glm::vec3 VisibilityHistogram::FindFarthestCorner(Camera &camera)
 }
 
 // Uses atomic adds to accumulate visibility values for respective intensity values, read directly from texture memory
-__global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *numInBin)
+__global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *numInBin, float *visVolume, int *countVolume)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
 
@@ -141,6 +141,10 @@ __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *num
 
 			atomicAdd(&(histBins[bin]), (float)color.x);
 			atomicAdd(&(numInBin[bin]), (int)1);
+
+			int voxelID = (int)(float)color.w;
+			atomicAdd(&(visVolume[voxelID]), (float)color.x);
+			atomicAdd(&(countVolume[voxelID]), (int)1);
 		}
 	}
 }
@@ -197,6 +201,11 @@ __global__ void CudaGrabFrustum(int numFrustumPixels, int frustumExtent, int mou
 // Calculate visibility histogram
 void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera)
 {
+	int voxelCount = volume.xRes*volume.yRes*volume.zRes;
+	visVolume.resize(voxelCount);
+	countVolume.resize(voxelCount);
+	std::fill(visVolume.begin(), visVolume.end(), 0.0f);
+	std::fill(countVolume.begin(), countVolume.end(), 0);
 //	std::fill(visibilities.begin(), visibilities.end(), 0.0f);
 //	std::fill(numVis.begin(), numVis.end(), 0);
 
@@ -204,6 +213,8 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	HANDLE_ERROR( cudaMemset(cudaHistBins, 0, 256 * sizeof(float)) );
 	HANDLE_ERROR( cudaMemset(cudaNumInBin, 0, 256 * sizeof(int)) );
 	//HANDLE_ERROR(cudaMemset(cudaNumInBin_intensity, 0, 256 * sizeof(int)));
+	HANDLE_ERROR(cudaMemset(cudaVisVolume, 0, voxelCount * sizeof(float)));
+	HANDLE_ERROR(cudaMemset(cudaCountVolume, 0, voxelCount * sizeof(int)));
 
 	// Bind visibility shader and framebuffer with a write texture attached
 	GLuint shaderProgramID = shaderManager.UseShader(VisibilityShader);
@@ -227,6 +238,9 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	uniformLoc = glGetUniformLocation (shaderProgramID, "model");
 	glUniformMatrix4fv (uniformLoc, 1, GL_FALSE, &model_mat[0][0]);
 
+	uniformLoc = glGetUniformLocation(shaderProgramID, "volumeRes");
+	glUniform3i(uniformLoc, volume.xRes, volume.yRes, volume.zRes);
+
 	glActiveTexture (GL_TEXTURE0);
 	uniformLoc = glGetUniformLocation(shaderProgramID,"volume");
 	glUniform1i(uniformLoc,0);
@@ -236,6 +250,9 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	uniformLoc = glGetUniformLocation(shaderProgramID,"transferFunc");
 	glUniform1i(uniformLoc,1);
 	glBindTexture (GL_TEXTURE_1D, tfTexture);
+
+
+
 
 
 	// Find closest point on volume to camera to start slicing there
@@ -320,7 +337,7 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 		{
 			// Launch CUDA kernel to accumulate visbility values in parallel
 			int numPixels = xPixels * yPixels;
-			CudaEvaluate<<<(numPixels + 255) / 256, 256>>>(xPixels, yPixels, cudaHistBins, cudaNumInBin);
+			CudaEvaluate <<<(numPixels + 255) / 256, 256 >>>(xPixels, yPixels, cudaHistBins, cudaNumInBin, cudaVisVolume, cudaCountVolume);
 		}
 		else
 		{
@@ -365,6 +382,10 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	// Copy intensity histogram of frustum back to CPU memory for ease of access
 	////HANDLE_ERROR(cudaMemcpy(&intensity_histogram[0], cudaNumInBin_intensity, 256 * sizeof(int), cudaMemcpyDeviceToHost));
 	HANDLE_ERROR(cudaMemcpy(&intensity_histogram[0], cudaNumInBin, 256 * sizeof(int), cudaMemcpyDeviceToHost));
+
+	// Copy visibility volume back to CPU memory for ease of access
+	HANDLE_ERROR(cudaMemcpy(&visVolume[0], cudaVisVolume, voxelCount * sizeof(float), cudaMemcpyDeviceToHost));
+	HANDLE_ERROR(cudaMemcpy(&countVolume[0], cudaCountVolume, voxelCount * sizeof(int), cudaMemcpyDeviceToHost));
 
 	// CPU average visbilities
 //	for (int i=0; i<256; i++)
