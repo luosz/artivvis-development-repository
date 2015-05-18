@@ -28,6 +28,8 @@ public:
 	std::vector<int> numVis;
 	std::vector<int> intensity_histogram;
 
+	std::vector<float> visVolume;
+	std::vector<int> countVolume;
 
 	// Qt GraphicsView for visibility histogram
 	MyGraphicsView *visibilityView;
@@ -37,6 +39,8 @@ public:
 	float *cudaHistBins;
 	int *cudaNumInBin;
 	//int *cudaNumInBin_intensity;
+	float *cudaVisVolume;
+	int *cudaCountVolume;
 
 	void Init(int screenWidth, int screenHeight);
 	void CalculateHistogram(VolumeDataset &volume, GLuint &tfTexture, ShaderManager shaderManager, Camera &camera);

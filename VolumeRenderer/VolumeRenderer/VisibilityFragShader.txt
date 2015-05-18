@@ -7,6 +7,8 @@ uniform sampler3D volume;
 uniform sampler1D transferFunc;
 uniform sampler2D opacityTex;
 
+uniform ivec3 volumeRes;
+
 out vec4 FragColor;
 
 vec3 CalculateNormal(vec3 texCoord)
@@ -43,7 +45,7 @@ void main()
 //	float opacity = prevOpacity + (1.0f - prevOpacity) * alpha;
 //	float visibility = (1.0f - prevOpacity) * alpha;
 
-	float gradient = length(CalculateNormal(texCoord));
+//	float gradient = length(CalculateNormal(texCoord));
 
 
 	float opacity = prevOpacity + alpha;
@@ -58,8 +60,10 @@ void main()
 	else
 		visibility = alpha;
 
+	vec3 voxelPos = texCoord * vec3(volumeRes.x, volumeRes.y, volumeRes.z);
+	float voxelID = voxelPos.x + (voxelPos.y * volumeRes.x) + (voxelPos.z * volumeRes.x * volumeRes.y);
 
-	vec4 final = vec4(visibility, opacity, scalar, gradient);
+	vec4 final = vec4(visibility, opacity, scalar, voxelID);
 
 	FragColor = final;
 }
