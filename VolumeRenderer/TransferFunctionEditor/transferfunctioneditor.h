@@ -206,6 +206,14 @@ private slots:
 
     void on_cameraButton_clicked();
 
+    void on_rotateButton_clicked();
+
+    void on_frontButton_clicked();
+
+    void on_topButton_clicked();
+
+    void on_leftButton_clicked();
+
 private:
     Ui::TransferFunctionEditor *ui;
 

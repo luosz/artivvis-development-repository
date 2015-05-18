@@ -52,6 +52,51 @@ public:
 		projMat = glm::perspective(FoV, aspect, nearPlane, farPlane);
 		viewMat = glm::lookAt(position, focus, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
+
+	void front()
+	{
+		position = glm::vec3(0.0f, 0.0f, 2.0f);
+		focus = glm::vec3(0.0f);
+		distFromFocus = glm::distance(position, focus);
+
+		float nearPlane = 0.1f;
+		float farPlane = 1000.0f;
+		FoV = 67.0f;
+		float aspect = (float)xPixels / (float)yPixels;
+
+		projMat = glm::perspective(FoV, aspect, nearPlane, farPlane);
+		viewMat = glm::lookAt(position, focus, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
+	//void top()
+	//{
+	//	front();
+	//	position = glm::rotateX(position, -90.f);
+	//}
+
+	//void left()
+	//{
+	//	front();
+	//	position = glm::rotateY(position, -90.f);
+	//}
+
+	// Rotate by degrees
+	void Camera::rotateX(float rotateAmount)
+	{
+		position = glm::rotateX(position, rotateAmount);
+	}
+
+	// Rotate by degrees
+	void Camera::rotateY(float rotateAmount)
+	{
+		position = glm::rotateY(position, rotateAmount);
+	}
+
+	// Rotate by degrees
+	void Camera::rotateZ(float rotateAmount)
+	{
+		position = glm::rotateZ(position, rotateAmount);
+	}
 };
 
 #endif

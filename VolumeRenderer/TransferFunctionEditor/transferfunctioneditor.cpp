@@ -218,8 +218,41 @@ void TransferFunctionEditor::on_cameraButton_clicked()
 	//p = tfView.volumeRenderer()->camera.position;
 	//std::cout << p.x << " " << p.y << " " << p.z << std::endl;
 	//auto degree = rand() % 20 - 10;
-	tfView.volumeRenderer()->camera.Rotate(15);
+    //tfView.volumeRenderer()->camera.Rotate(15);
 
+    CameraSerializer::to_file(tfView.volumeRenderer()->camera, "d:/camera.txt");
+    auto camera = CameraSerializer::from_file("d:/camera.txt");
+    std::cout<<"CameraSerializer\n";
+    std::cout << camera.position.x << "\t" << camera.position.y << "\t" << camera.position.z << std::endl;
+    std::cout << camera.xPixels << "\t" << camera.yPixels << std::endl;
 
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_rotateButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+    tfView.volumeRenderer()->camera.Rotate(15);
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_frontButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+    tfView.volumeRenderer()->camera.front();
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_topButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	tfView.volumeRenderer()->camera.rotateX(-15);
+#endif // NOT_USED_BY_VOLUME_RENDERER
+}
+
+void TransferFunctionEditor::on_leftButton_clicked()
+{
+#ifndef NOT_USED_BY_VOLUME_RENDERER
+	tfView.volumeRenderer()->camera.rotateZ(-15);
 #endif // NOT_USED_BY_VOLUME_RENDERER
 }

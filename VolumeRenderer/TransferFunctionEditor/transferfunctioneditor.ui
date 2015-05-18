@@ -320,13 +320,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="cameraButton">
-         <property name="text">
-          <string>save camera</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="computeDistanceButton">
          <property name="text">
           <string>compute distance</string>
@@ -337,6 +330,57 @@
         <widget class="QPushButton" name="visibilityHistogramButton">
          <property name="text">
           <string>visibility histogram</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_10">
+       <property name="leftMargin">
+        <number>7</number>
+       </property>
+       <property name="topMargin">
+        <number>7</number>
+       </property>
+       <property name="rightMargin">
+        <number>7</number>
+       </property>
+       <property name="bottomMargin">
+        <number>7</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="cameraButton">
+         <property name="text">
+          <string>save camera</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rotateButton">
+         <property name="text">
+          <string>rotate</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="frontButton">
+         <property name="text">
+          <string>front</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="leftButton">
+         <property name="text">
+          <string>left</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="topButton">
+         <property name="text">
+          <string>top</string>
          </property>
         </widget>
        </item>

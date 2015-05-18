@@ -373,6 +373,8 @@ void VisibilityHistogram::CalculateHistogram(VolumeDataset &volume, GLuint &tfTe
 	// Average visbilities
 	CudaNormalize<<< (numBins + 255) / 256, 256>>>(256, cudaHistBins, cudaNumInBin);
 
+	CudaNormalize <<< (voxelCount + 255) / 256, 256 >>>(voxelCount, cudaVisVolume, cudaCountVolume);
+
 	// Copy visibility info back to CPU memory for ease of access
 	HANDLE_ERROR(cudaMemcpy(&visibilities[0], cudaHistBins, 256 * sizeof(float), cudaMemcpyDeviceToHost));
 
