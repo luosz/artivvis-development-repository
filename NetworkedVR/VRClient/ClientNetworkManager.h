@@ -17,6 +17,8 @@ public:
 	UDPSocket udpSocket;
 	TCPSocket tcpSocket;
 
+	Packet tcpPacket;
+
 	HWND msgWnd;
 	
 	int udpPort, tcpPort;

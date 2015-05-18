@@ -37,7 +37,7 @@ void Update()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	bool messagesInQueue = true;
+//	bool messagesInQueue = true;
 
 //	while (messagesInQueue)
 //	for (int i=0; i<SCREEN_WIDTH * SCREEN_HEIGHT; i++)
@@ -55,6 +55,8 @@ void Update()
 	renderTex->Render();
 
 	glutSwapBuffers();
+
+//	glutPostRedisplay();
 }
 
 
@@ -83,7 +85,6 @@ void SpecialFunc(int key, int x, int y)
 // Mouse drags to control camera
 void MouseMove(int x, int y) 
 { 	
-
 }
 
 
@@ -112,6 +113,10 @@ void MouseWheel(int wheel, int direction, int x, int y)
 	
 }
 
+void Idle()
+{
+	glutPostRedisplay();
+}
 
 int main(int argc, char *argv[])
 {

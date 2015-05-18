@@ -57,7 +57,7 @@ bool NetworkManager::InitTCPMsgHandler()
 
 	return true;
 }
-
+/*
 void NetworkManager::Update(int screenWidth, int screenHeight, unsigned char *pixelBuffer)
 {
 	if (clients.size() > 0)
@@ -74,7 +74,7 @@ void NetworkManager::Update(int screenWidth, int screenHeight, unsigned char *pi
 		}
 	}
 }
-
+*/
 
 void NetworkManager::SendState()
 {
@@ -82,7 +82,7 @@ void NetworkManager::SendState()
 
 }
 
-
+/*
 void NetworkManager::SendBlock(int i, int j, int screenWidth, int screenHeight, unsigned char *pixelBuffer)
 {
 	int ID;
@@ -128,7 +128,58 @@ void NetworkManager::SendBlock(int i, int j, int screenWidth, int screenHeight, 
 //			std::cout << "Sent: " << i << " - " << j << std::endl;
 	}
 }
+*/
 
+void NetworkManager::Update(int screenWidth, int screenHeight, unsigned char *pixelBuffer)
+{
+	if (clients.size() > 0)
+	{
+		int numPixels = screenWidth * screenHeight;
+
+		for (int i=0; i<numPixels; i+=PIXELS_PER_CHUNK)
+		{
+			SendBlock(i, numPixels, pixelBuffer);
+		}
+	}
+}
+
+
+void NetworkManager::SendBlock(int pixelID, int numPixels, unsigned char *pixelBuffer)
+{
+	int numPixelsToSend;
+
+	if (pixelID + PIXELS_PER_CHUNK > numPixels)
+		numPixelsToSend = numPixels - pixelID;
+	else
+		numPixelsToSend = PIXELS_PER_CHUNK;
+
+	int bufferID = pixelID * 3;
+
+	Packet packet;
+
+	packet.WriteInt(0);
+	packet.WriteByte((unsigned char)PacketType::BLOCK);
+	packet.WriteInt(numPixelsToSend);
+	packet.WriteInt(bufferID);
+
+	packet.WriteChunk(pixelBuffer + bufferID, numPixelsToSend * 3);
+
+	packet.WriteCheckSum();
+
+	for (auto &client : clients)
+	{
+//		if (!udpSocket.Send(client.ipAddress, packet))
+//			std::cout << "Failed to send " << packet.size << "bytes to " << client.ipAddress.udpPort << " - Error: " << WSAGetLastError() << std::endl;
+
+		bool messageSent = false;
+
+		while(messageSent == false)
+			messageSent = client.linkedSocket.Send(packet);
+			
+//		else
+//			std::cout << "Sent: " << i << " - " << j << std::endl;
+	}
+}
 
 
 void NetworkManager::InitializeClient(Client &client)
@@ -137,16 +188,7 @@ void NetworkManager::InitializeClient(Client &client)
 	int ID;
 
 	Packet initPacket;
-//	initPacket.WriteInt(0);
-//	initPacket.WriteByte((unsigned char)PacketType::INITIALIZATION);
-//	initPacket.WriteInt(volume->timesteps);
-//	initPacket.WriteFloat(volume->timePerFrame);
-//	initPacket.WriteInt(volume->xRes);
-//	initPacket.WriteInt(volume->yRes);
-//	initPacket.WriteInt(volume->zRes);
-//	initPacket.WriteInt(volume->bytesPerElement);
-//	initPacket.WriteBool(volume->littleEndian);
-
+	initPacket.WriteInt(0);
 	initPacket.WriteCheckSum();
 
 	bool initSent = false;

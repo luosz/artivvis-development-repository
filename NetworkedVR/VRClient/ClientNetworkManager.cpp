@@ -159,7 +159,7 @@ void NetworkManager::UpdateBlock(Packet &packet)
 	int yMin = blockY * blockRes;
 	int zMin = blockZ * blockRes;
 
-	std::cout << blockX << " - " << blockY << " - " << blockZ << std::endl;
+//	std::cout << blockX << " - " << blockY << " - " << blockZ << std::endl;
 
 	for (int z=0; z<blockRes; z++)
 		for (int y=0; y<blockRes; y++)
@@ -178,32 +178,47 @@ void NetworkManager::UpdateBlock(Packet &packet)
 
 void NetworkManager::ReadMessage(WPARAM wParam)
 {
-	Packet packet;
+	int newPackSize = recv(wParam, (char*)(tcpPacket.message + tcpPacket.size), MAX_PACKET_SIZE - tcpPacket.size, 0);
+	tcpPacket.size += newPackSize;
 
-	packet.size = recv(wParam, (char*)packet.message, MAX_PACKET_SIZE, 0);
-
-	if (packet.size <= 0)
+	if (tcpPacket.size <= 0)
 		return;
 
 	int amountRead = 0;
 	int chunkSize = 0;
 
-	while (amountRead < packet.size)
+	while (amountRead < tcpPacket.size)
 	{
-		chunkSize = packet.ReadInt();
-		packet.type = (PacketType)packet.ReadByte();
+		chunkSize = tcpPacket.ReadInt();
 
-		switch (packet.type)
+		int bytesRemaining = tcpPacket.size - amountRead;
+
+		if (bytesRemaining <= 0)
+			int a = 0;
+
+		// Checks if a smaller packet has been split at the end of the bigger one and buffers the beginning of it to be complete on the next packet received
+		if (chunkSize > bytesRemaining)
+		{
+			std::memcpy(tcpPacket.message, tcpPacket.message + amountRead, bytesRemaining);
+			tcpPacket.size = bytesRemaining;
+			tcpPacket.readPosition = 0;
+
+			return;
+		}
+
+		tcpPacket.type = (PacketType)tcpPacket.ReadByte();
+
+		switch (tcpPacket.type)
 		{
 			case PacketType::INITIALIZATION:
-				std::cout << packet.size << " initialization packet received" << std::endl;
-				ReceiveInitialization(packet);
+				std::cout << tcpPacket.size << " initialization packet received" << std::endl;
+				ReceiveInitialization(tcpPacket);
 
 				break;
 
 			case PacketType::BLOCK:
-				std::cout << "Block packet size: " << chunkSize << std::endl;
-				UpdateBlock(packet);
+//				std::cout << "Block packet size: " << chunkSize << std::endl;
+				UpdateBlock(tcpPacket);
 				break;
 
 			default:
@@ -212,6 +227,9 @@ void NetworkManager::ReadMessage(WPARAM wParam)
 
 		amountRead += chunkSize;
 	}
+
+	tcpPacket.size = 0;
+	tcpPacket.readPosition = 0;
 }
 
 LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -227,6 +245,8 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 		    break;
 		
 		case FD_CLOSE:
+			std::cout << "Connection Lost" << std::endl;
+			getchar();
 		    //Lost the connection
 		    break;
 	}

@@ -7,12 +7,12 @@ bool TCPSocket::Open(unsigned short port)
 	if (!Socket::Open(port))
 		return false;
 
-	int flag = 1;
-	if ( setsockopt(handle, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int)) != 0 )
-	{
-		std::cout << "Failed to delay Nagle's algorithm" << std::endl;
-		return false;
-	}
+//	int flag = 1;
+//	if ( setsockopt(handle, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int)) != 0 )
+//	{
+//		std::cout << "Failed to delay Nagle's algorithm" << std::endl;
+//		return false;
+//	}
 
 	return true;
 }
