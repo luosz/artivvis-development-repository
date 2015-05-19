@@ -28,8 +28,8 @@ void NetworkManager::Init(int screenWidth_, int screenHeight_, unsigned char *bu
 	getsockname(udpSocket.handle, (sockaddr*)&addr, &len);
 	udpPort = ntohs(addr.sin_port);
 
-	server = IPAddress(127, 0, 0, 1, 40000);
-//	server = IPAddress(134, 226, 54, 9, 40000);
+//	server = IPAddress(127, 0, 0, 1, 40000);
+	server = IPAddress(134, 226, 54, 9, 40000);
 	server.tcpPort = 40001;
 
 	InitTCPMsgHandler();
@@ -240,7 +240,7 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 		    break;
 
 		case FD_READ:
-		    std::cout << "Incoming data: " << std::endl;
+//		    std::cout << "Incoming data: " << std::endl;
 			ReadMessage(wParam);
 		    break;
 		

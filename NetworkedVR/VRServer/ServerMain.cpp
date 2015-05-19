@@ -45,7 +45,9 @@ void MainLoop()
 
 			volume.UpdateTexture();
 
-			volume.currTexture3D = tempCoherence->TemporalCoherence(volume, volume.currentTimestep);
+//			volume.currTexture3D = tempCoherence->TemporalCoherence(volume, volume.currentTimestep);
+
+			networkManager.SendState(tempCoherence->numXBlocks, tempCoherence->numYBlocks, tempCoherence->numZBlocks, tempCoherence->blockRes);
 		}
 	}
 

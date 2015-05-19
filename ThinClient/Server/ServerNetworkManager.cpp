@@ -57,24 +57,7 @@ bool NetworkManager::InitTCPMsgHandler()
 
 	return true;
 }
-/*
-void NetworkManager::Update(int screenWidth, int screenHeight, unsigned char *pixelBuffer)
-{
-	if (clients.size() > 0)
-	{
-		int numXBlocks = glm::ceil((float)screenWidth / (float)IMAGE_BLOCK_RES);
-		int numYBlocks = glm::ceil((float)screenHeight / (float)IMAGE_BLOCK_RES);
 
-		for (int j=0; j<numYBlocks; j++)
-		{
-			for (int i=0; i<numXBlocks; i++)
-			{
-				SendBlock(i, j, screenWidth, screenHeight, pixelBuffer);
-			}
-		}
-	}
-}
-*/
 
 void NetworkManager::SendState()
 {
@@ -82,53 +65,6 @@ void NetworkManager::SendState()
 
 }
 
-/*
-void NetworkManager::SendBlock(int i, int j, int screenWidth, int screenHeight, unsigned char *pixelBuffer)
-{
-	int ID;
-
-	int xMin = i * IMAGE_BLOCK_RES;
-	int yMin = j * IMAGE_BLOCK_RES;
-
-	Packet packet;
-
-	packet.WriteInt(0);
-	packet.WriteByte((unsigned char)PacketType::BLOCK);
-	packet.WriteInt(IMAGE_BLOCK_RES);
-	packet.WriteInt(i);
-	packet.WriteInt(j);
-
-	for (int y=0; y<IMAGE_BLOCK_RES; y++)
-		for (int x=0; x<IMAGE_BLOCK_RES; x++)
-		{
-			if ((xMin + x) >= screenWidth || (yMin + y) >= screenHeight)
-				continue;
-
-			ID = (xMin + x) + ((yMin + y) * screenWidth);
-
-			ID *= 3;
-
-			for (int i = 0; i<3; i++)
-				packet.WriteByte(pixelBuffer[ID + i]);
-		}
-
-	packet.WriteCheckSum();
-
-	for (auto &client : clients)
-	{
-//		if (!udpSocket.Send(client.ipAddress, packet))
-//			std::cout << "Failed to send " << packet.size << "bytes to " << client.ipAddress.udpPort << " - Error: " << WSAGetLastError() << std::endl;
-
-		bool messageSent = false;
-
-		while(messageSent == false)
-			messageSent = client.linkedSocket.Send(packet);
-			
-//		else
-//			std::cout << "Sent: " << i << " - " << j << std::endl;
-	}
-}
-*/
 
 void NetworkManager::Update(int screenWidth, int screenHeight, unsigned char *pixelBuffer)
 {
@@ -168,16 +104,15 @@ void NetworkManager::SendBlock(int pixelID, int numPixels, unsigned char *pixelB
 
 	for (auto &client : clients)
 	{
-//		if (!udpSocket.Send(client.ipAddress, packet))
-//			std::cout << "Failed to send " << packet.size << "bytes to " << client.ipAddress.udpPort << " - Error: " << WSAGetLastError() << std::endl;
-
 		bool messageSent = false;
 
 		while(messageSent == false)
+		{
 			messageSent = client.linkedSocket.Send(packet);
 			
-//		else
-//			std::cout << "Sent: " << i << " - " << j << std::endl;
+			if (WSAGetLastError() != WSAEWOULDBLOCK)
+				break;
+		}
 	}
 }
 
@@ -195,9 +130,6 @@ void NetworkManager::InitializeClient(Client &client)
 
 	while (!initSent)
 		initSent = client.linkedSocket.Send(initPacket);
-
-
-
 }
 
 
@@ -267,6 +199,7 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 		    break;
 		
 		case FD_CLOSE:
+		{
 			for (auto it = clients.begin(); it != clients.end(); it++)
 			{
 				if (it->linkedSocket.handle == wParam)
@@ -277,6 +210,7 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 			}
 
 		    break;
+		}
 	}
 
 	return 0;

@@ -24,7 +24,7 @@ void VolumeDataset::Init()
 
 void VolumeDataset::InitTexture()
 {
-//	currTexture3D = GenerateTexture();
+	currTexture3D = GenerateTexture();
 
 	int bufferSize = xRes * yRes * zRes * bytesPerElement;
 
@@ -138,7 +138,7 @@ void VolumeDataset::UpdateTexture()
 	asyncTexLoad[currentThread].wait();
 	currMemblock = threadBlock[currentThread];
 
-//	CopyToTexture();
+	CopyToTexture();
 
 	int stepToBuffer;
 
