@@ -7,6 +7,7 @@
 #include <tchar.h>
 
 #define IMAGE_BLOCK_RES 16
+#define PIXELS_PER_CHUNK 300
 
 struct Client
 {
@@ -36,7 +37,7 @@ public:
 	void Init();
 	void Update(int screenWidth, int screenHeight, unsigned char *pixelBuffer);
 	void SendState();
-	void SendBlock(int i, int j, int screenWidth, int screenHeight, unsigned char *pixelBuffer);
+	void SendBlock(int pixelID, int numPixels, unsigned char *pixelBuffer);
 
 	void InitializeClient(Client &client);
 

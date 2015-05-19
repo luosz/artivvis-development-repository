@@ -30,8 +30,8 @@ void Update()
 
 	bool messagesInQueue = true;
 
-	while (messagesInQueue)
-		messagesInQueue = networkManager.CheckForMessages();
+//	while (messagesInQueue)
+//		messagesInQueue = networkManager.CheckForMessages();
 
 //	for (int i=0; i<10000; i++)
 //		networkManager.CheckForMessages();

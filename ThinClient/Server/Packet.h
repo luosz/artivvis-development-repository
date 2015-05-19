@@ -37,6 +37,9 @@ public:
 	bool WriteQuat(glm::quat toWrite);
 	bool WriteBool(bool toWrite);
 
+	bool ReadChunk(void *dst, int chunkSize);
+	bool WriteChunk(void *src, int chunkSize);
+
 	void WriteCheckSum();
 };
 

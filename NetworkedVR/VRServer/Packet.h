@@ -6,7 +6,7 @@
 #define MAX_PACKET_SIZE 60000
 //ideal 1.4kb, just under MTU
 
-enum class PacketType { INITIALIZATION, BLOCK };
+enum class PacketType { BLANK, INITIALIZATION, BLOCK };
 
 class Packet
 {

@@ -192,6 +192,35 @@ bool Packet::WriteBool(bool toWrite)
 	return true;
 }
 
+
+bool Packet::ReadChunk(void *dst, int chunkSize)
+{
+	int index = readPosition;
+	readPosition += chunkSize;
+
+	if ((size - readPosition) < 0)
+		return false;
+
+	std::memcpy(dst, message + index, chunkSize);
+
+	return true;
+}
+
+
+bool Packet::WriteChunk(void *src, int chunkSize)
+{
+	int index = size;
+	size += chunkSize;
+
+	if ((MAX_PACKET_SIZE - size) < 0)
+		return false;
+
+	std::memcpy(message + index, src, chunkSize);
+
+	return true;
+}
+
+
 void Packet::WriteCheckSum()
 {
 	*(int*)(&message[0]) = size;

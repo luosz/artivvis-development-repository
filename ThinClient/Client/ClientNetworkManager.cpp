@@ -136,7 +136,7 @@ bool NetworkManager::CheckForMessages()
 void NetworkManager::ReceiveInitialization(Packet &packet)
 {
 }
-
+/*
 void NetworkManager::UpdateBlock(Packet &packet)
 {
 	int ID;
@@ -164,7 +164,19 @@ void NetworkManager::UpdateBlock(Packet &packet)
 				pixelBuffer[ID + i] = packet.ReadByte();
 		}
 }
+*/
 
+void NetworkManager::UpdateBlock(Packet &packet)
+{
+	int numPixels = packet.ReadInt();
+
+	int bufferID = packet.ReadInt();
+
+//	std::memcpy(pixelBuffer + ID, packet.message, numPixels * 3);
+//	packet.readPosition += numPixels * 3;
+
+	packet.ReadChunk(pixelBuffer + bufferID, numPixels * 3);
+}
 
 
 void NetworkManager::ReadMessage(WPARAM wParam)
@@ -182,11 +194,13 @@ void NetworkManager::ReadMessage(WPARAM wParam)
 	{
 		chunkSize = tcpPacket.ReadInt();
 
+		int bytesRemaining = tcpPacket.size - amountRead;
+
 		// Checks if a smaller packet has been split at the end of the bigger one and buffers the beginning of it to be complete on the next packet received
-		if (chunkSize + amountRead > tcpPacket.size)
+		if (chunkSize > bytesRemaining)
 		{
-			std::memcpy(tcpPacket.message, tcpPacket.message + amountRead, chunkSize);
-			tcpPacket.size -= amountRead;
+			std::memcpy(tcpPacket.message, tcpPacket.message + amountRead, bytesRemaining);
+			tcpPacket.size = bytesRemaining;
 			tcpPacket.readPosition = 0;
 
 			return;
@@ -226,7 +240,7 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 		    break;
 
 		case FD_READ:
-//		    std::cout << "Incoming data: " << std::endl;
+		    std::cout << "Incoming data: " << std::endl;
 			ReadMessage(wParam);
 		    break;
 		
