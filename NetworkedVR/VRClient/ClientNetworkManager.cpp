@@ -193,9 +193,6 @@ void NetworkManager::ReadMessage(WPARAM wParam)
 
 		int bytesRemaining = tcpPacket.size - amountRead;
 
-		if (bytesRemaining <= 0)
-			int a = 0;
-
 		// Checks if a smaller packet has been split at the end of the bigger one and buffers the beginning of it to be complete on the next packet received
 		if (chunkSize > bytesRemaining)
 		{
@@ -223,6 +220,9 @@ void NetworkManager::ReadMessage(WPARAM wParam)
 
 			default:
 				std::cout << "Unknown packet type" << std::endl;
+				tcpPacket.size = 0;
+				tcpPacket.readPosition = 0;
+				return;
 		}
 
 		amountRead += chunkSize;
@@ -240,13 +240,12 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 		    break;
 
 		case FD_READ:
-		    std::cout << "Incoming data: " << std::endl;
+//		    std::cout << "Incoming data: " << std::endl;
 			ReadMessage(wParam);
 		    break;
 		
 		case FD_CLOSE:
 			std::cout << "Connection Lost" << std::endl;
-			getchar();
 		    //Lost the connection
 		    break;
 	}

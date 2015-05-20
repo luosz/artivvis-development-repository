@@ -37,17 +37,6 @@ void Update()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	bool messagesInQueue = true;
-
-//	while (messagesInQueue)
-//	for (int i=0; i<SCREEN_WIDTH * SCREEN_HEIGHT; i++)
-//	{
-//		messagesInQueue = networkManager.CheckForMessages();
-//		if (!messagesInQueue)
-//			break;
-//	}
-
-
 	glBindTexture(GL_TEXTURE_2D, renderTex->ID);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, renderTex->xPixels, renderTex->yPixels, GL_RGB, GL_UNSIGNED_BYTE, pixelBuffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -55,8 +44,6 @@ void Update()
 	renderTex->Render();
 
 	glutSwapBuffers();
-
-//	glutPostRedisplay();
 }
 
 
@@ -146,8 +133,9 @@ int main(int argc, char *argv[])
 	glutKeyboardFunc(KeyboardFunc);
 	glutSpecialFunc(SpecialFunc);
 	glutMouseFunc(MouseButton);
-	glutMotionFunc(MouseMove);
+	glutMotionFunc(NULL);
 	glutMouseWheelFunc(MouseWheel);
+	glutPassiveMotionFunc(NULL);
 
 	// Begin infinite event loop
 	glutMainLoop();

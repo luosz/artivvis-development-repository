@@ -119,13 +119,12 @@ void NetworkManager::SendBlock(int i, int j, int k, int blockRes)
 		bool messageSent = false;
 
 		while(messageSent == false)
+		{
 			messageSent = client.linkedSocket.Send(packet);
-
-
-//		if (!udpSocket.Send(client.ipAddress, packet))
-//			std::cout << "Failed to send " << packet.size << "bytes to " << client.ipAddress.udpPort << " - Error: " << WSAGetLastError() << std::endl;
-//		else
-//			std::cout << "Sent: " << i << " - " << j << " - " << k << std::endl;
+			
+			if (WSAGetLastError() != WSAEWOULDBLOCK)
+				break;
+		}
 	}
 }
 
