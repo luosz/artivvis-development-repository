@@ -1,7 +1,5 @@
 #include "ShaderManager.h"
 
-std::vector<Shader> ShaderManager::shaders;
-
 // Loads and compiles all Shaders
 void ShaderManager::Init()
 {
@@ -15,7 +13,10 @@ void ShaderManager::LoadShaders()
 {
 	Shader shader;
 
-	shader.Load("../Shaders/TransFuncVertShader.txt", "../Shaders/TransFuncFragShader.txt");
+	shader.Load("SimpleVertShader.txt", "SimpleFragShader.txt");
+	shaders.push_back(shader);
+
+	shader.Load("TransFuncVertShader.txt", "TransFuncFragShader.txt");
 	shaders.push_back(shader);
 }
 

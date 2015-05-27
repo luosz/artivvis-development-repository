@@ -1,59 +1,27 @@
-#include"ServerRenderer.h"
-#include "CudaHeaders.h"
-#include <stdlib.h>
-#include "ServerNetworkManager.h"
-#include "TempCoherence.h"
+#include "VolumeRenderer.h"
+
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
 VolumeRenderer volumeRenderer;
-NetworkManager networkManager;
-TempCoherence *tempCoherence;
-VolumeDataset volume;
-
 
 // For mouse control
 int xclickedAt = -1;
 int yclickedAt = -1;
 
 
+
 void Init()
 {
-	volume.Init();
-	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT, volume);
-	tempCoherence = new TempCoherence(SCREEN_WIDTH, SCREEN_HEIGHT, volume, &networkManager);
-	networkManager.Init(volume);
+	// Initialize Renderer
+	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 // Update renderer and check for Qt events
 void MainLoop()
 {
-	if (volume.timesteps > 1)
-	{
-		clock_t currentTime = clock();
-		float time = (currentTime - volume.oldTime) / (float) CLOCKS_PER_SEC;
-
-		if (time > volume.timePerFrame)
-		{
-			if (volume.currentTimestep < volume.timesteps - 1)
-				volume.currentTimestep++;
-			else
-				volume.currentTimestep = 0;
-
-			volume.oldTime = currentTime;
-
-			volume.UpdateTexture();
-
-			volume.currTexture3D = tempCoherence->TemporalCoherence(volume, volume.currentTimestep);
-
-//			networkManager.SendState(tempCoherence->numXBlocks, tempCoherence->numYBlocks, tempCoherence->numZBlocks, tempCoherence->blockRes);
-		}
-	}
-
 	volumeRenderer.Update();
-
-//	networkManager.Update();
 }
 
 
@@ -62,9 +30,38 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 {
 	switch(key)
 	{
+		case 'c':
+			if (volumeRenderer.clipPlane.active)
+				volumeRenderer.clipPlane.active = false;
+			else
+				volumeRenderer.clipPlane.active = true;
+			break;
+
+		case 'n':
+			volumeRenderer.sphereRadius = glm::max(volumeRenderer.sphereRadius - 0.02f, 0.0f);
+			break;
+
+		case 'm':
+			volumeRenderer.sphereRadius = glm::min(volumeRenderer.sphereRadius + 0.02f, 1.0f);
+			break;
+
+		case 'f':
+			volumeRenderer.FocusVolume();
+			break;
+
+		case 'g':
+			if (volumeRenderer.removed)
+				volumeRenderer.removed = false;
+			else
+				volumeRenderer.removed = true;
+
+			break;
+
+		case 'r':
+			volumeRenderer.Reset();
+			break;
 
 		case 27:
-			cudaDeviceReset();
 			exit(0);
 			break;
 	}
@@ -76,7 +73,24 @@ void SpecialFunc(int key, int x, int y)
  {
 	switch(key)
 	{
-
+	case GLUT_KEY_UP:
+		volumeRenderer.camera.position.z -= 0.5f;
+		break;
+	case GLUT_KEY_LEFT:
+		volumeRenderer.camera.position.x -= 0.5f;
+		break;
+	case GLUT_KEY_DOWN:
+		volumeRenderer.camera.position.z += 0.5f;
+		break;
+	case GLUT_KEY_RIGHT:
+		volumeRenderer.camera.position.x += 0.5f;
+		break;
+	case GLUT_KEY_PAGE_UP:
+		volumeRenderer.camera.position.y += 0.5f;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		volumeRenderer.camera.position.y -= 0.5f;
+		break;
 	}
 	glutPostRedisplay();
  }
@@ -116,20 +130,43 @@ void MouseButton(int button, int state, int x, int y)
 			yclickedAt = y;
 		}
 	}
+
+	if (button == GLUT_LEFT_BUTTON) 
+	{
+		if (state == GLUT_UP)
+		{
+			xclickedAt = -1;
+			yclickedAt = -1;
+		}
+		else
+		{
+			xclickedAt = x;
+			yclickedAt = y;
+
+			if (volumeRenderer.clipPlane.active)
+				volumeRenderer.AddBoxPoint(x, y);
+		}
+	}
 }
 
 
 // Mouse wheel to zoom camera
 void MouseWheel(int wheel, int direction, int x, int y) 
 {
-	volumeRenderer.camera.Zoom(-direction * 0.2f);	
+	if (volumeRenderer.clipPlane.active)
+		volumeRenderer.clipPlane.Move(-direction * 0.02f);
+	else
+		volumeRenderer.camera.Zoom(-direction * 0.2f);	
 }
+
+
 
 int main(int argc, char *argv[])
 {
+	
 	// Set up the window
 	glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     glutCreateWindow("Volume Renderer");
 
@@ -147,7 +184,8 @@ int main(int argc, char *argv[])
     }
 
 		
-	Init();
+	Init();	
+
 
 	// Specify glut input functions
 	glutKeyboardFunc(KeyboardFunc);

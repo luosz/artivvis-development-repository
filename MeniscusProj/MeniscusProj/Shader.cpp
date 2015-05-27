@@ -6,7 +6,7 @@ using namespace std;
 void Shader::Load(string vName, string fName)
 {
 	ifstream readFileV;
-	readFileV.open(vName);
+	readFileV.open(vName.c_str());
 	int i = 0;
 
 	if (readFileV.is_open())
@@ -23,10 +23,10 @@ void Shader::Load(string vName, string fName)
 		readFileV.close();
 	} else 
 	{
-		cout << "Unable to open shader file" << endl;
+		cout << "Unable to open vert shader file: " << vName.c_str() << endl;
 	}
 	ifstream readFileF;
-	readFileF.open(fName);
+	readFileF.open(fName.c_str());
 	i = 0;
 
 	if (readFileF.is_open())
@@ -43,7 +43,7 @@ void Shader::Load(string vName, string fName)
 		readFileF.close();
 	} else 
 	{
-		cout << "Unable to open shader file" << endl;
+		cout << "Unable to open frag shader file: " << fName.c_str() << endl;
 	}
 }
 
@@ -57,7 +57,6 @@ void Shader::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Sha
     if (ShaderObj == 0) 
 	{
         fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(0);
     }
 	// Bind the source code to the shader, this happens before compilation
 	glShaderSource(ShaderObj, 1, (const GLchar**)&pShaderText, NULL);
@@ -70,7 +69,6 @@ void Shader::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Sha
         GLchar InfoLog[1024];
         glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
         fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
- //       exit(1);
     }
 	// Attach the compiled shader object to the program object
     glAttachShader(ShaderProgram, ShaderObj);
@@ -84,7 +82,6 @@ GLuint Shader::CompileShaders()
     if (ID == 0) 
 	{
         fprintf(stderr, "Error creating shader program\n");
-//        exit(1);
     }
 
 	// Create two shader objects, one for the vertex, and one for the fragment shader
@@ -104,7 +101,6 @@ GLuint Shader::CompileShaders()
 	{
 		glGetProgramInfoLog(ID, sizeof(ErrorLog), NULL, ErrorLog);
 		fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
- //       exit(1);
 	}
 
 	// program has been successfully linked but needs to be validated to check whether the program can execute given the current pipeline state
@@ -116,7 +112,6 @@ GLuint Shader::CompileShaders()
 	{
         glGetProgramInfoLog(ID, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
-//        exit(1);
     }
 
 	// Finally, use the linked shader program

@@ -28,8 +28,8 @@ void NetworkManager::Init(VolumeRenderer *renderer_)
 	getsockname(udpSocket.handle, (sockaddr*)&addr, &len);
 	udpPort = ntohs(addr.sin_port);
 
-	server = IPAddress(127, 0, 0, 1, 40000);
-//	server = IPAddress(134, 226, 54, 9, 40000);
+//	server = IPAddress(127, 0, 0, 1, 40000);
+	server = IPAddress(134, 226, 54, 9, 40000);
 	server.tcpPort = 40001;
 
 	InitTCPMsgHandler();

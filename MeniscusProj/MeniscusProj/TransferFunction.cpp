@@ -2,13 +2,13 @@
 
 void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 {
-	origColorTable.resize(256);
-	currentColorTable.resize(256);
+	// Want the transfer functions to have 256 possible values
+	colorTable.resize(256);
 	LoadXML(filename);
 
 	colors.resize(numIntensities);
-	memcpy(&colors[0], &origColors[0], numIntensities * sizeof(glm::vec4));
 
+	//Generate the 1D texture
 	glGenTextures(1, &tfTexture);
     glBindTexture(GL_TEXTURE_1D, tfTexture);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -16,20 +16,18 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, 256, 0, GL_RGBA, GL_FLOAT, 0); 
 	glBindTexture(GL_TEXTURE_1D, 0);
 
-	LoadLookup(origColorTable);
-	LoadLookup(currentColorTable);
-
-	targetIntensity = 0.4f;
+	LoadLookup(colorTable);
 }
 
 
+
+// Reads XML file transfer function and copies it into the tables
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
-	tinyxml2::XMLError r = doc.LoadFile("nucleon.tfi");
-//	tinyxml2::XMLError r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
-//	tinyxml2::XMLError r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
-//	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/BlueSmoke.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/CT-Knee_spectrum_16_balance.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/nucleon.tfi");
+	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/MRIKneeTrans.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;
@@ -48,11 +46,7 @@ void TransferFunction::LoadXML(const char *filename)
 		int b = atoi(key->FirstChildElement("colorL")->Attribute("b"));
 		int a = atoi(key->FirstChildElement("colorL")->Attribute("a"));
 
-		origColors.push_back(glm::vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f));
-
-		std::cout << "intensity=" << intensity;
-		std::cout << "\tcolorL r=" << r << " g=" << g << " b=" << b << " a=" << a;
-		std::cout << std::endl;
+		colors.push_back(glm::vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f));
 
 		key = key->NextSiblingElement();
 	}
@@ -60,6 +54,7 @@ void TransferFunction::LoadXML(const char *filename)
 	numIntensities = intensities.size();
 }
 
+// Because file only specifies a number of control points, a full color table must be made from these control points by linearly interpolating
 void TransferFunction::LoadLookup(std::vector<glm::vec4> &colorTable)
 {
 	glm::vec4 previousColor(0.0f);
@@ -86,6 +81,7 @@ void TransferFunction::LoadLookup(std::vector<glm::vec4> &colorTable)
 	CopyToTex(colorTable);
 }
 
+// Copy final table to GPU memory
 void TransferFunction::CopyToTex(std::vector<glm::vec4> &data)
 {
 	glBindTexture(GL_TEXTURE_1D, tfTexture);
@@ -94,6 +90,7 @@ void TransferFunction::CopyToTex(std::vector<glm::vec4> &data)
 }
 
 
+// Linearly interpolate between two control points
 glm::vec4 TransferFunction::LERPColor(glm::vec4 firstColor, glm::vec4 secondColor, float firstIntensity, float secondIntensity, float currentIntensity)
 {
 	float difference = secondIntensity - firstIntensity;
