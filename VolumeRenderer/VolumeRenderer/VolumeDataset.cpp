@@ -10,17 +10,13 @@ void VolumeDataset::Init()
 	r.bufferAddress = NULL;
 	voxelReader.LoadVolume(folderPath, headerFile, r);
 	rTexture3D = generate_texture(rTexture3D, r.bufferAddress);
-
 	headerFile = folderPath + "Tooth_G.mhd";
 	voxelReader.LoadVolume(folderPath, headerFile, g);
 	gTexture3D = generate_texture(gTexture3D, g.bufferAddress);
-
 	headerFile = folderPath + "Tooth_B.mhd";
 	voxelReader.LoadVolume(folderPath, headerFile, b);
 	bTexture3D = generate_texture(bTexture3D, b.bufferAddress);
-
-	headerFile = folderPath + "Tooth_A.mhd";
-	//
+	headerFile = folderPath + "tooth.mhd";
 
 	VolumeProperties properties;
 	voxelReader.LoadVolume(folderPath, headerFile, properties);
