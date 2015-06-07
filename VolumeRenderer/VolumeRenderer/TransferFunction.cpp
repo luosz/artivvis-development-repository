@@ -26,7 +26,7 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
-	tinyxml2::XMLError r = doc.LoadFile("nucleon.tfi");
+	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/spectrum_6.tfi");
 //	tinyxml2::XMLError r = doc.LoadFile("../../Samples/CTknee/transfer_function/CT-Knee_spectrum_16_balance.tfi");
 //	tinyxml2::XMLError r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
 //	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/BlueSmoke.tfi");

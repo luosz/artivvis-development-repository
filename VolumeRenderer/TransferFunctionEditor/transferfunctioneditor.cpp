@@ -21,7 +21,7 @@ visibility_histogram_view("Visibility Histogram")
 	ui->verticalLayout_5->addWidget(&gradient_view);
 
 	// load default transfer function
-	//	filename = "../../transferfuncs/nucleon.tfi";
+	//	filename = "../../transferfuncs/";
 //	filename = "../../transferfuncs/CT-Knee_spectrum_16_balance.tfi";
 //	//	filename = "../../transferfuncs/00.tfi";
 //

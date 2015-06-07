@@ -100,6 +100,21 @@ void GPURaycaster::Raycast(VolumeDataset &volume, TransferFunction &transferFunc
 	glUniform1i(uniformLoc,0);
 	glBindTexture (GL_TEXTURE_3D, volume.currTexture3D);
 
+	glActiveTexture(GL_TEXTURE3);
+	uniformLoc = glGetUniformLocation(shaderProgramID, "volumeR");
+	glUniform1i(uniformLoc, 0);
+	glBindTexture(GL_TEXTURE_3D, volume.rTexture3D);
+
+	glActiveTexture(GL_TEXTURE4);
+	uniformLoc = glGetUniformLocation(shaderProgramID, "volumeG");
+	glUniform1i(uniformLoc, 0);
+	glBindTexture(GL_TEXTURE_3D, volume.gTexture3D);
+
+	glActiveTexture(GL_TEXTURE5);
+	uniformLoc = glGetUniformLocation(shaderProgramID, "volumeB");
+	glUniform1i(uniformLoc, 0);
+	glBindTexture(GL_TEXTURE_3D, volume.bTexture3D);
+
 	uniformLoc = glGetUniformLocation(shaderProgramID,"camPos");
 	glUniform3f(uniformLoc, camera.position.x, camera.position.y, camera.position.z);
 

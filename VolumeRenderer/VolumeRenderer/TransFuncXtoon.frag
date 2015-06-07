@@ -4,6 +4,9 @@ out vec4 FragColor;
 
 in vec3 facePos;
 
+uniform sampler3D volumeR;
+uniform sampler3D volumeG;
+uniform sampler3D volumeB;
 uniform sampler3D volume;
 uniform sampler1D transferFunc;
 uniform sampler2D transferFunc2D;
@@ -96,9 +99,12 @@ void main()
 		
 		texCoord = (position + 1.0f) / 2.0f; 
 
-		float index = texture(volume, texCoord).x;
-		
-		color = vec4(texture(transferFunc, index));
+		//float index = texture(volume, texCoord).x;
+
+		//color = vec4(texture(transferFunc, index));
+
+		color = vec4(texture(volumeR, texCoord).x, texture(volumeG, texCoord).x, texture(volumeB, texCoord).x, texture(volume, texCoord).x);
+
 		opacity = color.w;
 
 		normal = CalculateNormal(texCoord);
@@ -115,9 +121,8 @@ void main()
 
 		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f)
 		{
-//			if (absorption < 1.0f)
-//				finalColor += vec4(1.0f, 1.0f, 1.0f, 1.0f) * (1.0f - absorption);
-
+			if (absorption < 1.0f)
+				finalColor += vec4(1.0f, 1.0f, 1.0f, 0.0f) * (1.0f - absorption);
 			break;
 		}
 	}

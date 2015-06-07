@@ -544,7 +544,7 @@ public:
         QObject::connect(checkBox, SIGNAL(toggled(bool)), VolumeRendererClass, SLOT(ToggleIntensityOptimize(bool)));
         QObject::connect(GrabRegionCheckBox, SIGNAL(toggled(bool)), VolumeRendererClass, SLOT(ToggleGrabRegion(bool)));
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(3);
         shaderComboBox->setCurrentIndex(0);
 
 
