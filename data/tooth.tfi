@@ -7,49 +7,49 @@
         <threshold x="0" y="1" />
         <Keys>
             <key type="TransFuncMappingKey">
-                <intensity value="0.01520913" />
+                <intensity value="0.04" />
                 <split value="false" />
-                <colorL r="153" g="0" b="255" a="0" />
+                <colorL r="0" g="170" b="255" a="0" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.15000001" />
+                <intensity value="0.28" />
                 <split value="false" />
-                <colorL r="129" g="90" b="255" a="75" />
+                <colorL r="0" g="170" b="255" a="70" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.23" />
+                <intensity value="0.5" />
                 <split value="false" />
-                <colorL r="145" g="78" b="221" a="0" />
+                <colorL r="0" g="170" b="255" a="0" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.31" />
+                <intensity value="0.57999998" />
                 <split value="false" />
                 <colorL r="255" g="0" b="0" a="0" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.44999999" />
+                <intensity value="0.63999999" />
                 <split value="false" />
-                <colorL r="255" g="0" b="0" a="75" />
+                <colorL r="255" g="0" b="0" a="70" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.60076046" />
+                <intensity value="0.69999999" />
                 <split value="false" />
                 <colorL r="255" g="0" b="0" a="0" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.70722431" />
+                <intensity value="0.75999999" />
                 <split value="false" />
-                <colorL r="4" g="255" b="0" a="0" />
+                <colorL r="255" g="255" b="0" a="0" />
             </key>
             <key type="TransFuncMappingKey">
-                <intensity value="0.85000002" />
+                <intensity value="0.88" />
                 <split value="false" />
-                <colorL r="73" g="255" b="1" a="75" />
+                <colorL r="255" g="255" b="0" a="70" />
             </key>
             <key type="TransFuncMappingKey">
                 <intensity value="1" />
                 <split value="false" />
-                <colorL r="54" g="254" b="51" a="0" />
+                <colorL r="255" g="255" b="0" a="0" />
             </key>
         </Keys>
     </TransFuncIntensity>
