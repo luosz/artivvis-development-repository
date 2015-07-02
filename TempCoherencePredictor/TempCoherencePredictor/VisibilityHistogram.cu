@@ -102,8 +102,8 @@ __global__ void CudaEvaluate(int xPixels, int yPixels, float *histBins, int *num
 
 	if (tid < xPixels * yPixels)
 	{
-		int v = (int) tid / yPixels;
-		int u = tid % yPixels;
+		int v = (int) tid / xPixels;
+		int u = tid % xPixels;
 
 		float4 color = tex2D(texRef, u, v);
 		float scalar = color.z;

@@ -1,6 +1,7 @@
 # My own specified ignores before generic Visual Studio Ignores
 Samples/
 External Resources/
+Dataset/
 
 
 

@@ -69,9 +69,9 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 //	if (writeToFile)
 //		fileWriter.Init(screenWidth, screenHeight);
 
-	gridTexture = GenerateTexture2D(screenWidth, screenHeight);
-	volumeTexture = GenerateTexture2D(screenWidth, screenHeight);
-	framebuffer.Generate(screenWidth, screenHeight, gridTexture);
+//	gridTexture = GenerateTexture2D(screenWidth, screenHeight);
+//	volumeTexture = GenerateTexture2D(screenWidth, screenHeight);
+//	framebuffer.Generate(screenWidth, screenHeight, gridTexture);
 
 	oldTime = clock();
 
@@ -115,18 +115,18 @@ void VolumeRenderer::Update()
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.ID);	
-//	
-//	
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glEnable(GL_DEPTH_TEST);
+//	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.ID);	
+////	
+////	
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+////	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//	glEnable(GL_DEPTH_TEST);
+//
+//	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, volumeTexture, 0);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, volumeTexture, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
-	raycaster->Raycast(transferFunction, shaderProgramID, camera, bruteTex3D);
+//	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
+//	raycaster->Raycast(transferFunction, shaderProgramID, camera, bruteTex3D);
 //
 //	glDisable(GL_DEPTH_TEST);
 
@@ -135,40 +135,40 @@ void VolumeRenderer::Update()
 //
 //	tempCoherence->DrawBoxes(volume, shaderManager, camera);
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	
-	shaderProgramID = shaderManager.UseShader(TextureComboShader);
-	
-	glActiveTexture (GL_TEXTURE0);
-	int texLoc = glGetUniformLocation(shaderProgramID,"volumeTex");
-	glUniform1i(texLoc,0);
-	glBindTexture (GL_TEXTURE_2D, volumeTexture);	
+//	shaderProgramID = shaderManager.UseShader(TextureComboShader);
+//	
+//	glActiveTexture (GL_TEXTURE0);
+//	int texLoc = glGetUniformLocation(shaderProgramID,"volumeTex");
+//	glUniform1i(texLoc,0);
+//	glBindTexture (GL_TEXTURE_2D, volumeTexture);	
+//
+//
+//	glActiveTexture (GL_TEXTURE1);
+//	texLoc = glGetUniformLocation(shaderProgramID,"backgroundTex");
+//	glUniform1i(texLoc,1);
+//	glBindTexture (GL_TEXTURE_2D, imageTexture);	
 
-
-	glActiveTexture (GL_TEXTURE1);
-	texLoc = glGetUniformLocation(shaderProgramID,"backgroundTex");
-	glUniform1i(texLoc,1);
-	glBindTexture (GL_TEXTURE_2D, imageTexture);	
-
-	int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
-
-	glBegin(GL_QUADS);
-	glVertexAttrib2f(texcoords_location, 0.0f, 0.0f);
-	glVertex2f(-1.0f, -1.0f);
-
-	glVertexAttrib2f(texcoords_location, 1.0f, 0.0f);
-	glVertex2f(1.0f, -1.0f);
-
-	glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
-	glVertex2f(1.0f, 1.0f);
-
-	glVertexAttrib2f(texcoords_location, 0.0f, 1.0f);
-	glVertex2f(-1.0f, 1.0f);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, 0);
+//	int texcoords_location = glGetAttribLocation (shaderProgramID, "vTexture");
+//
+//	glBegin(GL_QUADS);
+//	glVertexAttrib2f(texcoords_location, 0.0f, 0.0f);
+//	glVertex2f(-1.0f, -1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 1.0f, 0.0f);
+//	glVertex2f(1.0f, -1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 1.0f, 1.0f);
+//	glVertex2f(1.0f, 1.0f);
+//
+//	glVertexAttrib2f(texcoords_location, 0.0f, 1.0f);
+//	glVertex2f(-1.0f, 1.0f);
+//	glEnd();
+//
+//	glBindTexture(GL_TEXTURE_2D, 0);
 
 //	fileWriter.WriteImage(currentTimestep);
 //
@@ -182,8 +182,8 @@ void VolumeRenderer::Update()
 
 	glutSwapBuffers();
 
-	if (currentTimestep == 499)
-			getchar();
+//	if (currentTimestep == 499)
+//			getchar();
 }
 
 

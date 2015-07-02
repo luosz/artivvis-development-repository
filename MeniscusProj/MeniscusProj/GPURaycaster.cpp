@@ -6,7 +6,7 @@ GPURaycaster::GPURaycaster(int screenWidth, int screenHeight, VolumeDataset &vol
 	maxRaySteps = 1000;
 	rayStepSize = 0.005f;
 	gradientStepSize = 0.005f;
-	lightPosition = glm::vec3(-0.0f, -5.0f, 5.0f);
+	lightPosition = glm::vec3(0.0f, 5.0f, 5.0f);
 }
 
 
@@ -96,4 +96,5 @@ void GPURaycaster::Raycast(GLuint currTexture3D, TransferFunction &transferFunct
 	glEnd();
 
 	glBindTexture(GL_TEXTURE_3D, 0);
+	glBindTexture (GL_TEXTURE_1D, 0);
 }

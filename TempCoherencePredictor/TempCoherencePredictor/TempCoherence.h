@@ -15,7 +15,7 @@
 #include <atomic>
 
 #define EXTRAP_CONST 2
-#define EPSILON 0.5f
+#define EPSILON 0.25f
 #define CHECK_STRIDE 1
 #define NUM_THREADS 7
 

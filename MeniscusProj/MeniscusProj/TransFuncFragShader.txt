@@ -14,15 +14,16 @@ uniform float gradientStepSize;
 
 uniform vec3 lightPosition;
 
-uniform bool clipPlaneActive;
 uniform vec3 clipPlanePos;
-uniform vec3 clipPlaneNormal;
-
+uniform int clipAxis;
 
 uniform bool focused;
 uniform bool removed;
 uniform float sphereRadius;
 uniform vec3 spherePoint;
+
+uniform float tfBandWidth;
+uniform float tfBandPos;
 
 vec3 CalculateNormal(vec3 texCoord)
 {
@@ -72,30 +73,21 @@ void main()
 	float absorption = 0.0f;
 	float opacity;
 
-//	if (clipPlaneActive)
-//	{
-		int steps = 0;
-		vec3 point = vec3(0.0f, 0.0f, 0.0f);
-		float dist;
+	int steps = 0;
 
-		if (camPos.z > 0.0f)
-			point.z = 1.0f;
-		else
-			point.z = -1.0f;
+	float posOnAxis = position[clipAxis];
+	float clipPosOnAxis = clipPlanePos[clipAxis];
 
-		dist = abs(point.z - clipPlanePos.z);
+	while (posOnAxis > clipPosOnAxis)
+	{
+		position += (direction * rayStepSize);
+		steps++;
 
-//		while ((abs(dot((point - position), clipPlaneNormal)) < dist) && (steps < maxRaySteps))
-//		{
-		while ((position.z > clipPlanePos.z) && (steps < maxRaySteps))
-		{
-			position += (direction * rayStepSize);
-			steps++;
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
+			return;
 
-			if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f)
-				return;
-		}
-//	}
+		posOnAxis = position[clipAxis];
+	}
 	
 	for(int i=0; i<maxRaySteps; i++)
 	{
@@ -107,7 +99,7 @@ void main()
 				{
 					position = position + (direction * rayStepSize);
 
-					if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f || position.z > clipPlanePos.z)
+					if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f || position[clipAxis] > clipPlanePos[clipAxis])
 						break;
 
 					continue;
@@ -132,7 +124,13 @@ void main()
 
 		float index = texture(volume, texCoord).x;
 		
-		color = vec4(texture(transferFunc, index));
+//		color = vec4(texture(transferFunc, index));
+		
+		if (abs(index - tfBandPos) < tfBandWidth)
+			color = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+		else
+			color = vec4(1.0f, 1.0f, 1.0f, 0.005f);
+
 		opacity = color.w;
 
 		normal = CalculateNormal(texCoord);
@@ -147,7 +145,7 @@ void main()
 
 		position = position + (direction * rayStepSize);
 
-		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f || position.z > clipPlanePos.z)
+		if (abs(position.x) > 1.0f || abs(position.y) > 1.0f || abs(position.z) > 1.0f || absorption >= 1.0f || position[clipAxis] > clipPlanePos[clipAxis])
 			break;
 	}
 

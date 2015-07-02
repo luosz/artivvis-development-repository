@@ -6,7 +6,7 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 //	folderPath = "../../Samples/CTknee/";
 //	headerFile = folderPath + "CTknee.mhd";
 
-	folderPath = "../../Samples/Knee3/";
+	folderPath = "../../Dataset/Knee3/";
 	headerFile = folderPath + "KneeBig.mhd";
 
 //	folderPath = "../../Samples/VisMale/";

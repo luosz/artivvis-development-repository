@@ -15,8 +15,6 @@ public:
 	VolumeDataset *volume;
 	TransferFunction transferFunction;
 	Raycaster *raycaster;
-
-	Framebuffer framebuffer;
 	
 	GLuint bruteTex3D, interpTex3D;
 

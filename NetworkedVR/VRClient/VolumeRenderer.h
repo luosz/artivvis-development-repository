@@ -5,6 +5,7 @@
 #include "ShaderManager.h"
 #include "TransferFunction.h"
 #include "Raycaster.h"
+#include "ImageProcessor.h"
 
 class VolumeRenderer
 {
@@ -14,6 +15,7 @@ public:
 	VolumeDataset volume;
 	TransferFunction transferFunction;
 	Raycaster *raycaster;
+	ImageProcessor imageProcessor;
 	
 	GLuint bruteTex3D, interpTex3D;
 

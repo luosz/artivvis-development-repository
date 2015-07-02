@@ -6,6 +6,7 @@
 #include "ShaderManager.h"
 #include "OpenGLRenderer.h"
 #include <time.h>
+#include <iomanip>
 
 class VolumeRenderer
 {
@@ -16,9 +17,7 @@ public:
 	OpenGLRenderer *renderer;
 	ClipPlane clipPlane;
 
-	float percentVolRemoved;
-	float percentFocusedVolRemoved;
-	float originalVolume, focusedVolume, sphereVolume;
+	int numRemoved, numInFocused;
 
 	GLubyte *tempVol;
 	int tempXRes, tempYRes, tempZRes;
@@ -38,6 +37,9 @@ public:
 	void DrawBox();
 	void AddBoxPoint(int xMousePos, int yMousePos);
 	void FocusVolume();
+
+	void FindRemoved();
+	void DrawMyText();
 
 	void Reset();
 };

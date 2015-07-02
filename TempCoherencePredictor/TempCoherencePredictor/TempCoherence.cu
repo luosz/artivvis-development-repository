@@ -320,7 +320,7 @@ void TempCoherence::CPUPredict(VolumeDataset &volume)
 		threads[i].join();
 	
 
-	std::cout << numBlocksExtrapolated << " - " << numBlocks - numBlocksCopied << std::endl;
+//	std::cout << numBlocksExtrapolated << " - " << numBlocks - numBlocksCopied << std::endl;
 }
 
 /*

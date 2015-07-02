@@ -7,6 +7,9 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
+//#define SCREEN_WIDTH 640
+//#define SCREEN_HEIGHT 360
+
 VolumeRenderer volumeRenderer;
 NetworkManager networkManager;
 TempCoherence *tempCoherence;
@@ -16,6 +19,9 @@ VolumeDataset volume;
 // For mouse control
 int xclickedAt = -1;
 int yclickedAt = -1;
+
+
+
 
 
 void Init()

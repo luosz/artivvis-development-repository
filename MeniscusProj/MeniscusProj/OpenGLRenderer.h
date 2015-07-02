@@ -13,6 +13,9 @@ public:
 	GPURaycaster *raycaster;
 	TransferFunction transferFunction;
 
+	float tfBandWidth;
+	float tfBandPos;
+
 	GLuint currTexture3D;
 	int textureSize;
 

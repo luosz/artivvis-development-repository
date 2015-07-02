@@ -15,8 +15,8 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
-	auto r = doc.LoadFile("nucleon.tfi");
-//	auto r = doc.LoadFile("CT-Knee_spectrum_16_balance.tfi");
+//	auto r = doc.LoadFile("nucleon.tfi");
+	auto r = doc.LoadFile("CT-Knee_spectrum_16_balance.tfi");
 //	auto r = doc.LoadFile("../../Samples/downsampled vortex/90.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)

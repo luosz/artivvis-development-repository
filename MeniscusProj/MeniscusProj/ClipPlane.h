@@ -19,8 +19,10 @@ public:
 
 	void Move(float x)
 	{
-		point.z += x;
+		point += x * normal;
 
+		point.x = glm::clamp(point.x, -1.0f, 1.0f);
+		point.y = glm::clamp(point.y, -1.0f, 1.0f);
 		point.z = glm::clamp(point.z, -1.0f, 1.0f);
 	}
 

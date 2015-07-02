@@ -27,7 +27,7 @@ void TransferFunction::LoadXML(const char *filename)
 	tinyxml2::XMLDocument doc;
 //	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/CT-Knee_spectrum_16_balance.tfi");
 //	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/nucleon.tfi");
-	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/MRIKneeTrans.tfi");
+	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/MRIKnee.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;

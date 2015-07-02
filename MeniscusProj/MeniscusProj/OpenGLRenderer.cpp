@@ -5,7 +5,10 @@ OpenGLRenderer::OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset 
 	currTexture3D = GenerateTexture(volume);
 
 	raycaster = new GPURaycaster(screenWidth, screenHeight, volume);
-	transferFunction.Init(" ", volume);
+//	transferFunction.Init(" ", volume);
+
+	tfBandWidth = 0.1f; 
+	tfBandPos = 0.5f;
 }
 
 
@@ -74,16 +77,12 @@ GLuint OpenGLRenderer::GenerateTexture(VolumeDataset &volume)
 void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera, ClipPlane &clipPlane, bool focused, bool removed, float sphereRadius, glm::vec3 &spherePoint)
 {
 	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
-
-	GLint uniformLoc = glGetUniformLocation(shaderProgramID, "clipPlaneActive");
-	glUniform1i(uniformLoc, clipPlane.active);
 		
-	uniformLoc = glGetUniformLocation(shaderProgramID, "clipPlanePos");
+	GLint uniformLoc = glGetUniformLocation(shaderProgramID, "clipPlanePos");
 	glUniform3f(uniformLoc, clipPlane.point.x, clipPlane.point.y, clipPlane.point.z);
 
-	uniformLoc = glGetUniformLocation(shaderProgramID,"clipPlaneNormal");
-	glUniform3f(uniformLoc, clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z);
-
+//	uniformLoc = glGetUniformLocation(shaderProgramID,"clipPlaneNormal");
+//	glUniform3f(uniformLoc, clipPlane.normal.x, clipPlane.normal.y, clipPlane.normal.z);
 
 	uniformLoc = glGetUniformLocation(shaderProgramID, "focused");
 	glUniform1i(uniformLoc, focused);
@@ -97,6 +96,20 @@ void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, C
 	uniformLoc = glGetUniformLocation(shaderProgramID,"spherePoint");
 	glUniform3f(uniformLoc, spherePoint.x, spherePoint.y, spherePoint.z);
 
+	uniformLoc = glGetUniformLocation(shaderProgramID, "clipAxis");
+	glUniform1i(uniformLoc, 2);
+	if (clipPlane.normal.x == 1.0f)
+		glUniform1i(uniformLoc, 0);
+	else if (clipPlane.normal.y == 1.0f)
+		glUniform1i(uniformLoc, 1);
+	else if (clipPlane.normal.z == 1.0f)
+		glUniform1i(uniformLoc, 2);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID, "tfBandWidth");
+	glUniform1f(uniformLoc, tfBandWidth);
+
+	uniformLoc = glGetUniformLocation(shaderProgramID, "tfBandPos");
+	glUniform1f(uniformLoc, tfBandPos);
 
 
 	raycaster->Raycast(currTexture3D, transferFunction, shaderProgramID, camera);

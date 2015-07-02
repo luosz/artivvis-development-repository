@@ -68,7 +68,7 @@ GLuint VolumeDataset::GenerateTexture()
 		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_UNSIGNED_SHORT, NULL);
 
 	else if (elementType == "FLOAT")
-		glTexImage3D(GL_TEXTURE_3D, 0, GL_R16F, xRes, yRes, zRes, 0, GL_RED, GL_FLOAT, NULL);
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, xRes, yRes, zRes, 0, GL_RED, GL_FLOAT, NULL);
 
 	glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
 	

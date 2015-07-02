@@ -42,7 +42,7 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 			break;
 
 		case 'm':
-			volumeRenderer.sphereRadius = glm::min(volumeRenderer.sphereRadius + 0.02f, 1.0f);
+			volumeRenderer.sphereRadius = glm::min(volumeRenderer.sphereRadius + 0.02f, 2.0f);
 			break;
 
 		case 'f':
@@ -61,6 +61,21 @@ void KeyboardFunc (unsigned char key, int xmouse, int ymouse)
 			volumeRenderer.Reset();
 			break;
 
+		case '1':
+			volumeRenderer.clipPlane.point = glm::vec3(1.0f, 0.0f, 0.0f);
+			volumeRenderer.clipPlane.normal = glm::vec3(1.0f, 0.0f, 0.0f);
+			break;
+
+		case '2':
+			volumeRenderer.clipPlane.point = glm::vec3(0.0f, 1.0f, 0.0f);
+			volumeRenderer.clipPlane.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+			break;
+
+		case '3':
+			volumeRenderer.clipPlane.point = glm::vec3(0.0f, 0.0f, 1.0f);
+			volumeRenderer.clipPlane.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+			break;
+
 		case 27:
 			exit(0);
 			break;
@@ -74,17 +89,19 @@ void SpecialFunc(int key, int x, int y)
 	switch(key)
 	{
 	case GLUT_KEY_UP:
-		volumeRenderer.camera.position.z -= 0.5f;
-		break;
-	case GLUT_KEY_LEFT:
-		volumeRenderer.camera.position.x -= 0.5f;
+		volumeRenderer.renderer->tfBandWidth = glm::clamp(volumeRenderer.renderer->tfBandWidth + 0.01f, 0.0f, 1.0f);
 		break;
 	case GLUT_KEY_DOWN:
-		volumeRenderer.camera.position.z += 0.5f;
+		volumeRenderer.renderer->tfBandWidth = glm::clamp(volumeRenderer.renderer->tfBandWidth - 0.01f, 0.0f, 1.0f);
+		break;
+
+	case GLUT_KEY_LEFT:
+		volumeRenderer.renderer->tfBandPos = glm::clamp(volumeRenderer.renderer->tfBandPos - 0.01f, 0.0f, 1.0f);
 		break;
 	case GLUT_KEY_RIGHT:
-		volumeRenderer.camera.position.x += 0.5f;
+		volumeRenderer.renderer->tfBandPos = glm::clamp(volumeRenderer.renderer->tfBandPos + 0.01f, 0.0f, 1.0f);
 		break;
+
 	case GLUT_KEY_PAGE_UP:
 		volumeRenderer.camera.position.y += 0.5f;
 		break;

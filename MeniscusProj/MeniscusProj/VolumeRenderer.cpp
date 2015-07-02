@@ -15,10 +15,6 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	removed = false;
 	spherePoint = glm::vec3(0.0f);
 	sphereRadius = 0.1f;
-
-	percentVolRemoved = 0.0f;
-	percentFocusedVolRemoved = 0.0f;
-	originalVolume = 2.0f * 2.0f * 2.0f;
 }
 
 
@@ -49,26 +45,85 @@ void VolumeRenderer::Update()
 		}	
 	}
 
+	FindRemoved();
+
 	renderer->Draw(volume, shaderManager, camera, clipPlane, focused, removed, sphereRadius, spherePoint);
 	DrawBox();
-
-
-//	// This stuff is wrong
-//	sphereVolume = (4.0f / 3.0f) * glm::pi<float>() * (sphereRadius * sphereRadius * sphereRadius);
-//
-//	if (spherePoint != glm::vec3(0.0f))
-//	{
-//		percentVolRemoved = (sphereVolume / originalVolume) * 100.0f;
-//		percentFocusedVolRemoved = (sphereVolume / focusedVolume) * 100.0f;
-//	}
-//	else
-//	{
-//		percentVolRemoved = 0.0f;
-//		percentFocusedVolRemoved = 0.0f;
-//	}
-//	//////////////
+	DrawMyText();
 
 	glutSwapBuffers();
+}
+
+
+void VolumeRenderer::FindRemoved()
+{
+	if (spherePoint == glm::vec3(0.0f))
+		return;
+
+	numInFocused = 0;
+	numRemoved = 0;
+	int ID = 0;
+
+	for (int z=0; z<volume.zRes; z++)
+		for (int y=0; y<volume.yRes; y++)
+			for (int x=0; x<volume.xRes; x++)
+			{
+				float voxVal = (float)volume.memblock3D[ID] / 255.0f;
+
+				if (glm::abs(voxVal - renderer->tfBandPos) < renderer->tfBandWidth)
+				{
+					numInFocused++;
+
+					glm::vec3 normalizedPos;
+
+					normalizedPos.x = ((x / (float)volume.xRes) * 2.0f) - 1.0f;
+					normalizedPos.y = ((y / (float)volume.yRes) * 2.0f) - 1.0f;
+					normalizedPos.z = ((z / (float)volume.zRes) * 2.0f) - 1.0f;
+
+					if (glm::distance(normalizedPos, spherePoint) < sphereRadius)
+						numRemoved++;
+				}
+				ID++;
+			}
+}
+
+void VolumeRenderer::DrawMyText()
+{
+	glActiveTexture (GL_TEXTURE0);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_TEXTURE_3D);
+	
+//	std::string tfWidthString = "TF Band Width: " + std::to_string(renderer->tfBandWidth);
+//	std::string tfPosString = "TF Band Pos: " + std::to_string(renderer->tfBandPos);
+
+	std::ostringstream tfWidthString;
+	tfWidthString << "tfWidth: " << std::setprecision(2) << renderer->tfBandWidth;
+
+	std::ostringstream tfPosString;
+	tfPosString << "tfPos: " << std::setprecision(2) << renderer->tfBandPos;
+
+	glUseProgram(0);
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	glRasterPos2f(-0.95f, 0.9f);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)tfWidthString.str().c_str());
+
+	
+	glRasterPos2f(-0.95f, 0.8f);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)tfPosString.str().c_str());	
+
+
+	if (spherePoint != glm::vec3(0.0f))
+	{
+		std::ostringstream removedString;
+		removedString << "% removed: " << std::setprecision(2) << ((float)numRemoved / (float)numInFocused) * 100.0f;
+
+		glRasterPos2f(-0.95f, 0.7f);
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)removedString.str().c_str());
+	}
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_3D);
 }
 
 
@@ -136,15 +191,6 @@ void VolumeRenderer::DrawBox()
 
 	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-//	for (int i=0; i<boxPoints.size(); i++)
-//		{
-//			int j = (i < boxPoints.size()-1) ? i + 1 : 0;
-//
-//			glVertex3f(boxPoints[i].x, boxPoints[i].y, boxPoints[i].z);
-//			glVertex3f(boxPoints[j].x, boxPoints[j].y, boxPoints[j].z);
-//		}
 }
 
 
@@ -158,16 +204,33 @@ void VolumeRenderer::AddBoxPoint(int xMousePos, int yMousePos)
 	}
 	else
 	{
-		if (boxPoints.size() > 8)
+		if (boxPoints.size() >= 8)
 		{
 			return;
 		}
 		else if (boxPoints.size() == 4)
 		{
-			boxPoints.push_back(glm::vec3(boxPoints[0].x, boxPoints[0].y, intersersection.z));
-			boxPoints.push_back(glm::vec3(boxPoints[1].x, boxPoints[1].y, intersersection.z));
-			boxPoints.push_back(glm::vec3(boxPoints[2].x, boxPoints[2].y, intersersection.z));
-			boxPoints.push_back(glm::vec3(boxPoints[3].x, boxPoints[3].y, intersersection.z));
+			if (clipPlane.normal.x == 1.0f)
+			{
+				boxPoints.push_back(glm::vec3(intersersection.x, boxPoints[0].y, boxPoints[0].z));
+				boxPoints.push_back(glm::vec3(intersersection.x, boxPoints[1].y, boxPoints[1].z));
+				boxPoints.push_back(glm::vec3(intersersection.x, boxPoints[2].y, boxPoints[2].z));
+				boxPoints.push_back(glm::vec3(intersersection.x, boxPoints[3].y, boxPoints[3].z));
+			}
+			else if (clipPlane.normal.y == 1.0f)
+			{
+				boxPoints.push_back(glm::vec3(boxPoints[0].x, intersersection.y, boxPoints[0].z));
+				boxPoints.push_back(glm::vec3(boxPoints[1].x, intersersection.y, boxPoints[1].z));
+				boxPoints.push_back(glm::vec3(boxPoints[2].x, intersersection.y, boxPoints[2].z));
+				boxPoints.push_back(glm::vec3(boxPoints[3].x, intersersection.y, boxPoints[3].z));
+			}
+			else if (clipPlane.normal.z == 1.0f)
+			{
+				boxPoints.push_back(glm::vec3(boxPoints[0].x, boxPoints[0].y, intersersection.z));
+				boxPoints.push_back(glm::vec3(boxPoints[1].x, boxPoints[1].y, intersersection.z));
+				boxPoints.push_back(glm::vec3(boxPoints[2].x, boxPoints[2].y, intersersection.z));
+				boxPoints.push_back(glm::vec3(boxPoints[3].x, boxPoints[3].y, intersersection.z));
+			}
 		}
 		else
 		{
@@ -175,8 +238,21 @@ void VolumeRenderer::AddBoxPoint(int xMousePos, int yMousePos)
 
 			if (boxPoints.size() == 2)
 			{
-				boxPoints.push_back(glm::vec3(boxPoints[0].x, boxPoints[1].y, boxPoints[0].z));
-				boxPoints.push_back(glm::vec3(boxPoints[1].x, boxPoints[0].y, boxPoints[0].z));
+				if (clipPlane.normal.x == 1.0f)
+				{
+					boxPoints.push_back(glm::vec3(intersersection.x, boxPoints[0].y, boxPoints[1].z));
+					boxPoints.push_back(glm::vec3(intersersection.x, boxPoints[1].y, boxPoints[0].z));
+				}
+				else if (clipPlane.normal.y == 1.0f)
+				{
+					boxPoints.push_back(glm::vec3(boxPoints[0].x, intersersection.y, boxPoints[1].z));
+					boxPoints.push_back(glm::vec3(boxPoints[1].x, intersersection.y, boxPoints[0].z));
+				}
+				else if (clipPlane.normal.z == 1.0f)
+				{
+					boxPoints.push_back(glm::vec3(boxPoints[0].x, boxPoints[1].y, intersersection.z));
+					boxPoints.push_back(glm::vec3(boxPoints[1].x, boxPoints[0].y, intersersection.z));
+				}
 			}
 		}
 	}
@@ -241,13 +317,11 @@ void VolumeRenderer::FocusVolume()
 	volume.yRes = newYRes;
 	volume.zRes = newZRes;
 
-	focusedVolume = ((newXRes / (float)tempXRes) * 2.0f) * ((newYRes / (float)tempYRes) * 2.0f) * ((newZRes / (float)tempZRes) * 2.0f);
-
-
 	renderer->currTexture3D = renderer->GenerateTexture(volume);
 
 	boxPoints.clear();
 	focused = true;
+	clipPlane.point = clipPlane.normal;
 }
 
 
