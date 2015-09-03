@@ -7,6 +7,7 @@
 #include "Raycaster.h"
 #include "Framebuffer.h"
 
+
 class VolumeRenderer
 {
 public:
@@ -15,6 +16,7 @@ public:
 	VolumeDataset *volume;
 	TransferFunction transferFunction;
 	Raycaster *raycaster;
+	
 	
 	GLuint bruteTex3D, interpTex3D;
 

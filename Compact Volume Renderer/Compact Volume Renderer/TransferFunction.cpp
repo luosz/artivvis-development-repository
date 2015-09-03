@@ -25,7 +25,9 @@ void TransferFunction::Init(const char *filename, VolumeDataset &volume_)
 void TransferFunction::LoadXML(const char *filename)
 {
 	tinyxml2::XMLDocument doc;
-	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/CT-Knee_spectrum_16_balance.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/CT-Knee_spectrum_16_balance.tfi");
+	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/VisMale_spectrum_4_balance_1000.tfi");
+//	tinyxml2::XMLError r = doc.LoadFile("../../transferfuncs/BlueSmoke.tfi");
 
 	if (r != tinyxml2::XML_NO_ERROR)
 		std::cout << "failed to open file" << std::endl;

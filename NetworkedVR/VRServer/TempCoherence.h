@@ -15,7 +15,7 @@
 #include "ServerNetworkManager.h"
 
 #define EXTRAP_CONST 2
-#define EPSILON 0.25f
+#define EPSILON 0.66f
 #define CHECK_STRIDE 1
 #define NUM_THREADS 7
 #define BLOCK_RES 4
@@ -35,6 +35,8 @@ public:
 	GLuint prevTexture3D;
 	GLuint nextTexture3D;
 	GLuint exactTexture3D;
+
+	float epsilon;
 	
 	std::atomic<int> atomicNumBlocksCopied;
 	int numBlocksCopied, numBlocksExtrapolated;

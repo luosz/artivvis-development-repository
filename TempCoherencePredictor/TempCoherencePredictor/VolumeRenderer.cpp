@@ -55,14 +55,14 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	volume.Init();
 
 
-//	tempCoherence = new TempCoherence(screenWidth, screenHeight, volume);
-	bruteForce = new BruteForce(volume);
+	tempCoherence = new TempCoherence(screenWidth, screenHeight, volume);
+//	bruteForce = new BruteForce(volume);
 
 	raycaster = new Raycaster(screenWidth, screenHeight, volume);
 
 	transferFunction.Init(" ", volume);
 
-	tester.Init(screenWidth, screenHeight, volume);
+//	tester.Init(screenWidth, screenHeight, volume);
 
 
 	writeToFile = false;
@@ -74,8 +74,12 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 //	framebuffer.Generate(screenWidth, screenHeight, gridTexture);
 
 	oldTime = clock();
+	
+	numFrames = 0;
+	frameTime = 0.0f;
+	extrapRatio = 0.0f;
 
-	imageTexture = ReadTexture();
+//	imageTexture = ReadTexture();
 }
 
 
@@ -102,15 +106,19 @@ void VolumeRenderer::Update()
 
 			oldTime = currentTime;
 
-//			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep, transferFunction, shaderManager, camera);
-			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
+			interpTex3D = tempCoherence->TemporalCoherence(volume, currentTimestep, transferFunction, shaderManager, camera);
+//			bruteTex3D = bruteForce->BruteForceCopy(volume, currentTimestep);
 
 //			tester.Test(volume, transferFunction, shaderManager, camera, *raycaster, bruteTex3D, interpTex3D, currentTimestep);
 			
 //			if (writeToFile)
 //				fileWriter.Write(currentTimestep, *tempCoherence, tester);
 
+			frameTime += time;
+//			extrapRatio += tempCoherence->numBlocksExtrapolated / (float)tempCoherence->numBlocks;
 		}
+
+		numFrames++;
 //	}
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
@@ -125,8 +133,8 @@ void VolumeRenderer::Update()
 //	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, volumeTexture, 0);
 //	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
-//	raycaster->Raycast(transferFunction, shaderProgramID, camera, bruteTex3D);
+	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
+	raycaster->Raycast(transferFunction, shaderProgramID, camera, interpTex3D);
 //
 //	glDisable(GL_DEPTH_TEST);
 
@@ -182,8 +190,13 @@ void VolumeRenderer::Update()
 
 	glutSwapBuffers();
 
-//	if (currentTimestep == 499)
-//			getchar();
+	if (currentTimestep == 499)
+	{
+		float avgFrameTime = frameTime / (float)numFrames;
+		std::cout << "Avg Frame Time: " << avgFrameTime << std::endl;
+		std::cout << "Avg Extrap: " << extrapRatio / 500.0f << std::endl;
+		getchar();
+	}
 }
 
 

@@ -17,6 +17,9 @@ void ShaderManager::LoadShaders()
 
 	shader.Load("../Shaders/TransFuncVertShader.txt", "../Shaders/TransFuncFragShader.txt");
 	shaders.push_back(shader);
+
+	shader.Load("../Shaders/Texture.vert", "../Shaders/Texture.frag");
+	shaders.push_back(shader);
 }
 
 

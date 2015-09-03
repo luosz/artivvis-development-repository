@@ -32,6 +32,8 @@ TempCoherence::TempCoherence(int screenWidth, int screenHeight, VolumeDataset &v
 
 	HANDLE_ERROR( cudaMalloc((void**)&cudaBlockFlags, numBlocks * sizeof(bool)) );
 	hostBlockFlags = new bool[numBlocks];
+
+	epsilon = 0.5f;
 }
 
 __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSurfaceObject_t surface)
@@ -59,7 +61,7 @@ __global__ void CudaPredict(int numVoxels, int xRes, int yRes, int zRes, cudaSur
 	}
 }
 
-__global__ void CudaBlockCompare(int numBlocks, int blockRes, int numXBlocks, int numYBlocks, int numZBlocks, int volumeXRes, int volumeYRes, int volumeZRes, bool *cudaBlockFlags, cudaSurfaceObject_t surface)
+__global__ void CudaBlockCompare(float epsilon, int numBlocks, int blockRes, int numXBlocks, int numYBlocks, int numZBlocks, int volumeXRes, int volumeYRes, int volumeZRes, bool *cudaBlockFlags, cudaSurfaceObject_t surface)
 {
 	int tid = threadIdx.x + (blockIdx.x * blockDim.x);
 
@@ -105,7 +107,7 @@ __global__ void CudaBlockCompare(int numBlocks, int blockRes, int numXBlocks, in
 
 		float similar = glm::sqrt(top / bottom);
 
-		if (similar > EPSILON)
+		if (similar > epsilon)
 		{
 			cudaBlockFlags[tid] = true;
 
@@ -178,7 +180,7 @@ void TempCoherence::GPUPredict(VolumeDataset &volume)
 
 	HANDLE_ERROR( cudaDeviceSynchronize() );
 
-	CudaBlockCompare <<<(numBlocks + 255) / 256, 256>>>(numBlocks, blockRes, numXBlocks, numYBlocks, numZBlocks, volume.xRes, volume.yRes, volume.zRes, cudaBlockFlags, writeSurface);
+	CudaBlockCompare <<<(numBlocks + 255) / 256, 256>>>(epsilon, numBlocks, blockRes, numXBlocks, numYBlocks, numZBlocks, volume.xRes, volume.yRes, volume.zRes, cudaBlockFlags, writeSurface);
 
 	HANDLE_ERROR( cudaDeviceSynchronize() );
 }
@@ -235,7 +237,7 @@ GLuint TempCoherence::TemporalCoherence(VolumeDataset &volume, int currentTimest
 				}
 
 
-		std::cout << "copied: " << numBlocksCopied << "   -   extrapolated: " << numBlocksExtrapolated << std::endl;
+//		std::cout << "copied: " << numBlocksCopied << "   -   extrapolated: " << numBlocksExtrapolated << std::endl;
 	}
 	
 	return nextTexture3D;

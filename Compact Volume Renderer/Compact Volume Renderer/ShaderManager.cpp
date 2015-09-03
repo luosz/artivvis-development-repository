@@ -1,5 +1,7 @@
 #include "ShaderManager.h"
 
+std::vector<Shader> ShaderManager::shaders;
+
 // Loads and compiles all Shaders
 void ShaderManager::Init()
 {

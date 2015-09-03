@@ -14,10 +14,10 @@ public:
 	GLuint currTexture3D;
 	int textureSize;
 
-	OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
+	OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, Camera &camera);
 	void UpdateTexture(int currentTimestep, VolumeDataset &volume);
 	GLuint GenerateTexture(VolumeDataset &volume);
-	void Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera);
+	void Draw(VolumeDataset &volume, Camera &camera);
 };
 
 #endif

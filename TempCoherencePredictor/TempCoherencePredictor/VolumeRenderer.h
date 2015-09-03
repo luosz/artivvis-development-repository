@@ -31,6 +31,10 @@ public:
 	GLuint volumeTexture;
 	GLuint imageTexture;
 
+	int numFrames;
+	float frameTime;
+	float extrapRatio;
+
 	bool writeToFile;
 	
 

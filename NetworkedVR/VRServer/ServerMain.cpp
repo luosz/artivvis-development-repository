@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "ServerNetworkManager.h"
 #include "TempCoherence.h"
+#include "ImageProcessor.h"
 
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
@@ -14,6 +15,7 @@ VolumeRenderer volumeRenderer;
 NetworkManager networkManager;
 TempCoherence *tempCoherence;
 VolumeDataset volume;
+ImageProcessor imageProcessor;
 
 
 // For mouse control
@@ -30,11 +32,15 @@ void Init()
 	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT, volume);
 	tempCoherence = new TempCoherence(SCREEN_WIDTH, SCREEN_HEIGHT, volume, &networkManager);
 	networkManager.Init(volume);
+	imageProcessor.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 // Update renderer and check for Qt events
 void MainLoop()
 {
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	if (volume.timesteps > 1)
 	{
 		clock_t currentTime = clock();
@@ -57,9 +63,35 @@ void MainLoop()
 		}
 	}
 
+	imageProcessor.Begin();
+
 	volumeRenderer.Update();
 
+//	if (volume.currentTimestep == 499)
+//	{
+//		imageProcessor.GetAutoCorrelation();
+//		exit(0);
+//	}
+
+	imageProcessor.GetAutoCorrelation();
+
+	if (volume.currentTimestep > 1)
+	{
+		tempCoherence->epsilon = (0.000205f * imageProcessor.aResult) - (0.000064f * imageProcessor.bResult) - 129.483846;
+		std::cout << tempCoherence->epsilon << std::endl;
+	}
+
+
+	imageProcessor.End();
+
+//	if ((volume.currentTimestep + 1) % 50 == 0)
+//		imageProcessor.WriteToImage(volume.currentTimestep);
+//
+//	if (volume.currentTimestep == 499)
+//		getchar();
 //	networkManager.Update();
+
+	glutSwapBuffers();
 }
 
 

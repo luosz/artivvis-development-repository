@@ -83,7 +83,7 @@ void VisibilityTFOptimizer::Optimize()
 	}
 
 	// Print energy
-	std::cout << iterations << ": " << energy << std::endl;
+//	std::cout << iterations << ": " << energy << std::endl;
 
 	iterations++;
 

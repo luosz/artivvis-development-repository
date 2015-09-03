@@ -9,6 +9,7 @@ void VoxelReader::LoadVolume(std::string folderPath, std::string headerFile, Vol
 	folderPath = "../../Samples/VisMale/";
 	headerFile = folderPath + "VisMale.mhd";
 
+
 //	folderPath = "../../Samples/downsampled vortex/";
 //	headerFile = folderPath + "dsVort.mhd";
 
