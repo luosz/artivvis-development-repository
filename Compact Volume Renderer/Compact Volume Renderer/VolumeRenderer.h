@@ -12,7 +12,6 @@ class VolumeRenderer
 public:
 	Camera camera;
 	GLuint shaderProgramID;
-	ShaderManager shaderManager;
 	VolumeDataset volume;
 	OpenGLRenderer *renderer;
 

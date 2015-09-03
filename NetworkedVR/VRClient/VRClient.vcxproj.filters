@@ -60,12 +60,6 @@
     <ClInclude Include="VolumeDataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImageProcessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\VRServer\Packet.cpp">
@@ -110,13 +104,5 @@
     <ClCompile Include="VolumeDataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="ImageProcessor.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
   </ItemGroup>
 </Project>

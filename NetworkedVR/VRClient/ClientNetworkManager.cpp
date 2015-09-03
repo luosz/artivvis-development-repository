@@ -38,7 +38,9 @@ void NetworkManager::Init(VolumeRenderer *renderer_)
 	bool serverFound = false;
 
 	while(!serverFound)
-		serverFound = LogIn();		
+		serverFound = LogIn();
+
+//	asyncListener = std::async(&NetworkManager::AsyncCheckForMessages, this);
 }
 
 
@@ -109,27 +111,77 @@ bool NetworkManager::LogIn()
 	}
 }
 
-bool NetworkManager::CheckForMessages()
+void NetworkManager::AsyncCheckForMessages()
 {
-	//I should loop my recvfrom until queue is empty
-	Packet packet;
-	IPAddress sender;
+//	while (true)
+//		CheckForMessages();
 
-	if (!udpSocket.Receive(sender, packet))
-		return false;
+	for (int i=0; i<100000; i++)
+		CheckForMessages();
+}
 
-	switch (packet.type)
+void NetworkManager::CheckForMessages()
+{
+	int newPackSize = recv(tcpSocket.handle, (char*)(tcpPacket.message + tcpPacket.size), MAX_PACKET_SIZE - tcpPacket.size, 0);
+
+//	std::cout << newPackSize << std::endl;
+
+	if (newPackSize <= 0)
+		return;
+
+	tcpPacket.size += newPackSize;
+
+	if (tcpPacket.size <= 0)
+		return;
+
+	int amountRead = 0;
+	int chunkSize = 0;
+
+	while (amountRead < tcpPacket.size)
 	{
-		case PacketType::BLOCK:
-			UpdateBlock(packet);
-			break;
+		chunkSize = tcpPacket.ReadInt();
 
-		default:
-			std::cout << "Unknown message from port " << sender.udpPort << std::endl;
-			break;
+		int bytesRemaining = tcpPacket.size - amountRead;
+
+		// Checks if a smaller packet has been split at the end of the bigger one and buffers the beginning of it to be complete on the next packet received
+		if (chunkSize > bytesRemaining)
+		{
+			std::memcpy(tcpPacket.message, tcpPacket.message + amountRead, bytesRemaining);
+			tcpPacket.size = bytesRemaining;
+			tcpPacket.readPosition = 0;
+
+			return;
+		}
+
+		tcpPacket.type = (PacketType)tcpPacket.ReadByte();
+
+		switch (tcpPacket.type)
+		{
+			case PacketType::INITIALIZATION:
+				std::cout << tcpPacket.size << " initialization packet received" << std::endl;
+				ReceiveInitialization(tcpPacket);
+
+				break;
+
+			case PacketType::BLOCK:
+//				std::cout << "Block packet size: " << chunkSize << std::endl;
+				UpdateBlock(tcpPacket);
+				break;
+
+			default:
+				std::cout << "Unknown packet type" << std::endl;
+				tcpPacket.size = 0;
+				tcpPacket.readPosition = 0;
+				return;
+		}
+
+		amountRead += chunkSize;
 	}
 
-	return true;
+	tcpPacket.size = 0;
+	tcpPacket.readPosition = 0;
+
+	return;
 }
 
 
@@ -179,6 +231,7 @@ void NetworkManager::UpdateBlock(Packet &packet)
 void NetworkManager::ReadMessage(WPARAM wParam)
 {
 	int newPackSize = recv(wParam, (char*)(tcpPacket.message + tcpPacket.size), MAX_PACKET_SIZE - tcpPacket.size, 0);
+
 	tcpPacket.size += newPackSize;
 
 	if (tcpPacket.size <= 0)
@@ -241,7 +294,7 @@ LRESULT CALLBACK  NetworkManager::ProcessMessage(HWND hwnd, UINT message, WPARAM
 
 		case FD_READ:
 //		    std::cout << "Incoming data: " << std::endl;
-			ReadMessage(wParam);
+//			ReadMessage(wParam);
 		    break;
 		
 		case FD_CLOSE:

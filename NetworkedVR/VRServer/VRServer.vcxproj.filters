@@ -72,6 +72,12 @@
     <ClInclude Include="ServerRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImageProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Packet.cpp">
@@ -119,6 +125,9 @@
     <ClCompile Include="ServerRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Shaders\TransFuncFragShader.txt">
@@ -130,6 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="TempCoherence.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="ImageProcessor.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

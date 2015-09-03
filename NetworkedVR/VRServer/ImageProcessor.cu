@@ -12,6 +12,7 @@ void ImageProcessor::Init(int screenWidth, int screenHeight)
 	framebuffer = new Framebuffer(xPixels, yPixels, fbTex->ID);
 
 //	HANDLE_ERROR (cudaMalloc((void**)&cudaSquareDiffs, xPixels * yPixels * sizeof(float)) );
+
 	aSquareDiffs.resize(numPixels);
 	bSquareDiffs.resize(numPixels);
 	pixelVals.resize(numPixels);
@@ -158,17 +159,17 @@ void ImageProcessor::GetAutoCorrelation()
 
 	CudaGetSquareDiffs<<<(numPixels + 255) / 256, 256>>>(numPixels, xPixels, yPixels, A_SQ_DIFF_RADIUS, &aSquareDiffs[0], B_SQ_DIFF_RADIUS, &bSquareDiffs[0], meanPixelVal);
 
-	float aResult = thrust::reduce(aSquareDiffs.begin(), aSquareDiffs.end(), 0.0f, thrust::plus<float>());
-	float bResult = thrust::reduce(bSquareDiffs.begin(), bSquareDiffs.end(), 0.0f, thrust::plus<float>());
+	aResult = thrust::reduce(aSquareDiffs.begin(), aSquareDiffs.end(), 0.0f, thrust::plus<float>());
+	bResult = thrust::reduce(bSquareDiffs.begin(), bSquareDiffs.end(), 0.0f, thrust::plus<float>());
 
-	std::cout << aResult << " - " << bResult << std::endl;
+//	std::cout << aResult << " - " << bResult << std::endl;
 
 	HANDLE_ERROR( cudaUnbindTexture(texRef) );
 	HANDLE_ERROR( cudaGraphicsUnmapResources(1, &cudaResource) );
 	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResource) );
 
 
-//	std::string targetFileName = "SqDiff_2_5_0_25_new.txt";
+//	std::string targetFileName = "dump.txt";
 //	ofstream outStream(targetFileName, std::ios::app);
 //
 //	if (outStream.is_open())
@@ -232,6 +233,50 @@ void ImageProcessor::WriteToTexture()
 
 	HANDLE_ERROR( cudaGraphicsUnmapResources(1, &cudaResource) );
 	HANDLE_ERROR( cudaGraphicsUnregisterResource(cudaResource) );
+}
+
+
+
+
+void ImageProcessor::WriteToImage(int currentTimestep)
+{
+	glBindTexture(GL_TEXTURE_2D, fbTex->ID);
+
+	ILboolean success;
+	ILuint imageID;
+	ilInit();
+//	std::vector<glm::vec4> pixelBuffer(numPixels);
+	std::vector<unsigned char> pixelBuffer(numPixels * 4);
+
+	std::string prefix;
+
+	if (currentTimestep < 10)
+		prefix = "00";
+	else if (currentTimestep < 100)
+		prefix = "0";
+	else
+		prefix = "";
+
+	std::string imageName("../Images/" + std::to_string(currentTimestep) + "/Ep_0_00__Time_" + prefix + std::to_string(currentTimestep) + ".png");
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+
+//	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, &pixelBuffer[0]);
+
+	glReadPixels(0, 0, xPixels, yPixels, GL_RGBA, GL_UNSIGNED_BYTE, &pixelBuffer[0]);
+
+	GLenum err = glGetError();
+
+	if (err != GL_NO_ERROR)
+	    printf("glError: %s\n", gluErrorString(err));
+
+	success = ilTexImage(xPixels, yPixels, 0, 4, IL_RGBA, IL_UNSIGNED_BYTE, &pixelBuffer[0]);
+
+	success = ilSave(IL_PNG, imageName.c_str());
+
+	ilDeleteImages(1, &imageID);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

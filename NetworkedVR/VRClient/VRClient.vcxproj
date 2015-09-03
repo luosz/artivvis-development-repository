@@ -27,11 +27,9 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ClientNetworkManager.h" />
     <ClInclude Include="GLM.h" />
-    <ClInclude Include="ImageProcessor.h" />
     <ClInclude Include="Raycaster.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
-    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransferFunction.h" />
     <ClInclude Include="VolumeDataset.h" />
@@ -48,14 +46,10 @@
     <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
-    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransferFunction.cpp" />
     <ClCompile Include="VolumeDataset.cpp" />
     <ClCompile Include="VolumeRenderer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="ImageProcessor.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3A49C4DB-B8FA-4245-B107-44C30310030E}</ProjectGuid>
@@ -116,13 +110,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\ARTIVVIS Gitlab\NetworkedVR\VRServer;C:\ARTIVVIS Gitlab\External Resources\glm;C:\ARTIVVIS Gitlab\External Resources\glew-1.10.0\include;C:\ARTIVVIS Gitlab\External Resources\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\NetworkedVR\VRServer;..\..\External Resources\glm;..\..\External Resources\glew-1.10.0\include;..\..\External Resources\DevIL\include\IL;..\..\External Resources\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>wsock32.lib;freeglut.lib;glew32.lib;cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\ARTIVVIS Gitlab\External Resources\glew-1.10.0\lib\Release\Win32;C:\ARTIVVIS Gitlab\External Resources\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DevIL.lib;ILU.lib;wsock32.lib;freeglut.lib;glew32.lib;cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\External Resources\DevIL\lib;..\..\External Resources\glew-1.10.0\lib\Release\Win32;..\..\External Resources\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
@@ -155,15 +149,15 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\ARTIVVIS Gitlab\NetworkedVR\VRServer;C:\ARTIVVIS Gitlab\External Resources\glm;C:\ARTIVVIS Gitlab\External Resources\glew-1.10.0\include;C:\ARTIVVIS Gitlab\External Resources\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\NetworkedVR\VRServer;..\..\External Resources\glm;..\..\External Resources\glew-1.10.0\include;..\..\External Resources\DevIL\include\IL;..\..\External Resources\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>wsock32.lib;freeglut.lib;glew32.lib;cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\ARTIVVIS Gitlab\External Resources\glew-1.10.0\lib\Release\Win32;C:\ARTIVVIS Gitlab\External Resources\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DevIL.lib;ILU.lib;wsock32.lib;freeglut.lib;glew32.lib;cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\External Resources\DevIL\lib;..\..\External Resources\glew-1.10.0\lib\Release\Win32;..\..\External Resources\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"

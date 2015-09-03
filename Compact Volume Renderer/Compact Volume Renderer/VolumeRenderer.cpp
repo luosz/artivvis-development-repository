@@ -5,10 +5,10 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	glEnable(GL_DEPTH_TEST);
 
 	camera.Init(screenWidth, screenHeight);
-	shaderManager.Init();
+	ShaderManager::Init();
 	volume.Init();
 
-	renderer = new OpenGLRenderer(screenWidth, screenHeight, volume, shaderManager, camera);
+	renderer = new OpenGLRenderer(screenWidth, screenHeight, volume, camera);
 
 	currentTimestep = 0;
 }
@@ -41,7 +41,7 @@ void VolumeRenderer::Update()
 		}	
 	}
 
-	renderer->Draw(volume, shaderManager, camera);
+	renderer->Draw(volume, camera);
 
 	glutSwapBuffers();
 }

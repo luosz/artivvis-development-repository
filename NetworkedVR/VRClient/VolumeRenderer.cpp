@@ -14,7 +14,7 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight)
 	raycaster = new Raycaster(screenWidth, screenHeight, volume);
 
 	transferFunction.Init(" ", volume);
-	imageProcessor.Init(screenWidth, screenHeight);
+//	imageProcessor.Init(screenWidth, screenHeight);
 }
 
 
@@ -29,15 +29,14 @@ void VolumeRenderer::Update()
 	{
 		volume.CopyToTexture();
 
-		imageProcessor.Begin();
+//		imageProcessor.Begin();
 
 		GLuint shaderProgramID = ShaderManager::UseShader(TFShader);
 		raycaster->Raycast(transferFunction, shaderProgramID, camera, volume.currTexture3D);
 
-		imageProcessor.GetAutoCorrelation();
-		imageProcessor.WriteToTexture();
-
-		imageProcessor.End();
+//		imageProcessor.GetAutoCorrelation();
+//		imageProcessor.WriteToTexture();
+//		imageProcessor.End();
 	}
 }
 

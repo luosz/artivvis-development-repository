@@ -19,18 +19,11 @@ void VolumeRenderer::Init(int screenWidth, int screenHeight, VolumeDataset &volu
 
 
 void VolumeRenderer::Update()
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+{	
 	camera.Update();
 
 	GLuint shaderProgramID = ShaderManager::UseShader(TFShader);
 	raycaster->Raycast(transferFunction, shaderProgramID, camera, volume->currTexture3D);
-	
-
-
-	glutSwapBuffers();
 }
 
 

@@ -24,7 +24,7 @@ void Init()
 	volumeRenderer.Init(SCREEN_WIDTH, SCREEN_HEIGHT);
 	networkManager.Init(&volumeRenderer);
 
-
+//	networkManager.asyncListener = std::async(&NetworkManager::AsyncCheckForMessages, &networkManager);
 }
 
 void Update()
@@ -33,15 +33,24 @@ void Update()
 
 	bool messagesInQueue = true;
 
-//	while (messagesInQueue)
-//		messagesInQueue = networkManager.CheckForMessages();
-
-//	for (int i=0; i<10000; i++)
+//	for (int i=0; i<100000; i++)
 //		networkManager.CheckForMessages();
+
+//	networkManager.asyncListener = std::async(&NetworkManager::AsyncCheckForMessages, &networkManager);
+	if (networkManager.asyncListener.valid())
+	{
+		networkManager.asyncListener.wait();
+	}
+
 
 	volumeRenderer.Update();
 
+
 	glutSwapBuffers();
+
+	glFinish();
+	networkManager.asyncListener = std::async(&NetworkManager::AsyncCheckForMessages, &networkManager);
+	
 }
 
 

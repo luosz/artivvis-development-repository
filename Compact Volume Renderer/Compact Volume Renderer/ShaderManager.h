@@ -10,14 +10,16 @@ enum ShaderType {	TFShader  };
 class ShaderManager
 {
 public:
-	void Init();
-	GLuint UseShader(ShaderType shaderType);
+	static void Init();
+	static GLuint UseShader(ShaderType shaderType);
 
 private:
-	std::vector<Shader> shaders;
+	static std::vector<Shader> shaders;
 
-	void LoadShaders();
-	void CompileShaders();
+	static void LoadShaders();
+	static void CompileShaders();
+
+	ShaderManager();
 };
 
 #endif

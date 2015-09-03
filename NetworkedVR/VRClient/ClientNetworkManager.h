@@ -6,6 +6,7 @@
 #include <vector>
 #include <tchar.h>
 #include "VolumeRenderer.h"
+#include <future>
 
 class NetworkManager
 {
@@ -16,6 +17,8 @@ public:
 
 	UDPSocket udpSocket;
 	TCPSocket tcpSocket;
+
+	std::future<void> asyncListener;
 
 	Packet tcpPacket;
 
@@ -29,7 +32,8 @@ public:
 
 	void Init(VolumeRenderer *renderer_);
 	bool LogIn();
-	bool CheckForMessages();
+	void AsyncCheckForMessages();
+	void CheckForMessages();
 
 	void ReceiveInitialization(Packet &packet);
 	void UpdateBlock(Packet &packet);

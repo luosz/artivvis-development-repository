@@ -1,6 +1,6 @@
 #include "OpenGLRenderer.h"
 
-OpenGLRenderer::OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
+OpenGLRenderer::OpenGLRenderer(int screenWidth, int screenHeight, VolumeDataset &volume, Camera &camera)
 {
 	currTexture3D = GenerateTexture(volume);
 
@@ -64,6 +64,8 @@ GLuint OpenGLRenderer::GenerateTexture(VolumeDataset &volume)
 		glTexImage3D(GL_TEXTURE_3D, 0, GL_R32F, volume.xRes, volume.yRes, volume.zRes, 0, GL_RED, GL_FLOAT, volume.memblock3D);
 
 	glPixelStoref(GL_UNPACK_SWAP_BYTES, false);
+
+	GLenum err = glGetError();
 	
 	glBindTexture(GL_TEXTURE_3D, 0);
 
@@ -71,9 +73,9 @@ GLuint OpenGLRenderer::GenerateTexture(VolumeDataset &volume)
 }
 
 
-void OpenGLRenderer::Draw(VolumeDataset &volume, ShaderManager &shaderManager, Camera &camera)
+void OpenGLRenderer::Draw(VolumeDataset &volume, Camera &camera)
 {
-	GLuint shaderProgramID = shaderManager.UseShader(TFShader);
+	GLuint shaderProgramID = ShaderManager::UseShader(TFShader);
 	raycaster->Raycast(currTexture3D, transferFunction, shaderProgramID, camera);
 }
 
