@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'transferfunctioneditor.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -74,9 +74,14 @@ public:
     QHBoxLayout *horizontalLayout_4;
     QCheckBox *checkBox;
     QCheckBox *checkBox_2;
-    QPushButton *cameraButton;
     QPushButton *computeDistanceButton;
     QPushButton *visibilityHistogramButton;
+    QHBoxLayout *horizontalLayout_10;
+    QPushButton *cameraButton;
+    QPushButton *rotateButton;
+    QPushButton *frontButton;
+    QPushButton *leftButton;
+    QPushButton *topButton;
     QHBoxLayout *horizontalLayout_2;
     QSpinBox *spinBox;
     QPushButton *entropyButton;
@@ -262,11 +267,6 @@ public:
 
         horizontalLayout_4->addWidget(checkBox_2);
 
-        cameraButton = new QPushButton(dockWidgetContents);
-        cameraButton->setObjectName(QStringLiteral("cameraButton"));
-
-        horizontalLayout_4->addWidget(cameraButton);
-
         computeDistanceButton = new QPushButton(dockWidgetContents);
         computeDistanceButton->setObjectName(QStringLiteral("computeDistanceButton"));
 
@@ -279,6 +279,38 @@ public:
 
 
         verticalLayout_0->addLayout(horizontalLayout_4);
+
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setSpacing(6);
+        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
+        horizontalLayout_10->setContentsMargins(7, 7, 7, 7);
+        cameraButton = new QPushButton(dockWidgetContents);
+        cameraButton->setObjectName(QStringLiteral("cameraButton"));
+
+        horizontalLayout_10->addWidget(cameraButton);
+
+        rotateButton = new QPushButton(dockWidgetContents);
+        rotateButton->setObjectName(QStringLiteral("rotateButton"));
+
+        horizontalLayout_10->addWidget(rotateButton);
+
+        frontButton = new QPushButton(dockWidgetContents);
+        frontButton->setObjectName(QStringLiteral("frontButton"));
+
+        horizontalLayout_10->addWidget(frontButton);
+
+        leftButton = new QPushButton(dockWidgetContents);
+        leftButton->setObjectName(QStringLiteral("leftButton"));
+
+        horizontalLayout_10->addWidget(leftButton);
+
+        topButton = new QPushButton(dockWidgetContents);
+        topButton->setObjectName(QStringLiteral("topButton"));
+
+        horizontalLayout_10->addWidget(topButton);
+
+
+        verticalLayout_0->addLayout(horizontalLayout_10);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
@@ -340,9 +372,13 @@ public:
         peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
         checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
         checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));
-        cameraButton->setText(QApplication::translate("TransferFunctionEditor", "save camera", 0));
         computeDistanceButton->setText(QApplication::translate("TransferFunctionEditor", "compute distance", 0));
         visibilityHistogramButton->setText(QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
+        cameraButton->setText(QApplication::translate("TransferFunctionEditor", "save camera", 0));
+        rotateButton->setText(QApplication::translate("TransferFunctionEditor", "rotate", 0));
+        frontButton->setText(QApplication::translate("TransferFunctionEditor", "front", 0));
+        leftButton->setText(QApplication::translate("TransferFunctionEditor", "left", 0));
+        topButton->setText(QApplication::translate("TransferFunctionEditor", "top", 0));
         entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));
         visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", 0));
     } // retranslateUi
