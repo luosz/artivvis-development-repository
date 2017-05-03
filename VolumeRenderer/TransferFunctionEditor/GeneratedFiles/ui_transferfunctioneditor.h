@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'transferfunctioneditor.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -354,33 +354,33 @@ public:
 
     void retranslateUi(QMainWindow *TransferFunctionEditor)
     {
-        TransferFunctionEditor->setWindowTitle(QApplication::translate("TransferFunctionEditor", "Transfer Function Editor", 0));
-        action_Open_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Open Transfer Function...", 0));
-        action_Save_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Save Transfer Function...", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "intensity histogram", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TransferFunctionEditor", "frustum", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("TransferFunctionEditor", "xtoon", 0));
-        menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", 0));
-        label->setText(QApplication::translate("TransferFunctionEditor", "opacity", 0));
-        rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", 0));
-        flatButton->setText(QApplication::translate("TransferFunctionEditor", "flat", 0));
-        distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "horizontal", 0));
-        distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", 0));
-        diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", 0));
-        peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", 0));
-        checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", 0));
-        checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", 0));
-        computeDistanceButton->setText(QApplication::translate("TransferFunctionEditor", "compute distance", 0));
-        visibilityHistogramButton->setText(QApplication::translate("TransferFunctionEditor", "visibility histogram", 0));
-        cameraButton->setText(QApplication::translate("TransferFunctionEditor", "save camera", 0));
-        rotateButton->setText(QApplication::translate("TransferFunctionEditor", "rotate", 0));
-        frontButton->setText(QApplication::translate("TransferFunctionEditor", "front", 0));
-        leftButton->setText(QApplication::translate("TransferFunctionEditor", "left", 0));
-        topButton->setText(QApplication::translate("TransferFunctionEditor", "top", 0));
-        entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", 0));
-        visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", 0));
+        TransferFunctionEditor->setWindowTitle(QApplication::translate("TransferFunctionEditor", "Transfer Function Editor", Q_NULLPTR));
+        action_Open_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Open Transfer Function...", Q_NULLPTR));
+        action_Save_Transfer_Function->setText(QApplication::translate("TransferFunctionEditor", "&Save Transfer Function...", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TransferFunctionEditor", "transfer function", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TransferFunctionEditor", "intensity histogram", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TransferFunctionEditor", "visibility histogram", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TransferFunctionEditor", "frustum", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("TransferFunctionEditor", "xtoon", Q_NULLPTR));
+        menu_File->setTitle(QApplication::translate("TransferFunctionEditor", "&File", Q_NULLPTR));
+        label->setText(QApplication::translate("TransferFunctionEditor", "opacity", Q_NULLPTR));
+        rampButton->setText(QApplication::translate("TransferFunctionEditor", "ramp", Q_NULLPTR));
+        flatButton->setText(QApplication::translate("TransferFunctionEditor", "flat", Q_NULLPTR));
+        distributeHorizontallyButton->setText(QApplication::translate("TransferFunctionEditor", "horizontal", Q_NULLPTR));
+        distributeVerticallyButton->setText(QApplication::translate("TransferFunctionEditor", "vertical", Q_NULLPTR));
+        diagonalButton->setText(QApplication::translate("TransferFunctionEditor", "diagonal", Q_NULLPTR));
+        peaksButton->setText(QApplication::translate("TransferFunctionEditor", "peaks", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("TransferFunctionEditor", "Ma's Optimizer", Q_NULLPTR));
+        checkBox_2->setText(QApplication::translate("TransferFunctionEditor", "Luo's Optimizer", Q_NULLPTR));
+        computeDistanceButton->setText(QApplication::translate("TransferFunctionEditor", "compute distance", Q_NULLPTR));
+        visibilityHistogramButton->setText(QApplication::translate("TransferFunctionEditor", "visibility histogram", Q_NULLPTR));
+        cameraButton->setText(QApplication::translate("TransferFunctionEditor", "save camera", Q_NULLPTR));
+        rotateButton->setText(QApplication::translate("TransferFunctionEditor", "rotate", Q_NULLPTR));
+        frontButton->setText(QApplication::translate("TransferFunctionEditor", "front", Q_NULLPTR));
+        leftButton->setText(QApplication::translate("TransferFunctionEditor", "left", Q_NULLPTR));
+        topButton->setText(QApplication::translate("TransferFunctionEditor", "top", Q_NULLPTR));
+        entropyButton->setText(QApplication::translate("TransferFunctionEditor", "entropy", Q_NULLPTR));
+        visibilityButton->setText(QApplication::translate("TransferFunctionEditor", "visibility", Q_NULLPTR));
     } // retranslateUi
 
 };

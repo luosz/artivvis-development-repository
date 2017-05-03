@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'volumerenderer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -553,72 +553,72 @@ public:
 
     void retranslateUi(QMainWindow *VolumeRendererClass)
     {
-        VolumeRendererClass->setWindowTitle(QApplication::translate("VolumeRendererClass", "VolumeRenderer", 0));
-        pushButton->setText(QApplication::translate("VolumeRendererClass", "Quit", 0));
-        label_8->setText(QApplication::translate("VolumeRendererClass", "Divisions", 0));
-        label_9->setText(QApplication::translate("VolumeRendererClass", "Opacity", 0));
-        opacityDiv1Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        opacityDiv2Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        opacityDiv3Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        opacityDiv4Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("VolumeRendererClass", "Opacity", 0));
-        cutOffLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        maxLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        label->setText(QApplication::translate("VolumeRendererClass", "CutOff", 0));
-        minLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        label_3->setText(QApplication::translate("VolumeRendererClass", "Maximum", 0));
-        label_2->setText(QApplication::translate("VolumeRendererClass", "Minimum", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("VolumeRendererClass", "Regions", 0));
-        label_5->setText(QApplication::translate("VolumeRendererClass", "Gradient Step Size", 0));
-        label_6->setText(QApplication::translate("VolumeRendererClass", "Ray Step Size", 0));
-        label_7->setText(QApplication::translate("VolumeRendererClass", "Max Ray Steps", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("VolumeRendererClass", "Raycast", 0));
+        VolumeRendererClass->setWindowTitle(QApplication::translate("VolumeRendererClass", "VolumeRenderer", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("VolumeRendererClass", "Quit", Q_NULLPTR));
+        label_8->setText(QApplication::translate("VolumeRendererClass", "Divisions", Q_NULLPTR));
+        label_9->setText(QApplication::translate("VolumeRendererClass", "Opacity", Q_NULLPTR));
+        opacityDiv1Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        opacityDiv2Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        opacityDiv3Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        opacityDiv4Label->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("VolumeRendererClass", "Opacity", Q_NULLPTR));
+        cutOffLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        maxLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        label->setText(QApplication::translate("VolumeRendererClass", "CutOff", Q_NULLPTR));
+        minLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        label_3->setText(QApplication::translate("VolumeRendererClass", "Maximum", Q_NULLPTR));
+        label_2->setText(QApplication::translate("VolumeRendererClass", "Minimum", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("VolumeRendererClass", "Regions", Q_NULLPTR));
+        label_5->setText(QApplication::translate("VolumeRendererClass", "Gradient Step Size", Q_NULLPTR));
+        label_6->setText(QApplication::translate("VolumeRendererClass", "Ray Step Size", Q_NULLPTR));
+        label_7->setText(QApplication::translate("VolumeRendererClass", "Max Ray Steps", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("VolumeRendererClass", "Raycast", Q_NULLPTR));
         shaderComboBox->clear();
         shaderComboBox->insertItems(0, QStringList()
-         << QApplication::translate("VolumeRendererClass", "Transfer Func Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Smoke Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "X-Toon Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Raycast Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Lighting Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Opacity Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Depth Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Normals Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "Shadow Shader", 0)
-         << QApplication::translate("VolumeRendererClass", "TransFuncXtoon", 0)
+         << QApplication::translate("VolumeRendererClass", "Transfer Func Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Smoke Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "X-Toon Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Raycast Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Lighting Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Opacity Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Depth Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Normals Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "Shadow Shader", Q_NULLPTR)
+         << QApplication::translate("VolumeRendererClass", "TransFuncXtoon", Q_NULLPTR)
         );
-        shaderComboBox->setCurrentText(QApplication::translate("VolumeRendererClass", "Transfer Func Shader", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("VolumeRendererClass", "Shaders", 0));
-        label_4->setText(QApplication::translate("VolumeRendererClass", "Time Per Frame", 0));
-        timingLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("VolumeRendererClass", "Timing", 0));
-        label_16->setText(QApplication::translate("VolumeRendererClass", "Contour Threshold", 0));
-        contourThresholdLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", 0));
-        label_17->setText(QApplication::translate("VolumeRendererClass", "Suggestive Thresh", 0));
-        suggestiveThresholdLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", 0));
-        label_18->setText(QApplication::translate("VolumeRendererClass", "Num Pixels Lower", 0));
-        numPixelsLowerLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", 0));
-        label_19->setText(QApplication::translate("VolumeRendererClass", "Kernel Radius", 0));
-        kernelRadiusLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", 0));
-        showDiffuseCheckbox->setText(QApplication::translate("VolumeRendererClass", "Show Diffuse", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_7), QApplication::translate("VolumeRendererClass", "Contours", 0));
-        tfIntLabel1->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel2->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel3->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel4->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel5->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel8->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel6->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel7->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel9->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel10->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel12->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel15->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel13->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        tfIntLabel11->setText(QApplication::translate("VolumeRendererClass", "TextLabel", 0));
-        label_10->setText(QApplication::translate("VolumeRendererClass", "Intensity Focus", 0));
-        checkBox->setText(QApplication::translate("VolumeRendererClass", "Optimize Intensity", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("VolumeRendererClass", "TransferFunc", 0));
-        GrabRegionCheckBox->setText(QApplication::translate("VolumeRendererClass", "GrabRegion", 0));
+        shaderComboBox->setCurrentText(QApplication::translate("VolumeRendererClass", "Transfer Func Shader", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("VolumeRendererClass", "Shaders", Q_NULLPTR));
+        label_4->setText(QApplication::translate("VolumeRendererClass", "Time Per Frame", Q_NULLPTR));
+        timingLabel->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("VolumeRendererClass", "Timing", Q_NULLPTR));
+        label_16->setText(QApplication::translate("VolumeRendererClass", "Contour Threshold", Q_NULLPTR));
+        contourThresholdLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", Q_NULLPTR));
+        label_17->setText(QApplication::translate("VolumeRendererClass", "Suggestive Thresh", Q_NULLPTR));
+        suggestiveThresholdLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", Q_NULLPTR));
+        label_18->setText(QApplication::translate("VolumeRendererClass", "Num Pixels Lower", Q_NULLPTR));
+        numPixelsLowerLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", Q_NULLPTR));
+        label_19->setText(QApplication::translate("VolumeRendererClass", "Kernel Radius", Q_NULLPTR));
+        kernelRadiusLabel->setText(QApplication::translate("VolumeRendererClass", "0.00", Q_NULLPTR));
+        showDiffuseCheckbox->setText(QApplication::translate("VolumeRendererClass", "Show Diffuse", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_7), QApplication::translate("VolumeRendererClass", "Contours", Q_NULLPTR));
+        tfIntLabel1->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel2->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel3->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel4->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel5->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel8->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel6->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel7->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel9->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel10->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel12->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel15->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel13->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        tfIntLabel11->setText(QApplication::translate("VolumeRendererClass", "TextLabel", Q_NULLPTR));
+        label_10->setText(QApplication::translate("VolumeRendererClass", "Intensity Focus", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("VolumeRendererClass", "Optimize Intensity", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_6), QApplication::translate("VolumeRendererClass", "TransferFunc", Q_NULLPTR));
+        GrabRegionCheckBox->setText(QApplication::translate("VolumeRendererClass", "GrabRegion", Q_NULLPTR));
     } // retranslateUi
 
 };
